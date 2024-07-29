@@ -30,5 +30,5 @@ def handle_sub(sub: Subscription):
     except ValueError as e:
         print(f"--- {sub.url} - {e}")
 
-cat = subscribe.parse_gr(args.file)
+cat = subscribe.parse_google_reader(args.file)
 handle_cat(cat)

@@ -19,8 +19,6 @@ args = arg_parser.parse_args()
 conn = Connection('reader')
 conn.connect("admin", "password", "localhost", 5984)
 
-# FIXME!! check for uniqueness here before proceeding
-
 salt = bcrypt.gensalt()
 
 user = User()
@@ -31,3 +29,5 @@ user.email_address = args.email
 success = create_user(conn, user)
 if not success:
     logging.warning("Cannot create user")
+
+logging.info("User created successfully")
