@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from argparse import ArgumentParser
+from config import read_config
 from datatype import User
 from store import create_user
 from store import Connection
@@ -15,9 +16,10 @@ arg_parser.add_argument("-e", "--email", help="user's email", required=True)
 # FIXME!! none of these fields are validated for now
 
 args = arg_parser.parse_args()
+config = read_config("config.yaml")
 
-conn = Connection('reader')
-conn.connect("admin", "password", "localhost", 5984)
+conn = Connection()
+conn.connect(config.database)
 
 salt = bcrypt.gensalt()
 

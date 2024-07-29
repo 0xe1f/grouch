@@ -1,21 +1,27 @@
+from config import DatabaseConfig
 import couchdb
+
 
 class Connection:
 
-    def __init__(self, db_name: str):
-        self.db_name = db_name
 
-    def connect(self, user: str, pword: str, host: str, port: int):
-        self.server = couchdb.Server(f"http://{user}:{pword}@{host}:{port}/")
-        self.initialize()
+    def __init__(self):
+        pass
 
-    def initialize(self):
-        # Create db
-        if self.db_name not in self.server:
-            self.db = self.server.create(self.db_name)
+
+    def connect(self, config: DatabaseConfig):
+        config.validate()
+        self.server = couchdb.Server(f"http://{config.username}:{config.password}@{config.host}:{config.port}/")
+        self.initialize(config.name)
+
+
+    def initialize(self, database_name: str):
+        # Create DB if necessary
+        if database_name not in self.server:
+            self.db = self.server.create(database_name)
         else:
-            self.db = self.server[self.db_name]
-        
+            self.db = self.server[database_name]
+
         # Create views
         self.create_view(
             "maint",
@@ -40,6 +46,7 @@ class Connection:
             """,
             reduce_fn="_count"
         )
+
 
     def create_view(self, design_doc: str, name: str, map_fn: str, reduce_fn: str=None) -> bool:
         id = f"_design/{design_doc}"

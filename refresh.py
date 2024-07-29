@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from argparse import ArgumentParser
+from config import read_config
 from parser import parse_feed
 from time import gmtime
 from time import localtime
@@ -17,9 +18,10 @@ arg_parser.add_argument(
 )
 
 args = arg_parser.parse_args()
+config = read_config("config.yaml")
 
-conn = store.Connection('reader')
-conn.connect("admin", "password", "localhost", 5984)
+conn = store.Connection()
+conn.connect(config.database)
 
 def main():
     fresh_seconds = args.fresh * 60
