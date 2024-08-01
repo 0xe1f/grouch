@@ -1,30 +1,47 @@
-from common import format_iso
+from common import build_key
+from common import now_in_iso
+from uuid import uuid4
+from couchdb.http import ResourceConflict
 from datatype import Folder
-from store import Connection
-from time import gmtime
-import logging
+from store.connection import Connection
 
+def write_folders(conn: Connection, *folders: Folder) -> list[Folder]:
+    for folder in folders:
+        if not folder.user_id:
+            raise ValueError(f"Folder {folder.title} is missing user_id")
 
-def create_folder(conn: Connection, folder: Folder) -> bool:
-    if not folder.user_id:
-        logging.error("Folder missing user_id")
-        return False
-    elif not folder.id:
-        logging.error("Folder missing id")
-        return False
+    docs = []
+    id_map = {}
+    for folder in folders:
+        if not folder.id:
+            folder.id = build_key("folder", uuid4().hex)
+        doc = wrap_folder(folder)
+        docs.append(doc)
+        id_map[doc["_id"]] = folder
 
-    item_id = folder_id(folder)
-    doc = {
-        "_id": item_id,
+    results = conn.db.update(docs)
+    succeeded = []
+
+    for result in results:
+        success, id, status = result
+        if success:
+            succeeded.append(id_map[id])
+        elif not type(status) is ResourceConflict:
+            raise status
+
+    return succeeded
+
+def find_folders_by_user_id(conn: Connection, user_id: str) -> map:
+    matches = {}
+    for item in conn.db.view("maint/folders-by-user", key=user_id):
+        matches[item.value] = item.id
+
+    return matches
+
+def wrap_folder(folder: Folder) -> map:
+    return {
+        "_id": build_key("folder", folder.id),
         "doc_type": "folder",
         "content": folder.doc(),
-        "updated": format_iso(gmtime()),
+        "updated": now_in_iso(),
     }
-
-    conn.db[item_id] = doc
-
-    return True
-
-
-def folder_id(folder: Folder) -> str:
-    return f"folder::{folder.id}"

@@ -7,48 +7,48 @@ import feedparser
 def parse_feed(url: str) -> ParseResult:
     doc = feedparser.parse(url)
     if not doc:
-        raise ValueError("No document to parse")
+        return ParseResult(url, error="No document to parse")
     if "feed" not in doc:
-        raise ValueError("Document is missing feed")
+        return ParseResult(url, error="Document is missing feed")
     if not doc.entries:
-        raise ValueError("Document is missing entries")
+        return ParseResult(url, error="Document is missing entries")
     if "title" not in doc.feed:
-        raise ValueError("Feed is missing a title")
+        return ParseResult(url, error="Feed is missing a title")
 
     feed = create_feed_content(url, doc.feed)
     entries = [create_entry_content(entry) for entry in doc.entries]
 
-    return ParseResult(feed, entries)
+    return ParseResult(url, feed=feed, entries=entries)
 
 def create_feed_content(url, feed):
-    doc = {}
-    doc["url"] = url
-    doc["title"] = feed.title
+    content = FeedContent()
+    content.feed_url = url
+    content.title = feed.title
     if "subtitle" in feed:
-        doc["description"] = feed.subtitle
+        content.description = feed.subtitle
     elif "description" in feed:
-        doc["description"] = feed.description
-    # doc.fav_icon = None
-    doc["site_url"] = feed.link
+        content.description = feed.description
+    # TODO content.favicon_url = None
+    content.site_url = feed.link
     if "updated" in feed:
-        doc["published"] = format_iso(feed.updated_parsed)
+        content.published = format_iso(feed.updated_parsed)
     elif "published" in feed:
-        doc["published"] = format_iso(feed.published_parsed)
+        content.published = format_iso(feed.published_parsed)
 
-    return FeedContent(url, doc)
+    return content
 
 def create_entry_content(entry):
-    doc = {}
-    doc["title"] = entry.title
+    content = EntryContent()
+    content.entry_uid = entry.id
+    content.title = entry.title
     if "author" in entry:
-        doc["author"] = entry.author
-    doc["link"] = entry.link
-    doc["content"] = entry.description
+        content.author = entry.author
+    content.link = entry.link
+    content.text_body = entry.description
     if "updated" in entry:
-        doc["published"] = format_iso(entry.updated_parsed)
+        content.published = format_iso(entry.updated_parsed)
     elif "published" in entry:
-        doc["published"] = format_iso(entry.published_parsed)
-    # TODO: generate own
-    doc["summary"] = "abc123"
+        content.published = format_iso(entry.published_parsed)
+    # TODO content.summary = None
 
-    return EntryContent(entry.id, doc)
+    return content

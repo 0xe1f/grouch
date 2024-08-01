@@ -1,19 +1,15 @@
 from config import DatabaseConfig
 import couchdb
 
-
 class Connection:
-
 
     def __init__(self):
         pass
-
 
     def connect(self, config: DatabaseConfig):
         config.validate()
         self.server = couchdb.Server(f"http://{config.username}:{config.password}@{config.host}:{config.port}/")
         self.initialize(config.name)
-
 
     def initialize(self, database_name: str):
         # Create DB if necessary
@@ -23,43 +19,102 @@ class Connection:
             self.db = self.server[database_name]
 
         # Create views
-        self.create_view(
+        self.create_views(
             "maint",
-            "updated-feeds",
-            map_fn="""
-                function (doc) {
-                    if (doc.doc_type == 'feed') {
-                        emit(doc.updated, doc.content.url);
-                    }
-                }
-            """
-        )
-        self.create_view(
-            "maint",
-            "users-by-email",
-            map_fn="""
-                function (doc) {
-                    if (doc.doc_type == 'user') {
-                        emit(doc.content.email_address, null);
-                    }
-                }
-            """,
-            reduce_fn="_count"
+            {
+                "updated-feeds": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.updated, null);
+                            }
+                        }
+                    """
+                },
+                "users-by-email": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'user') {
+                                emit(doc.content.email_address, null);
+                            }
+                        }
+                    """,
+                    "reduce": "_count"
+                },
+                "feeds-by-url": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.content.feed_url, null);
+                            }
+                        }
+                    """
+                },
+                "folders-by-user": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'folder') {
+                                emit(doc.content.user_id, doc.content.title);
+                            }
+                        }
+                    """
+                },
+                "entries-by-feed-id": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'entry') {
+                                emit([doc.content.feed_id, doc.content.entry_uid], null);
+                            }
+                        }
+                    """
+                },
+                "entries-by-feed-updated": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'entry') {
+                                emit([doc.content.feed_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
+                "sub-last-synced-by-user": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub') {
+                                emit([ doc.content.user_id, doc.content.last_synced ], { "feed_id": doc.content.feed_id, "last_sync": doc.content.last_synced });
+                            }
+                        }
+                    """
+                },
+                "articles-by-user": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.content.user_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
+                "articles-by-sub": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.content.subscription_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
+            },
         )
 
-
-    def create_view(self, design_doc: str, name: str, map_fn: str, reduce_fn: str=None) -> bool:
+    def create_views(self, design_doc: str, content: str) -> bool:
         id = f"_design/{design_doc}"
         if id in self.db:
             return False
 
-        view_dict = { "map": map_fn }
-        if reduce_fn:
-            view_dict["reduce"] = reduce_fn
-
         self.db[id] = {
             "_id": f"_design/{design_doc}",
-            "views": { name: view_dict },
+            "views": content,
             "language": "javascript",
             "options": { "partitioned": False }
         }

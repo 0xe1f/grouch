@@ -2,8 +2,16 @@ import bcrypt
 
 class User:
 
-    def __init__(self):
-        self._doc = {}
+    def __init__(self, source: dict={}):
+        self._doc = source.copy()
+
+    @property
+    def id(self):
+        return self._doc.get("id")
+
+    @id.setter
+    def id(self, val: str):
+        self._doc["id"] = val
 
     @property
     def username(self):

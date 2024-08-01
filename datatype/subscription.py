@@ -1,7 +1,17 @@
 class Subscription:
 
-    def __init__(self):
-        self._doc = {}
+    def __init__(self, source: dict | None=None):
+        self._doc = (source or {}).copy()
+        if source == None:
+            self.unread_count = 0
+
+    @property
+    def id(self) -> str:
+        return self._doc.get("id")
+
+    @id.setter
+    def id(self, val: str):
+        self._doc["id"] = val
 
     @property
     def title(self) -> str:
@@ -20,7 +30,7 @@ class Subscription:
         self._doc["unread_count"] = val
 
     @property
-    def subscribed(self):
+    def subscribed(self) -> str:
         return self._doc.get("subscribed")
 
     @subscribed.setter
@@ -28,7 +38,7 @@ class Subscription:
         self._doc["subscribed"] = val
 
     @property
-    def feed_id(self):
+    def feed_id(self) -> str:
         return self._doc.get("feed_id")
 
     @feed_id.setter
@@ -36,7 +46,7 @@ class Subscription:
         self._doc["feed_id"] = val
 
     @property
-    def folder_id(self):
+    def folder_id(self) -> str:
         return self._doc.get("folder_id")
 
     @folder_id.setter
@@ -44,11 +54,19 @@ class Subscription:
         self._doc["folder_id"] = val
 
     @property
-    def user_id(self) -> int:
+    def last_synced(self) -> str:
+        return self._doc.get("last_synced")
+
+    @last_synced.setter
+    def last_synced(self, val: str):
+        self._doc["last_synced"] = val
+
+    @property
+    def user_id(self) -> str:
         return self._doc.get("user_id")
 
     @user_id.setter
-    def user_id(self, val: int):
+    def user_id(self, val: str):
         self._doc["user_id"] = val
 
     def doc(self):
