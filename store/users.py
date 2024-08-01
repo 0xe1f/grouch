@@ -5,6 +5,12 @@ from store import Connection
 from time import gmtime
 import logging
 
+def find_user_id(conn: Connection, username: str) -> str:
+    item_id = f"user::{username}"
+    if conn.db.get(item_id):
+        return item_id
+    
+    return None
 
 def create_user(conn: Connection, user: User) -> bool:
     item_id = user_id(user)
@@ -15,6 +21,7 @@ def create_user(conn: Connection, user: User) -> bool:
         logging.error(f"User with email address {user.email_address} already exists")
         return False
 
+    user.id = item_id
     doc = {
         "_id": item_id,
         "doc_type": "user",
@@ -37,7 +44,6 @@ def create_user(conn: Connection, user: User) -> bool:
         return False
 
     return True
-
 
 def email_address_count(conn: Connection, email_address: str) -> bool:
     result = conn.db.view("maint/users-by-email", reduce=True, group=True, limit=1)

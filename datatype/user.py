@@ -6,6 +6,14 @@ class User:
         self._doc = {}
 
     @property
+    def id(self):
+        return self._doc.get("id")
+
+    @id.setter
+    def id(self, val: str):
+        self._doc["id"] = val
+
+    @property
     def username(self):
         return self._doc.get("username")
 

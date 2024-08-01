@@ -1,7 +1,18 @@
 class Folder:
 
-    def __init__(self):
-        self._doc = {}
+    def __init__(self, source: map=None):
+        if source:
+            self._doc = {} | source
+        else:
+            self._doc = {}
+
+    @property
+    def id(self) -> str:
+        return self._doc.get("id")
+
+    @id.setter
+    def id(self, val: str):
+        self._doc["id"] = val
 
     @property
     def title(self) -> str:

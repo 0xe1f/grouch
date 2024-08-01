@@ -2,18 +2,12 @@
 
 from argparse import ArgumentParser
 from config import read_config
-from tasks import refresh_feeds
+from tasks import sync_subs
 import logging
 import store
 
 arg_parser = ArgumentParser()
-arg_parser.add_argument(
-    "-f",
-    "--fresh",
-    help="freshness duration, in minutes",
-    required=True,
-    type=int
-)
+arg_parser.add_argument("-u", "--username", help="username of subscriber", required=True)
 
 args = arg_parser.parse_args()
 config = read_config("config.yaml")
@@ -23,7 +17,9 @@ conn = store.Connection()
 conn.connect(config.database)
 
 def main():
-    freshness_seconds = args.fresh * 60
-    refresh_feeds(conn, freshness_seconds)
+    user_id = store.find_user_id(conn, args.username)
+    if not user_id:
+        raise ValueError(f"User with username {args.username} not found")
+    sync_subs(conn, user_id)
 
 main()

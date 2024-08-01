@@ -2,6 +2,15 @@ class Subscription:
 
     def __init__(self):
         self._doc = {}
+        self.unread_count = 0
+
+    @property
+    def id(self) -> str:
+        return self._doc.get("id")
+
+    @id.setter
+    def id(self, val: str):
+        self._doc["id"] = val
 
     @property
     def title(self) -> str:

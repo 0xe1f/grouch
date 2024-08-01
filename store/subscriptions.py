@@ -1,55 +1,25 @@
-from common import format_iso
-from couchdb.http import ResourceConflict
-from datatype import Feed
-from datatype import User
-from store import Connection
-from time import gmtime
-import logging
+from common import now_in_iso
+from common import build_key
+from datatype import Subscription
+from store import BulkUpdateQueue
 
+def enqueue_subs(bulk_queue: BulkUpdateQueue, *subs: tuple[Subscription, str]):
+    for sub, _ in subs:
+        if not sub.user_id:
+            raise ValueError(f"Sub {sub.title} is missing user_id")
+        elif not sub.feed_id:
+            raise ValueError(f"Sub {sub.title} is missing feed_id")
 
-def subscribe(conn: Connection, user: User, feed: Feed) -> bool:
-    
-#     item_id = user_id(user)
-#     if item_id in conn.db:
-#         logging.error(f"User with id {item_id} already exists")
-#         return False
-#     elif email_address_count(conn, user.email_address) > 0:
-#         logging.error(f"User with email address {user.email_address} already exists")
-#         return False
-
-#     doc = {
-#         "_id": item_id,
-#         "doc_type": "user",
-#         "content": user.doc(),
-#         "updated": format_iso(gmtime()),
-#     }
-
-#     try:
-#         new_id, _ = conn.db.save(doc)
-#     except ResourceConflict as e:
-#         logging.exception(f"Error writing user {item_id}", e)
-#         return False
-
-#     # Ensure we didn't end up writing multiple addresses
-#     new_count = email_address_count(conn, user.email_address)
-#     if new_count > 1:
-#         logging.warning(f"There are {new_count} instances of users with address {user.email_address}")
-#         # Delete dupe account
-#         del conn.db[new_id]
-#         return False
-
-#     return True
-
-
-# def email_address_count(conn: Connection, email_address: str) -> bool:
-#     result = conn.db.view("maint/users-by-email", reduce=True, group=True, limit=1)
-#     next_item = next(result[email_address].__iter__(), None)
-
-#     if next_item:
-#         return next_item.value
-#     else:
-#         return 0
-
-
-# def user_id(user: User) -> str:
-#     return f"user::{user.username}"
+    now_iso = now_in_iso()
+    for sub, rev in subs:
+        if not sub.id:
+            sub.id = build_key("sub", sub.user_id, sub.feed_id)
+        doc = {
+            "_id": sub.id,
+            "doc_type": "sub",
+            "content": sub.doc(),
+            "updated": now_iso,
+        }
+        if rev:
+            doc["_rev"] = rev
+        bulk_queue.enqueue(doc)
