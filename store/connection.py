@@ -68,6 +68,24 @@ class Connection:
                         }
                     """
                 },
+                "entries-by-feed-updated": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'entry') {
+                                emit([doc.content.feed_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
+                "sub-last-synced-by-user": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub') {
+                                emit([ doc.content.user_id, doc.content.last_synced ], { "feed_id": doc.content.feed_id, "last_sync": doc.content.last_synced });
+                            }
+                        }
+                    """
+                },
             },
         )
 

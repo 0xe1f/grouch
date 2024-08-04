@@ -1,34 +1,69 @@
-from common import format_iso
+from common import now_in_iso
+from datatype import Article
 from datatype import Subscription
-from store import find_feeds_by_url
+from itertools import batched
+from store import enqueue_articles
 from store import enqueue_subs
+from store import fetch_sub
+from store import find_articles_by_entry_id
+from store import find_entries_fetched_since
+from store import find_feeds_by_url
+from store import find_user_subs_synced
 from store import BulkUpdateQueue
 from store import Connection
 from subscribe import SubSource
 from tasks import import_feeds
-from time import gmtime
 import logging
 
 def sync_subs(conn: Connection, user_id: str):
-    print(f"refresh_subs {user_id}")
-    # now = time.mktime(time.localtime())
-    # stale_start = time.gmtime(now - freshness_seconds)
+    bulk_q = BulkUpdateQueue(conn)
 
-    # bulk_q = BulkUpdateQueue(conn)
-    # pending_fetch: list[tuple[FeedContent, str]] = []
-    # fetch_batch_max = 40
-    # # TODO: probably good to set some sort of max limit
-    # for t in stale_feeds(conn, stale_start=stale_start):
-    #     pending_fetch.append(t)
-    #     if len(pending_fetch) >= fetch_batch_max:
-    #         _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
-    #         pending_fetch.clear()
+    for sub_id, feed_id, synced in find_user_subs_synced(conn, user_id):
+        max_synced = ""
+        read_batch_size = 40
 
-    # if pending_fetch:
-    #     _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
-    #     pending_fetch.clear()
+        # Fetch entries that have updated
+        marked_unread = 0
+        updated_article_count = 0
+        for tuple_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
+            update_map = {}
+            for entry_id, updated in tuple_batch:
+                update_map[entry_id] = updated or ""
+                max_synced = max(max_synced, updated or "")
 
-    # bulk_q.flush()
+            # Batch existing articles
+            for article, rev in find_articles_by_entry_id(conn, user_id, *update_map.keys()):
+                updated = update_map.pop(article.entry_id)
+                if article.synced == updated:
+                    # Nothing's changed
+                    continue
+                marked_unread += 1
+                updated_article_count += 1
+                article.toggle_prop(Article.PROP_UNREAD, True)
+                article.synced = updated
+                enqueue_articles(bulk_q, (article, rev))
+
+            # Batch new articles
+            for entry_id, updated in update_map.items():
+                marked_unread += 1
+                updated_article_count += 1
+                article = Article()
+                article.user_id = user_id
+                article.entry_id = entry_id
+                article.toggle_prop(Article.PROP_UNREAD, True)
+                article.synced = updated
+                enqueue_articles(bulk_q, (article, None))
+
+        # Update sub, if there were changes
+        if updated_article_count:
+            sub, sub_rev = fetch_sub(conn, sub_id)
+            sub.last_synced = max_synced
+            sub.unread_count += marked_unread
+            enqueue_subs(bulk_q, (sub, sub_rev))
+
+    bulk_q.flush()
+
+    logging.debug(f"{bulk_q.records_written}/{bulk_q.records_enqueued} records written")
 
 def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
     # Subscribe to all available feeds, get list of remaining
@@ -71,13 +106,13 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSo
         # if sub_source.parent_id:
         #     sub.folder_id = folder_id_map[sub_source.parent_id]
         sub.title = sub_source.title
-        sub.subscribed = format_iso(gmtime())
+        sub.subscribed = now_in_iso()
 
         enqueue_subs(bulk_q, (sub, None))
         all_subs.remove(sub_source)
 
     bulk_q.flush()
 
-    logging.info(f"Subscribed to {bulk_q.write_ok} feeds")
+    logging.info(f"Subscribed to {bulk_q.records_written} feeds")
 
     return all_subs

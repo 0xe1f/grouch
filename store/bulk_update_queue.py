@@ -10,6 +10,7 @@ class BulkUpdateQueue:
         self._docs = []
         self._items = {}
         self._conn = conn
+        self._enqueued_count = 0
         self._success_count = 0
         self._conflict_count = 0
         self._success_items = []
@@ -18,6 +19,7 @@ class BulkUpdateQueue:
         self.enqueue_tuple(*[(doc, None) for doc in docs])
 
     def enqueue_tuple(self, *docs: tuple[dict, object]):
+        self._enqueued_count += len(docs)
         for doc, item in docs:
             self._docs.append(doc)
             if item:
@@ -34,24 +36,21 @@ class BulkUpdateQueue:
         self._bulk_write(pending)
 
     @property
-    def write_ok(self) -> int:
+    def records_enqueued(self) -> int:
+        return self._enqueued_count
+
+    @property
+    def records_written(self) -> int:
         return self._success_count
 
     @property
-    def write_conflict(self) -> int:
+    def records_conflicted(self) -> int:
         return self._conflict_count
 
     def successful_items(self) -> list:
         success = self._success_items.copy()
         self._success_items.clear()
         return success
-
-    def reset(self):
-        self._docs.clear()
-        self._items.clear()
-        self._success_items.clear()
-        self._success_count = 0
-        self._conflict_count = 0
 
     def _bulk_write(self, docs: list):
         if not len(docs):

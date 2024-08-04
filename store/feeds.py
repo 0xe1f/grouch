@@ -3,8 +3,8 @@ from common import format_iso
 from common import now_in_iso
 from couchdb.http import ResourceConflict
 from datatype import FeedContent
-from store import BulkUpdateQueue
-from store import Connection
+from store.bulk_update_queue import BulkUpdateQueue
+from store.connection import Connection
 from time import struct_time
 
 def find_feeds_by_url(conn: Connection, *urls: str) -> dict:
@@ -15,7 +15,6 @@ def find_feeds_by_url(conn: Connection, *urls: str) -> dict:
     return matches
 
 def enqueue_feeds(bulk_queue: BulkUpdateQueue, *feeds: tuple[FeedContent, str]):
-    now_iso = now_in_iso()
     for feed, rev in feeds:
         if not feed.id:
             feed.id = build_key("feed", feed.feed_url)
@@ -24,7 +23,7 @@ def enqueue_feeds(bulk_queue: BulkUpdateQueue, *feeds: tuple[FeedContent, str]):
             "doc_type": "feed",
             "content": feed.doc(),
             "digest": feed.digest(),
-            "updated": now_iso,
+            "updated": now_in_iso(),
         }
         if rev:
             doc["_rev"] = rev

@@ -1,10 +1,9 @@
 from common import build_key
-from common import format_iso
+from common import now_in_iso
 from uuid import uuid4
 from couchdb.http import ResourceConflict
 from datatype import Folder
-from store import Connection
-from time import gmtime
+from store.connection import Connection
 
 def write_folders(conn: Connection, *folders: Folder) -> list[Folder]:
     for folder in folders:
@@ -44,5 +43,5 @@ def wrap_folder(folder: Folder) -> map:
         "_id": build_key("folder", folder.id),
         "doc_type": "folder",
         "content": folder.doc(),
-        "updated": format_iso(gmtime()),
+        "updated": now_in_iso(),
     }

@@ -1,8 +1,7 @@
-from common import format_iso
+from common import now_in_iso
 from couchdb.http import ResourceConflict
 from datatype import User
-from store import Connection
-from time import gmtime
+from store.connection import Connection
 import logging
 
 def find_user_id(conn: Connection, username: str) -> str:
@@ -17,7 +16,7 @@ def create_user(conn: Connection, user: User) -> bool:
     if item_id in conn.db:
         logging.error(f"User with id {item_id} already exists")
         return False
-    elif email_address_count(conn, user.email_address) > 0:
+    elif _email_address_count(conn, user.email_address) > 0:
         logging.error(f"User with email address {user.email_address} already exists")
         return False
 
@@ -26,7 +25,7 @@ def create_user(conn: Connection, user: User) -> bool:
         "_id": item_id,
         "doc_type": "user",
         "content": user.doc(),
-        "updated": format_iso(gmtime()),
+        "updated": now_in_iso(),
     }
 
     try:
@@ -36,7 +35,7 @@ def create_user(conn: Connection, user: User) -> bool:
         return False
 
     # Ensure we didn't end up writing multiple addresses
-    new_count = email_address_count(conn, user.email_address)
+    new_count = _email_address_count(conn, user.email_address)
     if new_count > 1:
         logging.warning(f"There are {new_count} instances of users with address {user.email_address}")
         # Delete dupe account
@@ -45,7 +44,7 @@ def create_user(conn: Connection, user: User) -> bool:
 
     return True
 
-def email_address_count(conn: Connection, email_address: str) -> bool:
+def _email_address_count(conn: Connection, email_address: str) -> bool:
     result = conn.db.view("maint/users-by-email", reduce=True, group=True, limit=1)
     next_item = next(result[email_address].__iter__(), None)
 
