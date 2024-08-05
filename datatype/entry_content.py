@@ -1,104 +1,104 @@
+from common import build_key
+from datatype.flex_object import FlexObject
 import hashlib
 import json
 
-class EntryContent:
+class EntryContent(FlexObject):
 
     def __init__(self, source: dict[str, str]={}):
-        self._doc = source.copy()
-        self.computed_digest = None
-
-    @property
-    def id(self) -> str:
-        return self._doc.get("id")
-
-    @id.setter
-    def id(self, val: str):
-        self._doc["id"] = val
+        super().__init__(source)
+        if not source:
+            self.doc_type = "entry"
+        self._computed_digest = None
 
     @property
     def feed_id(self) -> str:
-        return self._doc.get("feed_id")
+        return self.get_prop("feed_id")
 
     @feed_id.setter
     def feed_id(self, val: str):
-        self._doc["feed_id"] = val
+        self.set_prop("feed_id", val)
 
     @property
     def entry_uid(self) -> str:
-        return self._doc.get("entry_uid")
+        return self.get_prop("entry_uid")
 
     @entry_uid.setter
     def entry_uid(self, val: str):
-        self._doc["entry_uid"] = val
-        self.computed_digest = None
+        self.set_prop("entry_uid", val)
+        self._computed_digest = None
 
     @property
     def title(self) -> str:
-        return self._doc.get("title")
+        return self.get_prop("title")
 
     @title.setter
     def title(self, val: str):
-        self._doc["title"] = val
-        self.computed_digest = None
+        self.set_prop("title", val)
+        self._computed_digest = None
 
     @property
     def author(self) -> str:
-        return self._doc.get("author")
+        return self.get_prop("author")
 
     @author.setter
     def author(self, val: str):
-        self._doc["author"] = val
-        self.computed_digest = None
+        self.set_prop("author", val)
+        self._computed_digest = None
 
     @property
     def link(self) -> str:
-        return self._doc.get("link")
+        return self.get_prop("link")
 
     @link.setter
     def link(self, val: str):
-        self._doc["link"] = val
-        self.computed_digest = None
+        self.set_prop("link", val)
+        self._computed_digest = None
 
     @property
     def text_body(self) -> str:
-        return self._doc.get("text_body")
+        return self.get_prop("text_body")
 
     @text_body.setter
     def text_body(self, val: str):
-        self._doc["text_body"] = val
-        self.computed_digest = None
+        self.set_prop("text_body", val)
+        self._computed_digest = None
 
     @property
     def text_summary(self) -> str:
-        return self._doc.get("text_summary")
+        return self.get_prop("text_summary")
 
     @text_summary.setter
     def text_summary(self, val: str):
-        self._doc["text_summary"] = val
-        self.computed_digest = None
+        self.set_prop("text_summary", val)
+        self._computed_digest = None
 
     @property
     def published(self) -> str:
-        return self._doc.get("published")
+        return self.get_prop("published")
 
     @published.setter
     def published(self, val: str):
-        self._doc["published"] = val
-        self.computed_digest = None
+        self.set_prop("published", val)
+        self._computed_digest = None
 
-    def doc(self):
-        return self._doc
+    @property
+    def digest(self) -> str:
+        return self.get_prop("digest")
 
-    def digest(self):
-        if not self.computed_digest:
+    @digest.setter
+    def digest(self, val: str):
+        self.set_prop("digest", val)
+
+    def computed_digest(self):
+        if not self._computed_digest:
+            hash_keys = [ "entry_uid", "title", "author", "link", "text_body", "text_summary", "published" ]
+            hash_doc = { key:self._doc[key] for key in hash_keys if key in self._doc }
             m = hashlib.md5()
-            doc = self._doc.copy()
-            if "feed_id" in doc:
-                del doc["feed_id"]
-            if "id" in doc:
-                del doc["id"]
+            m.update(json.dumps(hash_doc).encode())
+            self._computed_digest = m.hexdigest()
 
-            m.update(json.dumps(doc).encode())
-            self.computed_digest = m.hexdigest()
+        return self._computed_digest
 
-        return self.computed_digest
+    def build_key(self) -> str|None:
+        return build_key(self.doc_type, self.feed_id, self.entry_uid)

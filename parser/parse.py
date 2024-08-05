@@ -34,6 +34,7 @@ def create_feed_content(url, feed):
         content.published = format_iso(feed.updated_parsed)
     elif "published" in feed:
         content.published = format_iso(feed.published_parsed)
+    content.digest = content.computed_digest()
 
     return content
 
@@ -49,6 +50,7 @@ def create_entry_content(entry):
         content.published = format_iso(entry.updated_parsed)
     elif "published" in entry:
         content.published = format_iso(entry.published_parsed)
-    # TODO content.summary = None
+    content.summary = "Abc123"
+    content.digest = content.computed_digest()
 
     return content

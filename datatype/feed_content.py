@@ -1,88 +1,87 @@
+from common import build_key
+from datatype.flex_object import FlexObject
 import hashlib
 import json
 
-class FeedContent:
+class FeedContent(FlexObject):
 
     def __init__(self, source: dict[str, str]={}):
-        self._doc = source.copy()
+        super().__init__(source)
+        if not source:
+            self.doc_type = "feed"
         self._computed_digest = None
 
     @property
-    def id(self) -> str:
-        return self._doc.get("id")
-
-    @id.setter
-    def id(self, val: str):
-        self._doc["id"] = val
-        # Hash is unaffected
-
-    @property
     def feed_url(self) -> str:
-        return self._doc.get("feed_url")
+        return self.get_prop("feed_url")
 
     @feed_url.setter
     def feed_url(self, val: str):
-        self._doc["feed_url"] = val
+        self.set_prop("feed_url", val)
         self._computed_digest = None
 
     @property
     def title(self) -> str:
-        return self._doc.get("title")
+        return self.get_prop("title")
 
     @title.setter
     def title(self, val: str):
-        self._doc["title"] = val
+        self.set_prop("title", val)
         self._computed_digest = None
 
     @property
     def description(self) -> str:
-        return self._doc.get("description")
+        return self.get_prop("description")
 
     @description.setter
     def description(self, val: str):
-        self._doc["description"] = val
+        self.set_prop("description", val)
         self._computed_digest = None
 
     @property
     def favicon_url(self) -> str:
-        return self._doc.get("favicon_url")
+        return self.get_prop("favicon_url")
 
     @favicon_url.setter
     def favicon_url(self, val: str):
-        self._doc["favicon_url"] = val
+        self.set_prop("favicon_url", val)
         self._computed_digest = None
 
     @property
     def site_url(self) -> str:
-        return self._doc.get("site_url")
+        return self.get_prop("site_url")
 
     @site_url.setter
     def site_url(self, val: str):
-        self._doc["site_url"] = val
+        self.set_prop("site_url", val)
         self._computed_digest = None
 
     @property
     def published(self) -> str:
-        return self._doc.get("published")
+        return self.get_prop("published")
 
     @published.setter
     def published(self, val: str):
-        self._doc["published"] = val
+        self.set_prop("published", val)
         self._computed_digest = None
 
-    def doc(self):
-        return self._doc
+    @property
+    def digest(self) -> str:
+        return self.get_prop("digest")
 
-    def digest(self):
+    @digest.setter
+    def digest(self, val: str):
+        self.set_prop("digest", val)
+
+    def computed_digest(self):
         if not self._computed_digest:
-            # Remove identifiers
-            doc = self._doc.copy()
-            if "id" in doc:
-                del doc["id"]
-
-            # Compute hash
+            hash_keys = [ "feed_url", "title", "description", "favicon_url", "site_url", "published" ]
+            hash_doc = { key:self._doc[key] for key in hash_keys if key in self._doc }
             m = hashlib.md5()
-            m.update(json.dumps(doc).encode())
+            m.update(json.dumps(hash_doc).encode())
             self._computed_digest = m.hexdigest()
 
         return self._computed_digest
+
+    def build_key(self) -> str|None:
+        return build_key(self.doc_type, self.feed_url)

@@ -6,14 +6,14 @@ from store.connection import Connection
 
 def find_articles_by_user(conn: Connection, user_id: str, limit: int=40) -> list[Article]:
     matches = []
-    for item in conn.db.view("maint/articles-by-user", start_key=[ user_id ], end_key=[ user_id, {}], include_docs=True, limit=limit):
-        matches.append(Article(item["doc"]["content"]))
+    for item in conn.db.view("maint/articles-by-user", end_key=[ user_id ], start_key=[ user_id, {}], include_docs=True, limit=limit, descending=True):
+        matches.append(Article(item["doc"]))
     return matches
 
 def find_articles_by_sub(conn: Connection, sub_id: str, limit: int=40) -> list[Article]:
     matches = []
-    for item in conn.db.view("maint/articles-by-sub", start_key=[ sub_id ], end_key=[ sub_id, {}], include_docs=True, limit=limit):
-        matches.append(Article(item["doc"]["content"]))
+    for item in conn.db.view("maint/articles-by-sub", end_key=[ sub_id ], start_key=[ sub_id, {}], include_docs=True, limit=limit, descending=True):
+        matches.append(Article(item["doc"]))
     return matches
 
 def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
@@ -24,18 +24,11 @@ def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
     for item in conn.db.view("_all_docs", **options):
         doc = item.get("doc")
         if doc:
-            yield Article(doc["content"]), doc["_rev"]
+            yield Article(doc)
 
-def enqueue_articles(bulk_q: BulkUpdateQueue, *articles: tuple[Article, str]):
-    for article, rev in articles:
+def enqueue_articles(bulk_q: BulkUpdateQueue, *articles: Article):
+    for article in articles:
         if not article.id:
-            article.id = build_key("article", article.user_id, article.entry_id)
-        doc = {
-            "_id": article.id,
-            "doc_type": "article",
-            "content": article.doc(),
-            "updated": now_in_iso(),
-        }
-        if rev:
-            doc["_rev"] = rev
-        bulk_q.enqueue_tuple((doc, article))
+            article.id = article.build_key()
+        article.updated = now_in_iso()
+        bulk_q.enqueue_tuple((article.doc(), article))

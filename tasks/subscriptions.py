@@ -7,7 +7,7 @@ from store import enqueue_subs
 from store import fetch_sub
 from store import find_articles_by_entry
 from store import find_entries_fetched_since
-from store import find_feeds_by_url
+from store import find_feed_ids_by_url
 from store import find_user_subs_synced
 from store import BulkUpdateQueue
 from store import Connection
@@ -26,45 +26,44 @@ def sync_subs(conn: Connection, user_id: str):
         # Fetch entries that have updated
         marked_unread = 0
         updated_article_count = 0
-        for tuple_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
-            update_map = {}
-            for entry, updated in tuple_batch:
-                # FIXME!!!
-                update_map[entry.id] = updated or ""
-                max_synced = max(max_synced, updated or "")
+        for entry_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
+            entry_map = {}
+            for entry in entry_batch:
+                entry_map[entry.id] = entry
+                max_synced = max(max_synced, entry.updated or "")
 
             # Batch existing articles
-            for article, rev in find_articles_by_entry(conn, user_id, *update_map.keys()):
-                updated = update_map.pop(article.entry_id)
-                if article.synced == updated:
+            for article in find_articles_by_entry(conn, user_id, *entry_map.keys()):
+                entry = entry_map.pop(article.entry_id)
+                if article.synced == entry.updated:
                     # Nothing's changed
                     continue
                 marked_unread += 1
                 updated_article_count += 1
                 article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = updated
+                article.synced = entry.updated
                 article.published = entry.published
-                enqueue_articles(bulk_q, (article, rev))
+                enqueue_articles(bulk_q, article)
 
             # Batch new articles
-            for entry_id, updated in update_map.items():
+            for entry in entry_map.values():
                 marked_unread += 1
                 updated_article_count += 1
                 article = Article()
                 article.user_id = user_id
                 article.subscription_id = sub_id
-                article.entry_id = entry_id
+                article.entry_id = entry.id
                 article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = updated
+                article.synced = entry.updated
                 article.published = entry.published
-                enqueue_articles(bulk_q, (article, None))
+                enqueue_articles(bulk_q, article)
 
         # Update sub, if there were changes
         if updated_article_count:
-            sub, sub_rev = fetch_sub(conn, sub_id)
+            sub = fetch_sub(conn, sub_id)
             sub.last_synced = max_synced
             sub.unread_count += marked_unread
-            enqueue_subs(bulk_q, (sub, sub_rev))
+            enqueue_subs(bulk_q, sub)
 
     bulk_q.flush()
 
@@ -97,7 +96,7 @@ def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
 def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSource) -> set[SubSource]:
     source_dict = { source.url:source for source in sub_sources }
     all_subs = set(source_dict.values())
-    existing_feeds_by_url = find_feeds_by_url(conn, *source_dict.keys())
+    existing_feeds_by_url = find_feed_ids_by_url(conn, *source_dict.keys())
     if not existing_feeds_by_url:
         return all_subs
 
@@ -113,7 +112,7 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSo
         sub.title = sub_source.title
         sub.subscribed = now_in_iso()
 
-        enqueue_subs(bulk_q, (sub, None))
+        enqueue_subs(bulk_q, sub)
         all_subs.remove(sub_source)
 
     bulk_q.flush()
