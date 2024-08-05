@@ -1,39 +1,14 @@
-/*****************************************************************************
- **
- ** Gofr
- ** https://github.com/pokebyte/Gofr
- ** Copyright (C) 2013 Akop Karapetyan
- **
- ** This program is free software; you can redistribute it and/or modify
- ** it under the terms of the GNU General Public License as published by
- ** the Free Software Foundation; either version 2 of the License, or
- ** (at your option) any later version.
- **
- ** This program is distributed in the hope that it will be useful,
- ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- ** GNU General Public License for more details.
- **
- ** You should have received a copy of the GNU General Public License
- ** along with this program; if not, write to the Free Software
- ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- **
- ******************************************************************************
- */
-
 $().ready(function() {
 	var $dragSource = null;
 	var $dragClone = null;
 	var dragDestination = null;
 
-	var clientId = null;
 	var subscriptionMap = null;
 	var continueFrom = null;
 	var lastContinued = null;
 	var lastGPressTime = 0;
 	var lastRefresh = -1;
 	var timeoutId = -1;
-	var channel;
 
 	// A 15x15 transparent image
 	var transparentIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH3QkaEBchBQxHYwAAAbxJREFUKM+lkr1rFEEYxn8zs7eXu1u4i3prwJOAqBeicCBYCYIgCgraSBRt/ANSia2FdsbCIkVsLDVaqdiJYJqQWGkTUEyQBYNfJ5ecObMfszMWl2wIuYiQt5qB+T3P+77zwA5KACw9uYyTqv+GtEqpXHmKBDJQeP663j9r/b2TtVDop3jhPjYJMa0A0/qMDmYxzU/bi2Rwrkj64yOyfxDl11F+nVz9LHp+ivj9JDbubA+b9iLh6zuAQHo+cu8wbuMSzsFTqNoxwle3MSvfN8Fy4+TQd/oW7vHryIFhdDDN6sub6IU3iL4y+ROjIFVvZ1neh/KHUP4QAO6Ri0QzE0RvHyJKVdTAUdzGCPG7ya3OphXw59ko4dQ9dDCLKFXJn7yBKO4imnmATUJyh8+AUD3aXvt122kSTY+TzL1AuB5uYwS72sL8/ADKRVZqPWDHpXBujML5u8hyjXjuOViDrB4CIP210AV2H9g6M2mKDZcAsEkHdIxZ/oKs7EfkPUxzvgtXBjfHc+XR1bWbAqVAx9kSbdjGRr9B5ZClPZj2N8DiXXvcddYq7UbOpqDTTNksL27sI00w7a9ZtndcfwE4Q5nI69qxywAAAABJRU5ErkJggg==";
@@ -175,7 +150,6 @@ $().ready(function() {
 			$.getJSON('articles', {
 				'filter':   JSON.stringify(subscription.getFilter()),
 				'continue': continueFrom ? continueFrom : undefined,
-				'client':   clientId,
 			})
 			.success(function(response) {
 				continueFrom = response.continue;
@@ -417,7 +391,6 @@ $().ready(function() {
 			var subscription = this;
 			if (!subscription.isFolder()) {
 				$.post('unsubscribe', {
-					'client': clientId,
 					'subscription': subscription.id,
 					'folder': subscription.parent,
 				}, 
@@ -431,7 +404,6 @@ $().ready(function() {
 			var subscription = this;
 
 			$.post('markAllAsRead', {
-				'client':       clientId,
 				'subscription': subscription.isFolder() ? undefined : subscription.id,
 				'folder':       subscription.isFolder() ? subscription.id : subscription.parent,
 				'filter':       filter,
@@ -446,7 +418,6 @@ $().ready(function() {
 			var subscription = this;
 
 			$.post('moveSubscription', {
-				'client':       clientId,
 				'subscription': subscription.id,
 				'folder':       subscription.parent ? subscription.parent : undefined,
 				'destination':  folder.id ? folder.id : undefined,
@@ -469,7 +440,6 @@ $().ready(function() {
 		'subscribe': function(url) {
 			var params = {
 				'url': url,
-				'client': clientId,
 			};
 			if (this.id)
 				params['folder'] = this.id;
@@ -493,7 +463,6 @@ $().ready(function() {
 		'remove': function() {
 			var folder = this;
 			$.post('removeFolder', {
-				'client': clientId,
 				'folder': folder.id,
 			}, 
 			function(response) {
@@ -519,7 +488,6 @@ $().ready(function() {
 		'remove': function() {
 			var tag = this;
 			$.post('removeTag', {
-				'client': clientId,
 				'tag': tag.title,
 			}, 
 			function(response) {
@@ -554,8 +522,8 @@ $().ready(function() {
 			return $.inArray(propertyName, this.properties) > -1;
 		},
 		'markAsRead': function(force) {
-			if (!this.hasProperty('read') || force)
-				this.setProperty('read', true);
+			if (this.hasProperty("unread") || force)
+				this.setProperty("unread", false);
 		},
 		'setProperty': function(propertyName, propertyValue) {
 			if (propertyValue == this.hasProperty(propertyName))
@@ -563,37 +531,40 @@ $().ready(function() {
 
 			var entry = this;
 
-			$.post('setProperty', {
-				'article':      this.id,
-				'subscription': this.source,
-				'folder':       this.getSubscription().parent,
-				'property':     propertyName,
-				'set':          propertyValue,
-			},
-			function(properties) {
-				delete entry.properties;
-
-				entry.properties = properties;
-
-				if (propertyName == 'read') {
-					var subscription = entry.getSubscription();
-					subscription.updateUnreadCount(propertyValue ? -1 : 1);
-
-					subscription.syncView();
-					ui.updateUnreadCount();
-				} else if (propertyName == 'like') {
-					var delta = propertyValue ? 1 : -1;
-					entry.extras.likeCount += delta;
+			$.ajax({
+				url: "setProperty",
+				type: "POST",
+				data: JSON.stringify({
+					'article': this.id,
+					'property': propertyName,
+					'set': propertyValue,
+				}),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(properties) {
+					delete entry.properties;
+					entry.properties = properties;
+	
+					if (propertyName == "unread") {
+						var subscription = entry.getSubscription();
+						subscription.updateUnreadCount(propertyValue ? 1 : -1);
+	
+						subscription.syncView();
+						ui.updateUnreadCount();
+					} else if (propertyName == 'like') {
+						var delta = propertyValue ? 1 : -1;
+						entry.extras.likeCount += delta;
+					}
+	
+					entry.syncView();
 				}
-
-				entry.syncView();
-			}, 'json');
+			});
 		},
 		'toggleStarred': function(propertyName) {
 			this.toggleProperty("star");
 		},
 		'toggleUnread': function() {
-			this.toggleProperty("read");
+			this.toggleProperty("unread");
 		},
 		'toggleLike': function() {
 			this.toggleProperty("like");
@@ -607,7 +578,7 @@ $().ready(function() {
 			$entry
 				.toggleClass('star', this.hasProperty('star'))
 				.toggleClass('like', this.hasProperty('like'))
-				.toggleClass('read', this.hasProperty('read'));
+				.toggleClass("read", !this.hasProperty("unread"));
 			$entry.find('.gofr-like-count')
 				.text(_l("(%d)", [this.extras.likeCount]))
 				.toggleClass('unliked', this.extras.likeCount < 1);
@@ -922,9 +893,6 @@ $().ready(function() {
 				$.post('authUpload', {
 				},
 				function(response) {
-					// Set the client ID
-					$form.find('input[name=client]').val(clientId);
-
 					// Upload the file
 					$form
 						.attr('action', response.uploadUrl)
@@ -1214,7 +1182,7 @@ $().ready(function() {
 			// Update the title bar
 
 			var root = subscriptionMap[""];
-			var title = 'Gofr';
+			var title = 'grouch';
 
 			if (root.unread > 0)
 				title += ' (' + root.unread + ')';
@@ -1893,7 +1861,6 @@ $().ready(function() {
 			lastRefresh = now;
 
 			$.post('syncFeeds', {
-				'client': clientId,
 			},
 			function(response) {
 				resetSubscriptionDom(response, false);
@@ -1906,49 +1873,7 @@ $().ready(function() {
 		})();
 	};
 
-	var initChannels = function() {
-		clientId = Math.random() + "";
-
-		$.post('initChannel', {
-			'client': clientId,
-		},
-		function(response) {
-			channel = new goog.appengine.Channel(response.token);
-			socket = channel.open();
-
-			socket.onopen = function() {
-				if (console && console.debug)
-					console.debug("Channel open");
-			};
-			socket.onclose = function() {
-				// Reconnect
-				if (console && console.debug) {
-					console.debug("Channel closed");
-					initChannels();
-				}
-			};
-			socket.onmessage = function(m) {
-				var obj = $.parseJSON(m.data);
-				if (obj.error)
-					ui.showToast(obj.error, true);
-				else {
-					if (obj.message)
-						ui.showToast(obj.message, false);
-					if (obj.refresh)
-						refresh(true);
-					if (obj.subscriptions)
-						resetSubscriptionDom(response, true);
-				}
-			};
-			socket.onerror = function(error) {
-				if (console && console.debug)
-					console.debug("Received an error: " + error);
-			};
-		}, 'json');
-	};
-
 	ui.init();
-	initChannels();
 
 	refresh();
 });

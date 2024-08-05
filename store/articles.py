@@ -4,17 +4,75 @@ from datatype import Article
 from store.bulk_update_queue import BulkUpdateQueue
 from store.connection import Connection
 
-def find_articles_by_user(conn: Connection, user_id: str, limit: int=40) -> list[Article]:
+type ArticlePageMarker = tuple
+type ArticlePage = tuple[list[Article], ArticlePageMarker|None]
+
+def find_articles_by_id(conn: Connection, *article_ids: str) -> list[Article]:
     matches = []
-    for item in conn.db.view("maint/articles-by-user", end_key=[ user_id ], start_key=[ user_id, {}], include_docs=True, limit=limit, descending=True):
-        matches.append(Article(item["doc"]))
+    for item in conn.db.view("_all_docs", keys=article_ids, include_docs=True):
+        if "doc" in item:
+            matches.append(Article(item["doc"]))
+
     return matches
 
-def find_articles_by_sub(conn: Connection, sub_id: str, limit: int=40) -> list[Article]:
+def find_articles_by_user(conn: Connection, user_id: str, start: str=None, limit: int=40) -> ArticlePage:
+    options = {
+        "end_key": [user_id],
+        "start_key": start if start else [user_id, {}],
+        "include_docs": True,
+        "limit": limit + 1,
+        "descending": True,
+    }
+
+    next_start = None
     matches = []
-    for item in conn.db.view("maint/articles-by-sub", end_key=[ sub_id ], start_key=[ sub_id, {}], include_docs=True, limit=limit, descending=True):
-        matches.append(Article(item["doc"]))
-    return matches
+    for item in conn.db.view("maint/articles-by-user", **options):
+        if len(matches) < limit:
+            matches.append(Article(item.doc))
+        else:
+            next_start = item.key
+            break
+
+    return matches, next_start
+
+def find_articles_by_prop(conn: Connection, user_id: str, prop: str, start: str=None, limit: int=40) -> ArticlePage:
+    options = {
+        "end_key": [user_id, prop],
+        "start_key": start if start else [user_id, prop, {}],
+        "include_docs": True,
+        "limit": limit + 1,
+        "descending": True,
+    }
+
+    next_start = None
+    matches = []
+    for item in conn.db.view("maint/articles-by-prop", **options):
+        if len(matches) < limit:
+            matches.append(Article(item.doc))
+        else:
+            next_start = item.key
+            break
+
+    return matches, next_start
+
+def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, limit: int=40) -> ArticlePage:
+    options = {
+        "end_key": [sub_id],
+        "start_key": start if start else [sub_id, {}],
+        "include_docs": True,
+        "limit": limit + 1,
+        "descending": True,
+    }
+    next_start = None
+    matches = []
+    for item in conn.db.view("maint/articles-by-sub", **options):
+        if len(matches) < limit:
+            matches.append(Article(item.doc))
+        else:
+            next_start = item.key
+            break
+
+    return matches, next_start
 
 def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
     options = {
