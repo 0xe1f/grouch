@@ -20,7 +20,7 @@ def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
 
     bulk_q = BulkUpdateQueue(conn)
 
-    feeds_to_create = [(parse_result.feed, None) for parse_result in successful]
+    feeds_to_create = [parse_result.feed for parse_result in successful]
     enqueue_feeds(bulk_q, *feeds_to_create)
 
     feed_count = 0
@@ -30,7 +30,7 @@ def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
         entry_count += len(parse_result.entries)
         for entry in parse_result.entries:
             entry.feed_id = parse_result.feed.id
-            enqueue_entries(bulk_q, (entry, None))
+            enqueue_entries(bulk_q, entry)
     bulk_q.flush()
 
     feeds_written = 0
@@ -52,11 +52,11 @@ def refresh_feeds(conn: Connection, freshness_seconds: int):
     stale_start = time.gmtime(now - freshness_seconds)
 
     bulk_q = BulkUpdateQueue(conn)
-    pending_fetch: list[tuple[FeedContent, str]] = []
+    pending_fetch = []
     fetch_batch_max = 40
     # TODO: probably good to set some sort of max limit
-    for t in stale_feeds(conn, stale_start=stale_start):
-        pending_fetch.append(t)
+    for feed in stale_feeds(conn, stale_start=stale_start):
+        pending_fetch.append(feed)
         if len(pending_fetch) >= fetch_batch_max:
             _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
             pending_fetch.clear()
@@ -67,26 +67,27 @@ def refresh_feeds(conn: Connection, freshness_seconds: int):
 
     bulk_q.flush()
 
-def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feeds: tuple[FeedContent, str, str]):
-    local_feed_map = { feed.feed_url:(feed, digest, rev) for feed, digest, rev in feeds }
+def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feeds: FeedContent):
+    local_feed_map = { feed.feed_url:feed for feed in feeds }
 
     feeds_changed = 0
     entries_changed = 0
     successful, _ = _fetch_feeds(*local_feed_map.keys())
     for result in successful:
         remote_feed = result.feed
-        local_feed, local_feed_digest, rev = local_feed_map[remote_feed.feed_url]
-        if remote_feed.digest() != local_feed_digest:
+        local_feed = local_feed_map[remote_feed.feed_url]
+        if remote_feed.digest != local_feed.digest:
             feeds_changed += 1
-            enqueue_feeds(bulk_q, (remote_feed, rev))
+            remote_feed.rev = local_feed.rev
+            enqueue_feeds(bulk_q, remote_feed)
 
         remote_entry_map = { entry.entry_uid:entry for entry in result.entries }
-        for local_entries in find_entries_by_uid(conn, local_feed.id, *remote_entry_map.keys()):
-            local_entry, local_entry_digest, rev = local_entries
+        for local_entry in find_entries_by_uid(conn, local_feed.id, *remote_entry_map.keys()):
             remote_entry = remote_entry_map[local_entry.entry_uid]
-            if remote_entry.digest() != local_entry_digest:
+            if remote_entry.digest != local_entry.digest:
                 remote_entry.feed_id = local_feed.id
-                enqueue_entries(bulk_q, (remote_entry, rev))
+                remote_entry.rev = local_entry.rev
+                enqueue_entries(bulk_q, remote_entry)
                 entries_changed += 1
                 del remote_entry_map[local_entry.entry_uid]
             else:
@@ -95,7 +96,7 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
         new_entries = []
         for remote_entry in remote_entry_map.values():
             remote_entry.feed_id = local_feed.id
-            new_entries.append((remote_entry, None))
+            new_entries.append(remote_entry)
         enqueue_entries(bulk_q, *new_entries)
 
     logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated, {len(new_entries)} new entries")

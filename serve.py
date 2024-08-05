@@ -14,7 +14,6 @@ from store import find_articles_by_sub
 from store import find_articles_by_user
 from store import find_entries_by_id
 from store import find_feeds_by_id
-from store import find_feeds_by_id
 from store import find_user_id
 from store import find_user_subs
 import logging
@@ -45,11 +44,10 @@ def subscriptions():
 def articles():
     filter = _parse_filter(request.args.get("filter"))
     if filter.subscription_id:
-        articles = find_articles_by_sub(conn, user.id)
+        articles = find_articles_by_sub(conn, filter.subscription_id)
     else:
         articles = find_articles_by_user(conn, user.id)
 
-    articles = find_articles_by_user(conn, user.id)
     entries = find_entries_by_id(conn, *[article.entry_id for article in articles])
     entry_map = { entry.id:entry for entry in entries }
 
@@ -72,6 +70,6 @@ if __name__ == '__main__':
     conn.connect(config.database)
 
     user_id = find_user_id(conn, "foo")
-    user, _ = fetch_user(conn, user_id)
+    user = fetch_user(conn, user_id)
 
     app.run(host='0.0.0.0', port='8080', debug=True)

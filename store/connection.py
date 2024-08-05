@@ -35,7 +35,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'user') {
-                                emit(doc.content.email_address, null);
+                                emit(doc.email_address, null);
                             }
                         }
                     """,
@@ -45,7 +45,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'feed') {
-                                emit(doc.content.feed_url, null);
+                                emit(doc.feed_url, null);
                             }
                         }
                     """
@@ -63,7 +63,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'entry') {
-                                emit([doc.content.feed_id, doc.content.entry_uid], null);
+                                emit([doc.feed_id, doc.entry_uid], null);
                             }
                         }
                     """
@@ -72,7 +72,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'entry') {
-                                emit([doc.content.feed_id, doc.updated], null);
+                                emit([doc.feed_id, doc.updated], null);
                             }
                         }
                     """
@@ -81,7 +81,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'sub') {
-                                emit([ doc.content.user_id, doc.content.last_synced ], { "feed_id": doc.content.feed_id, "last_sync": doc.content.last_synced });
+                                emit([ doc.user_id, doc.last_synced ], { "feed_id": doc.feed_id, "last_sync": doc.last_synced });
                             }
                         }
                     """
@@ -90,7 +90,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article') {
-                                emit([doc.content.user_id, doc.updated], null);
+                                emit([doc.user_id, doc.published, doc.updated], null);
                             }
                         }
                     """
@@ -99,7 +99,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article') {
-                                emit([doc.content.subscription_id, doc.updated], null);
+                                emit([doc.subscription_id, doc.published, doc.updated], null);
                             }
                         }
                     """

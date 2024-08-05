@@ -1,53 +1,49 @@
+from common import build_key
+from datatype.flex_object import FlexObject
 import bcrypt
 
-class User:
+class User(FlexObject):
 
-    def __init__(self, source: dict={}):
-        self._doc = source.copy()
-
-    @property
-    def id(self):
-        return self._doc.get("id")
-
-    @id.setter
-    def id(self, val: str):
-        self._doc["id"] = val
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+        if not source:
+            self.doc_type = "user"
 
     @property
-    def username(self):
-        return self._doc.get("username")
+    def username(self) -> str:
+        return self.get_prop("username")
 
     @username.setter
     def username(self, val: str):
-        self._doc["username"] = val
+        self.set_prop("username", val)
 
     @property
-    def hashed_password(self):
-        return self._doc.get("hashed_password")
+    def hashed_password(self) -> str:
+        return self.get_prop("hashed_password")
 
     @hashed_password.setter
     def hashed_password(self, val: str):
-        self._doc["hashed_password"] = val
+        self.set_prop("hashed_password", val)
 
     @property
-    def salt(self):
-        return self._doc.get("salt")
+    def salt(self) -> str:
+        return self.get_prop("salt")
 
     @salt.setter
     def salt(self, val: str):
-        self._doc["salt"] = val
+        self.set_prop("salt", val)
 
     @property
-    def email_address(self):
-        return self._doc.get("email_address")
+    def email_address(self) -> str:
+        return self.get_prop("email_address")
 
     @email_address.setter
     def email_address(self, val: str):
-        self._doc["email_address"] = val
+        self.set_prop("email_address", val)
 
     def set_hashed_password(self, plaintext: str, salt: bytes):
         self.hashed_password = bcrypt.hashpw(plaintext.encode(), salt).hex()
         self.salt = salt.hex()
 
-    def doc(self):
-        return self._doc
+    def build_key(self) -> str|None:
+        return build_key(self.doc_type, self.username)
