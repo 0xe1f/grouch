@@ -2,8 +2,8 @@ import bcrypt
 
 class User:
 
-    def __init__(self):
-        self._doc = {}
+    def __init__(self, source: dict={}):
+        self._doc = source.copy()
 
     @property
     def id(self):

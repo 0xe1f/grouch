@@ -4,7 +4,19 @@ from datatype import Article
 from store.bulk_update_queue import BulkUpdateQueue
 from store.connection import Connection
 
-def find_articles_by_entry_id(conn: Connection, user_id: str, *entry_ids: str):
+def find_articles_by_user(conn: Connection, user_id: str, limit: int=40) -> list[Article]:
+    matches = []
+    for item in conn.db.view("maint/articles-by-user", start_key=[ user_id ], end_key=[ user_id, {}], include_docs=True, limit=limit):
+        matches.append(Article(item["doc"]["content"]))
+    return matches
+
+def find_articles_by_sub(conn: Connection, sub_id: str, limit: int=40) -> list[Article]:
+    matches = []
+    for item in conn.db.view("maint/articles-by-sub", start_key=[ sub_id ], end_key=[ sub_id, {}], include_docs=True, limit=limit):
+        matches.append(Article(item["doc"]["content"]))
+    return matches
+
+def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
     options = {
         "include_docs": True,
         "keys": [build_key("article", user_id, entry_id) for entry_id in entry_ids],

@@ -5,7 +5,7 @@ from itertools import batched
 from store import enqueue_articles
 from store import enqueue_subs
 from store import fetch_sub
-from store import find_articles_by_entry_id
+from store import find_articles_by_entry
 from store import find_entries_fetched_since
 from store import find_feeds_by_url
 from store import find_user_subs_synced
@@ -18,6 +18,7 @@ import logging
 def sync_subs(conn: Connection, user_id: str):
     bulk_q = BulkUpdateQueue(conn)
 
+    # TODO: mayhap split this across multiple executors
     for sub_id, feed_id, synced in find_user_subs_synced(conn, user_id):
         max_synced = ""
         read_batch_size = 40
@@ -27,12 +28,13 @@ def sync_subs(conn: Connection, user_id: str):
         updated_article_count = 0
         for tuple_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
             update_map = {}
-            for entry_id, updated in tuple_batch:
-                update_map[entry_id] = updated or ""
+            for entry, updated in tuple_batch:
+                # FIXME!!!
+                update_map[entry.id] = updated or ""
                 max_synced = max(max_synced, updated or "")
 
             # Batch existing articles
-            for article, rev in find_articles_by_entry_id(conn, user_id, *update_map.keys()):
+            for article, rev in find_articles_by_entry(conn, user_id, *update_map.keys()):
                 updated = update_map.pop(article.entry_id)
                 if article.synced == updated:
                     # Nothing's changed
@@ -41,6 +43,7 @@ def sync_subs(conn: Connection, user_id: str):
                 updated_article_count += 1
                 article.toggle_prop(Article.PROP_UNREAD, True)
                 article.synced = updated
+                article.published = entry.published
                 enqueue_articles(bulk_q, (article, rev))
 
             # Batch new articles
@@ -49,9 +52,11 @@ def sync_subs(conn: Connection, user_id: str):
                 updated_article_count += 1
                 article = Article()
                 article.user_id = user_id
+                article.subscription_id = sub_id
                 article.entry_id = entry_id
                 article.toggle_prop(Article.PROP_UNREAD, True)
                 article.synced = updated
+                article.published = entry.published
                 enqueue_articles(bulk_q, (article, None))
 
         # Update sub, if there were changes

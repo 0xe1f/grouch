@@ -10,7 +10,14 @@ def fetch_sub(conn: Connection, sub_id: str) -> tuple[Subscription, str]:
 
     return None
 
-def find_user_subs_synced(conn: Connection, user_id: str):
+def find_user_subs(conn: Connection, user_id: str) -> list[Subscription]:
+    matches = []
+    for item in conn.db.view("maint/sub-last-synced-by-user", start_key=[ user_id ], end_key=[ user_id, {} ], include_docs=True):
+        matches.append(Subscription(item.doc["content"]))
+
+    return matches
+
+def find_user_subs_synced(conn: Connection, user_id: str) -> list[tuple[str, str, str]]:
     matches = []
     for doc in conn.db.view("maint/sub-last-synced-by-user", start_key=[ user_id ], end_key=[ user_id, {} ]):
         matches.append((doc.id, doc.value["feed_id"], doc.value.get("last_sync")))

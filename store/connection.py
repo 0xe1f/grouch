@@ -86,6 +86,24 @@ class Connection:
                         }
                     """
                 },
+                "articles-by-user": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.content.user_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
+                "articles-by-sub": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.content.subscription_id, doc.updated], null);
+                            }
+                        }
+                    """
+                },
             },
         )
 

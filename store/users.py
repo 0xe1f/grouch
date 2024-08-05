@@ -8,7 +8,13 @@ def find_user_id(conn: Connection, username: str) -> str:
     item_id = f"user::{username}"
     if conn.db.get(item_id):
         return item_id
-    
+
+    return None
+
+def fetch_user(conn: Connection, user_id: str) -> User:
+    for item in conn.db.view("_all_docs", key=user_id, include_docs=True):
+        return User(item.doc["content"]), item.doc["_rev"]
+
     return None
 
 def create_user(conn: Connection, user: User) -> bool:

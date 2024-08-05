@@ -36,6 +36,14 @@ class Article:
         self._doc["entry_id"] = val
 
     @property
+    def subscription_id(self) -> str:
+        return self._doc.get("subscription_id")
+
+    @subscription_id.setter
+    def subscription_id(self, val: str):
+        self._doc["subscription_id"] = val
+
+    @property
     def tags(self) -> list[str]:
         return self._doc.get("tags")
 
@@ -61,6 +69,14 @@ class Article:
             self.props.append(name)
         elif not is_set and name in self.props:
             self.props.remove(name)
+
+    @property
+    def published(self) -> str:
+        return self._doc.get("published")
+
+    @published.setter
+    def published(self, val: str):
+        self._doc["published"] = val
 
     @property
     def synced(self) -> str:

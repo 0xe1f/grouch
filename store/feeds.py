@@ -1,11 +1,17 @@
 from common import build_key
 from common import format_iso
 from common import now_in_iso
-from couchdb.http import ResourceConflict
 from datatype import FeedContent
 from store.bulk_update_queue import BulkUpdateQueue
 from store.connection import Connection
 from time import struct_time
+
+def find_feeds_by_id(conn: Connection, *feed_ids: str) -> list[FeedContent]:
+    matches = []
+    for item in conn.db.view("_all_docs", keys=feed_ids, include_docs=True):
+        matches.append(FeedContent(item.doc["content"]))
+
+    return matches
 
 def find_feeds_by_url(conn: Connection, *urls: str) -> dict:
     matches = {}
