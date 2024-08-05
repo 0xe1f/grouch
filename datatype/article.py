@@ -4,7 +4,8 @@ from datatype.flex_object import FlexObject
 class Article(FlexObject):
 
     PROP_UNREAD = "unread"
-    PROP_LIKED = "liked"
+    PROP_LIKED = "like"
+    PROP_STARRED = "star"
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)

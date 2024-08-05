@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
+from common.secret import deobfuscate_json
+from common.secret import obfuscate_json
 from config import read_config
-from datatype import Filter
 from datatype import PublicArticle
 from datatype import PublicSub
 from flask import Flask
@@ -10,6 +11,7 @@ from flask import request
 from json import loads
 from store import Connection
 from store import fetch_user
+from store import find_articles_by_prop
 from store import find_articles_by_sub
 from store import find_articles_by_user
 from store import find_entries_by_id
@@ -42,25 +44,36 @@ def subscriptions():
 
 @app.route('/articles')
 def articles():
-    filter = _parse_filter(request.args.get("filter"))
-    if filter.subscription_id:
-        articles = find_articles_by_sub(conn, filter.subscription_id)
+    rq_args = request.args
+
+    start = None
+    if "continue" in rq_args:
+        start = deobfuscate_json(rq_args["continue"])
+
+    filter = {}
+    if "filter" in rq_args:
+        try:
+            filter = loads(rq_args["filter"])
+        except ValueError:
+            logging.error("filter is not valid JSON")
+
+    if "s" in filter:
+        articles, next_start = find_articles_by_sub(conn, filter["s"], start)
+    elif "p" in filter:
+        articles, next_start = find_articles_by_prop(conn, user.id, filter["p"], start)
     else:
-        articles = find_articles_by_user(conn, user.id)
+        articles, next_start = find_articles_by_user(conn, user.id, start)
 
     entries = find_entries_by_id(conn, *[article.entry_id for article in articles])
     entry_map = { entry.id:entry for entry in entries }
 
-    return {
-        "articles": [PublicArticle(article, entry_map[article.entry_id]).doc() for article in articles]
+    results = {
+        "articles": [PublicArticle(article, entry_map[article.entry_id]).doc() for article in articles],
     }
+    if next_start:
+        results["continue"] = obfuscate_json(next_start)
 
-def _parse_filter(doc: str):
-    json = loads(doc)
-    if "s" in json:
-        return Filter(sub_id=json["s"])
-
-    return Filter()
+    return results
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

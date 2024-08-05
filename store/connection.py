@@ -104,6 +104,17 @@ class Connection:
                         }
                     """
                 },
+                "articles-by-prop": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                doc.props.forEach((prop) => {
+                                    emit([doc.user_id, prop, doc.published, doc.updated])
+                                });
+                            }
+                        }
+                    """
+                },
             },
         )
 

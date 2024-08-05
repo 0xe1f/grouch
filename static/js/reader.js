@@ -1214,7 +1214,7 @@ $().ready(function() {
 			// Update the title bar
 
 			var root = subscriptionMap[""];
-			var title = 'Gofr';
+			var title = 'grouch';
 
 			if (root.unread > 0)
 				title += ' (' + root.unread + ')';

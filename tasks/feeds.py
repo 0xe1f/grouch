@@ -97,9 +97,10 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
         for remote_entry in remote_entry_map.values():
             remote_entry.feed_id = local_feed.id
             new_entries.append(remote_entry)
+            entries_changed += 1
         enqueue_entries(bulk_q, *new_entries)
 
-    logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated, {len(new_entries)} new entries")
+    logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated")
 
 def _fetch_feeds(*feed_urls: str) -> tuple[list[ParseResult], list[ParseResult]]:
     start = time.time()
