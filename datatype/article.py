@@ -1,5 +1,7 @@
 from common import build_key
+from common import decompose_key
 from datatype.flex_object import FlexObject
+from datatype.user import User
 
 class Article(FlexObject):
 
@@ -7,10 +9,12 @@ class Article(FlexObject):
     PROP_LIKED = "like"
     PROP_STARRED = "star"
 
+    DOC_TYPE = "article"
+
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
         if not source:
-            self.doc_type = "article"
+            self.doc_type = Article.DOC_TYPE
         if self.tags == None:
             self.tags = []
         if self.props == None:
@@ -56,7 +60,7 @@ class Article(FlexObject):
     def props(self, val: list[str]):
         self.set_prop("props", val)
 
-    def toggle_prop(self, name: str, is_set: bool | None):
+    def toggle_prop(self, name: str, is_set: bool|None=None):
         if is_set == None:
             if name in self.props:
                 self.props.remove(name)
@@ -85,3 +89,12 @@ class Article(FlexObject):
 
     def build_key(self) -> str|None:
         return build_key(self.doc_type, self.user_id, self.entry_id)
+
+    @staticmethod
+    def extract_owner_id(article_id: str) -> str|None:
+        doc_type, parts = decompose_key(article_id)
+        if doc_type != Article.DOC_TYPE:
+            return None
+        if len(parts) != 3:
+            return None
+        return build_key(User.DOC_TYPE, parts[0])

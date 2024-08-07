@@ -1,5 +1,6 @@
 from store.articles import enqueue_articles
 from store.articles import find_articles_by_entry
+from store.articles import find_articles_by_id
 from store.articles import find_articles_by_prop
 from store.articles import find_articles_by_sub
 from store.articles import find_articles_by_user
@@ -18,7 +19,7 @@ from store.feeds import stale_feeds
 from store.folders import find_folders_by_user_id
 from store.folders import write_folders
 from store.subscriptions import enqueue_subs
-from store.subscriptions import fetch_sub
+from store.subscriptions import find_subs_by_id
 from store.subscriptions import find_user_subs
 from store.subscriptions import find_user_subs_synced
 from store.users import create_user

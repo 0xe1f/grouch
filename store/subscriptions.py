@@ -3,11 +3,13 @@ from datatype import Subscription
 from store import BulkUpdateQueue
 from store import Connection
 
-def fetch_sub(conn: Connection, sub_id: str) -> Subscription|None:
-    for item in conn.db.view("_all_docs", key=sub_id, include_docs=True):
-        return Subscription(item.doc)
+def find_subs_by_id(conn: Connection, *sub_ids: str) -> list[Subscription]:
+    matches = []
+    for item in conn.db.view("_all_docs", keys=sub_ids, include_docs=True):
+        if "doc" in item:
+            matches.append(Subscription(item["doc"]))
 
-    return None
+    return matches
 
 def find_user_subs(conn: Connection, user_id: str) -> list[Subscription]:
     matches = []

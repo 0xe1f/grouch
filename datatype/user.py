@@ -4,10 +4,12 @@ import bcrypt
 
 class User(FlexObject):
 
+    DOC_TYPE = "user"
+
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
         if not source:
-            self.doc_type = "user"
+            self.doc_type = User.DOC_TYPE
 
     @property
     def username(self) -> str:

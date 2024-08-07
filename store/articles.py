@@ -7,6 +7,14 @@ from store.connection import Connection
 type ArticlePageMarker = tuple
 type ArticlePage = tuple[list[Article], ArticlePageMarker|None]
 
+def find_articles_by_id(conn: Connection, *article_ids: str) -> list[Article]:
+    matches = []
+    for item in conn.db.view("_all_docs", keys=article_ids, include_docs=True):
+        if "doc" in item:
+            matches.append(Article(item["doc"]))
+
+    return matches
+
 def find_articles_by_user(conn: Connection, user_id: str, start: str=None, limit: int=40) -> ArticlePage:
     options = {
         "end_key": [user_id],
