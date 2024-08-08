@@ -16,6 +16,7 @@ from store.entries import find_entries_fetched_since
 from store.feeds import find_feeds_by_id
 from store.feeds import find_feed_ids_by_url
 from store.feeds import stale_feeds
+from store.folders import find_folders_by_id
 from store.folders import find_folders_by_user_id
 from store.folders import write_folders
 from store.subscriptions import enqueue_subs

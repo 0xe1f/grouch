@@ -46,6 +46,7 @@ def find_articles_by_prop(conn: Connection, user_id: str, prop: str, start: str=
 
     next_start = None
     matches = []
+
     for item in conn.db.view("maint/articles-by-prop", **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
@@ -55,7 +56,7 @@ def find_articles_by_prop(conn: Connection, user_id: str, prop: str, start: str=
 
     return matches, next_start
 
-def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, limit: int=40) -> ArticlePage:
+def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, unread_only: bool=False, limit: int=40) -> ArticlePage:
     options = {
         "end_key": [sub_id],
         "start_key": start if start else [sub_id, {}],
@@ -63,9 +64,12 @@ def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, limit: 
         "limit": limit + 1,
         "descending": True,
     }
+
     next_start = None
     matches = []
-    for item in conn.db.view("maint/articles-by-sub", **options):
+    view_name = "maint/articles-by-sub-unread" if unread_only else "maint/articles-by-sub"
+
+    for item in conn.db.view(view_name, **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
         else:

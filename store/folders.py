@@ -5,6 +5,14 @@ from couchdb.http import ResourceConflict
 from datatype import Folder
 from store.connection import Connection
 
+def find_folders_by_id(conn: Connection, *ids: str) -> list[Folder]:
+    matches = []
+    for item in conn.db.view("_all_docs", keys=ids, include_docs=True):
+        if "doc" in item:
+            matches.append(Folder(item["doc"]))
+
+    return matches
+
 def write_folders(conn: Connection, *folders: Folder) -> list[Folder]:
     for folder in folders:
         if not folder.user_id:

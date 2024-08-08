@@ -5,6 +5,9 @@ from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
 from config import read_config
 from datatype import Article
+from datatype import Folder
+from datatype import Subscription
+from datatype import FlexObject
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -18,14 +21,17 @@ from store import find_articles_by_sub
 from store import find_articles_by_user
 from store import find_entries_by_id
 from store import find_feeds_by_id
+from store import find_folders_by_id
 from store import find_subs_by_id
 from store import find_user_id
 from store import find_user_subs
 from web.ext_type import Error
+from web.ext_type import Folder as PubFolder
 from web.ext_type import SetProperty
 from web.ext_type import ArticlePage
 from web.ext_type import PublicArticle
 from web.ext_type import PublicSub
+from web.ext_type import Rename
 from web.ext_type import TableOfContents
 import logging
 
@@ -46,6 +52,7 @@ def subscriptions():
 
     return TableOfContents(
         subs=[PublicSub(sub, feed_map[sub.feed_id]) for sub in subs],
+        folders=[PubFolder()],
     ).as_dict()
 
 @app.route('/articles')
@@ -61,10 +68,11 @@ def articles():
         try:
             filter = loads(rq_args["filter"])
         except ValueError:
-            logging.error("filter is not valid JSON")
+            logging.error("Filter is not valid JSON")
 
     if "s" in filter:
-        articles, next_start = find_articles_by_sub(conn, filter["s"], start)
+        unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
+        articles, next_start = find_articles_by_sub(conn, filter["s"], start, unread_only=unread_only)
     elif "p" in filter:
         articles, next_start = find_articles_by_prop(conn, user.id, filter["p"], start)
     else:
@@ -88,9 +96,9 @@ def set_property():
         logging.warning(f"Missing article id for {request.json}")
         return Error("FIXME!!").as_dict()
 
-    article_owner_id = Article.extract_owner_id(arg.article_id)
-    if not article_owner_id or article_owner_id != user.id:
-        logging.warning(f"User not authorized ({article_owner_id}!={user.id})")
+    owner_id = Article.extract_owner_id(arg.article_id)
+    if owner_id != user.id:
+        logging.warning(f"User not authorized ({owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     article = first_or_none(find_articles_by_id(conn, arg.article_id))
@@ -111,6 +119,49 @@ def set_property():
         bulk_q.flush()
 
     return article.props
+
+@app.route('/rename', methods=['POST'])
+def rename():
+    arg = Rename(request.json)
+    if not arg:
+        logging.warning(f"Invalid setProperty request {request.json}")
+        return Error("FIXME!!").as_dict()
+    elif not arg.id:
+        logging.warning(f"Missing object id for {request.json}")
+        return Error("FIXME!!").as_dict()
+    # FIXME!! validate title
+
+    doc_type = FlexObject.extract_doc_type(arg.id)
+    bulk_q = BulkUpdateQueue(conn)
+    if doc_type == Subscription.DOC_TYPE:
+        owner_id = Subscription.extract_owner_id(arg.id)
+        if owner_id != user.id:
+            logging.warning(f"User not authorized ({owner_id}!={user.id})")
+            return Error("FIXME!!").as_dict()
+        obj = first_or_none(find_subs_by_id(conn, arg.id))
+        if not obj:
+            return Error("FIXME!!").as_dict()
+        obj.title = arg.title
+        bulk_q.enqueue_tuple((obj.doc(), obj))
+    elif doc_type == Folder.DOC_TYPE:
+        owner_id = Folder.extract_owner_id(arg.id)
+        if owner_id != user.id:
+            logging.warning(f"User not authorized ({owner_id}!={user.id})")
+            return Error("FIXME!!").as_dict()
+        obj = first_or_none(find_folders_by_id(conn, arg.id))
+        if not obj:
+            return Error("FIXME!!").as_dict()
+        obj.title = arg.title
+        bulk_q.enqueue_tuple((obj.doc(), obj))
+    else:
+        logging.warning(f"Unrecognized doc_type: {doc_type}")
+        return Error("FIXME!!").as_dict()
+
+    bulk_q.flush()
+
+    # FIXME!!: return the entire tree?
+
+    return {}
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
