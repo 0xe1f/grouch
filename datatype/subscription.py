@@ -1,12 +1,16 @@
 from common import build_key
+from common import decompose_key
 from datatype.flex_object import FlexObject
+from datatype.user import User
 
 class Subscription(FlexObject):
+
+    DOC_TYPE = "sub"
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
         if not source:
-            self.doc_type = "sub"
+            self.doc_type = __class__.DOC_TYPE
             self.unread_count = 0
 
     @property
@@ -67,3 +71,12 @@ class Subscription(FlexObject):
 
     def build_key(self) -> str|None:
         return build_key(self.doc_type, self.user_id, self.feed_id)
+
+    @staticmethod
+    def extract_owner_id(obj_id: str) -> str|None:
+        doc_type, parts = decompose_key(obj_id)
+        if doc_type != __class__.DOC_TYPE:
+            return None
+        if len(parts) != 2:
+            return None
+        return build_key(User.DOC_TYPE, parts[0])

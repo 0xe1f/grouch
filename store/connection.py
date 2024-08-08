@@ -115,6 +115,15 @@ class Connection:
                         }
                     """
                 },
+                "articles-by-sub-unread": {
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article' && doc.props.includes('unread')) {
+                                emit([doc.subscription_id, doc.published, doc.updated], null);
+                            }
+                        }
+                    """
+                },
             },
         )
 

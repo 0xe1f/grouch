@@ -1,3 +1,5 @@
+from common import decompose_key
+
 class FlexObject:
 
     def __init__(self, source: dict[str, str]={}):
@@ -46,3 +48,8 @@ class FlexObject:
 
     def doc(self):
         return self._doc.copy()
+
+    @staticmethod
+    def extract_doc_type(obj_id: str) -> str|None:
+        doc_type, _ = decompose_key(obj_id)
+        return doc_type

@@ -91,9 +91,9 @@ class Article(FlexObject):
         return build_key(self.doc_type, self.user_id, self.entry_id)
 
     @staticmethod
-    def extract_owner_id(article_id: str) -> str|None:
-        doc_type, parts = decompose_key(article_id)
-        if doc_type != Article.DOC_TYPE:
+    def extract_owner_id(obj_id: str) -> str|None:
+        doc_type, parts = decompose_key(obj_id)
+        if doc_type != __class__.DOC_TYPE:
             return None
         if len(parts) != 3:
             return None
