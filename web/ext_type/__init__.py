@@ -7,3 +7,4 @@ from web.ext_type.public_article import PublicArticle
 from web.ext_type.public_sub import PublicSub
 from web.ext_type.rename import Rename
 from web.ext_type.table_of_contents import TableOfContents
+from web.ext_type.tag import Tag

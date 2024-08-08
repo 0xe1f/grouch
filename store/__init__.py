@@ -23,6 +23,7 @@ from store.subscriptions import enqueue_subs
 from store.subscriptions import find_subs_by_id
 from store.subscriptions import find_user_subs
 from store.subscriptions import find_user_subs_synced
+from store.tags import find_tags_by_user
 from store.users import create_user
 from store.users import fetch_user
 from store.users import find_user_id
