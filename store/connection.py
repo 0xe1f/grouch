@@ -26,7 +26,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'feed') {
-                                emit(doc.updated, null);
+                                emit(doc.updated);
                             }
                         }
                     """
@@ -35,7 +35,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'user') {
-                                emit(doc.email_address, null);
+                                emit(doc.email_address);
                             }
                         }
                     """,
@@ -45,7 +45,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'feed') {
-                                emit(doc.feed_url, null);
+                                emit(doc.feed_url);
                             }
                         }
                     """
@@ -63,7 +63,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'entry') {
-                                emit([doc.feed_id, doc.entry_uid], null);
+                                emit([doc.feed_id, doc.entry_uid]);
                             }
                         }
                     """
@@ -72,7 +72,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'entry') {
-                                emit([doc.feed_id, doc.updated], null);
+                                emit([doc.feed_id, doc.updated]);
                             }
                         }
                     """
@@ -90,7 +90,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article') {
-                                emit([doc.user_id, doc.published, doc.updated], null);
+                                emit([doc.user_id, doc.published, doc.updated]);
                             }
                         }
                     """
@@ -99,7 +99,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article') {
-                                emit([doc.subscription_id, doc.published, doc.updated], null);
+                                emit([doc.subscription_id, doc.published, doc.updated]);
                             }
                         }
                     """
@@ -119,10 +119,20 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article' && doc.props.includes('unread')) {
-                                emit([doc.subscription_id, doc.published, doc.updated], null);
+                                emit([doc.subscription_id, doc.published, doc.updated]);
                             }
                         }
                     """
+                },
+                "tags-by-user": {
+                    "map": """
+                        function (doc) {
+                            doc.tags.forEach((tag) => {
+                                emit([doc.user_id, tag])
+                            });
+                        }
+                    """,
+                    "reduce": "_count"
                 },
             },
         )

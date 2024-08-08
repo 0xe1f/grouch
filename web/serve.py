@@ -22,6 +22,7 @@ from store import find_articles_by_user
 from store import find_entries_by_id
 from store import find_feeds_by_id
 from store import find_folders_by_id
+from store import find_tags_by_user
 from store import find_subs_by_id
 from store import find_user_id
 from store import find_user_subs
@@ -33,6 +34,7 @@ from web.ext_type import PublicArticle
 from web.ext_type import PublicSub
 from web.ext_type import Rename
 from web.ext_type import TableOfContents
+from web.ext_type import Tag
 import logging
 
 app = Flask(__name__)
@@ -49,10 +51,13 @@ def subscriptions():
     subs = find_user_subs(conn, user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
     feed_map = { feed.id:feed for feed in feeds }
+    # FIXME!!: limit to a max
+    tags = [Tag(tag) for tag in find_tags_by_user(conn, user.id)]
 
     return TableOfContents(
         subs=[PublicSub(sub, feed_map[sub.feed_id]) for sub in subs],
         folders=[PubFolder()],
+        tags=tags,
     ).as_dict()
 
 @app.route('/articles')
