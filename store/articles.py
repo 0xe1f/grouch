@@ -26,7 +26,7 @@ def find_articles_by_user(conn: Connection, user_id: str, start: str=None, limit
 
     next_start = None
     matches = []
-    for item in conn.db.view("maint/articles-by-user", **options):
+    for item in conn.db.view("maint/articles_by_user", **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
         else:
@@ -47,7 +47,7 @@ def find_articles_by_prop(conn: Connection, user_id: str, prop: str, start: str=
     next_start = None
     matches = []
 
-    for item in conn.db.view("maint/articles-by-prop", **options):
+    for item in conn.db.view("maint/articles_by_prop", **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
         else:
@@ -67,7 +67,7 @@ def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, unread_
 
     next_start = None
     matches = []
-    view_name = "maint/articles-by-sub-unread" if unread_only else "maint/articles-by-sub"
+    view_name = "maint/articles_by_sub_unread" if unread_only else "maint/articles_by_sub"
 
     for item in conn.db.view(view_name, **options):
         if len(matches) < limit:
