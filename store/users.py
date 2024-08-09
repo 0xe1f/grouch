@@ -31,7 +31,7 @@ def create_user(conn: Connection, user: User) -> bool:
     user.updated = now_in_iso()
 
     try:
-        new_id, _ = conn.db.save(user.doc())
+        new_id, _ = conn.db.save(user.as_dict())
     except ResourceConflict as e:
         logging.exception(f"Error writing user {user.id}", e)
         return False

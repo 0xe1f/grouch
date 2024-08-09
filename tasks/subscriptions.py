@@ -3,8 +3,6 @@ from common import now_in_iso
 from datatype import Article
 from datatype import Subscription
 from itertools import batched
-from store import enqueue_articles
-from store import enqueue_subs
 from store import find_subs_by_id
 from store import find_articles_by_entry
 from store import find_entries_fetched_since
@@ -17,58 +15,60 @@ from tasks import import_feeds
 import logging
 
 def sync_subs(conn: Connection, user_id: str):
-    bulk_q = BulkUpdateQueue(conn)
-
     # TODO: mayhap split this across multiple executors
-    for sub_id, feed_id, synced in find_user_subs_synced(conn, user_id):
-        max_synced = ""
-        read_batch_size = 40
+    with BulkUpdateQueue(conn) as bulk_q:
+        for sub_id, feed_id, synced in find_user_subs_synced(conn, user_id):
+            max_synced = ""
+            read_batch_size = 40
 
-        # Fetch entries that have updated
-        marked_unread = 0
-        updated_article_count = 0
-        for entry_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
-            entry_map = {}
-            for entry in entry_batch:
-                entry_map[entry.id] = entry
-                max_synced = max(max_synced, entry.updated or "")
+            # Fetch entries that have updated
+            marked_unread = 0
+            updated_article_count = 0
+            for entry_batch in batched(find_entries_fetched_since(conn, feed_id, synced), read_batch_size):
+                entry_map = {}
+                for entry in entry_batch:
+                    entry_map[entry.id] = entry
+                    max_synced = max(max_synced, entry.updated or "")
 
-            # Batch existing articles
-            for article in find_articles_by_entry(conn, user_id, *entry_map.keys()):
-                entry = entry_map.pop(article.entry_id)
-                if article.synced == entry.updated:
-                    # Nothing's changed
-                    continue
-                marked_unread += 1
-                updated_article_count += 1
-                article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = entry.updated
-                article.published = entry.published
-                enqueue_articles(bulk_q, article)
+                # Batch existing articles
+                for article in find_articles_by_entry(conn, user_id, *entry_map.keys()):
+                    entry = entry_map.pop(article.entry_id)
+                    if article.synced == entry.updated:
+                        # Nothing's changed
+                        continue
+                    marked_unread += 1
+                    updated_article_count += 1
+                    article.toggle_prop(Article.PROP_UNREAD, True)
+                    article.synced = entry.updated
+                    article.published = entry.published
+                    article.updated = now_in_iso()
+                    bulk_q.enqueue_flex(article)
 
-            # Batch new articles
-            for entry in entry_map.values():
-                marked_unread += 1
-                updated_article_count += 1
-                article = Article()
-                article.user_id = user_id
-                article.subscription_id = sub_id
-                article.entry_id = entry.id
-                article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = entry.updated
-                article.published = entry.published
-                enqueue_articles(bulk_q, article)
+                # Batch new articles
+                for entry in entry_map.values():
+                    marked_unread += 1
+                    updated_article_count += 1
+                    article = Article()
+                    article.user_id = user_id
+                    article.subscription_id = sub_id
+                    article.entry_id = entry.id
+                    article.toggle_prop(Article.PROP_UNREAD, True)
+                    article.synced = entry.updated
+                    article.published = entry.published
+                    article.id = article.build_key()
+                    article.updated = now_in_iso()
+                    bulk_q.enqueue_flex(article)
 
-        # Update sub, if there were changes
-        if updated_article_count:
-            sub = first_or_none(find_subs_by_id(conn, sub_id))
-            sub.last_synced = max_synced
-            sub.unread_count += marked_unread
-            enqueue_subs(bulk_q, sub)
+            # Update sub, if there were changes
+            if updated_article_count:
+                sub = first_or_none(find_subs_by_id(conn, sub_id))
+                sub.last_synced = max_synced
+                sub.unread_count += marked_unread
+                sub.id = sub.build_key()
+                sub.updated = now_in_iso()
+                bulk_q.enqueue_flex(sub)
 
-    bulk_q.flush()
-
-    logging.debug(f"{bulk_q.records_written}/{bulk_q.records_enqueued} records written")
+    logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written")
 
 def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
     # Subscribe to all available feeds, get list of remaining
@@ -101,23 +101,23 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSo
     if not existing_feeds_by_url:
         return all_subs
 
-    bulk_q = BulkUpdateQueue(conn)
-    for url, feed_id in existing_feeds_by_url.items():
-        sub_source = source_dict[url]
-        sub = Subscription()
-        sub.user_id = user_id
-        sub.feed_id = feed_id
-        # FIXME!!
-        # if sub_source.parent_id:
-        #     sub.folder_id = folder_id_map[sub_source.parent_id]
-        sub.title = sub_source.title
-        sub.subscribed = now_in_iso()
+    with BulkUpdateQueue(conn) as bulk_q:
+        for url, feed_id in existing_feeds_by_url.items():
+            sub_source = source_dict[url]
+            sub = Subscription()
+            sub.user_id = user_id
+            sub.feed_id = feed_id
+            sub.id = sub.build_key()
+            # FIXME!!
+            # if sub_source.parent_id:
+            #     sub.folder_id = folder_id_map[sub_source.parent_id]
+            sub.title = sub_source.title
+            sub.subscribed = now_in_iso()
+            sub.updated = now_in_iso()
 
-        enqueue_subs(bulk_q, sub)
-        all_subs.remove(sub_source)
+            bulk_q.enqueue_flex(sub)
+            all_subs.remove(sub_source)
 
-    bulk_q.flush()
-
-    logging.info(f"Subscribed to {bulk_q.records_written} feeds")
+    logging.info(f"Subscribed to {bulk_q.written_count} feeds")
 
     return all_subs

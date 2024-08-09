@@ -46,7 +46,7 @@ class FlexObject:
     def build_key(self) -> str|None:
         return None
 
-    def doc(self):
+    def as_dict(self):
         return self._doc.copy()
 
     @staticmethod

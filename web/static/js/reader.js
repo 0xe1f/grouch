@@ -392,6 +392,7 @@ $().ready(function() {
                 dataType: "json",
                 success: function(response) {
                     sub.title = newName;
+                    // TODO: not good enough; need to sort
                     sub.syncView();
                 }
             });
@@ -609,7 +610,7 @@ $().ready(function() {
             if (typeof this.articleRoot === 'undefined')
             {
                 // Determine and store article root and path
-                var articleUrl = this.entry.link;
+                var articleUrl = this.link;
 
                 this.articleRoot = articleUrl;
                 this.articlePath = articleUrl;

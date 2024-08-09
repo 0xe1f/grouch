@@ -31,12 +31,3 @@ def stale_feeds(conn: Connection, stale_start: struct_time=None):
     iterable = conn.db.iterview("maint/updated_feeds", batch_limit, **options)
     for item in iterable:
         yield FeedContent(item.doc)
-
-def enqueue_feeds(bulk_queue: BulkUpdateQueue, *feeds: FeedContent):
-    for feed in feeds:
-        if not feed.id:
-            feed.id = feed.build_key()
-        feed.digest = feed.computed_digest()
-        feed.updated = now_in_iso()
-
-        bulk_queue.enqueue_tuple((feed.doc(), feed))

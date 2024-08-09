@@ -87,10 +87,3 @@ def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
         doc = item.get("doc")
         if doc:
             yield Article(doc)
-
-def enqueue_articles(bulk_q: BulkUpdateQueue, *articles: Article):
-    for article in articles:
-        if not article.id:
-            article.id = article.build_key()
-        article.updated = now_in_iso()
-        bulk_q.enqueue_tuple((article.doc(), article))

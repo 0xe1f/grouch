@@ -24,16 +24,3 @@ def find_user_subs_synced(conn: Connection, user_id: str) -> list[tuple[str, str
         matches.append((doc.id, doc.value["feed_id"], doc.value.get("last_sync")))
 
     return matches
-
-def enqueue_subs(bulk_queue: BulkUpdateQueue, *subs: Subscription):
-    for sub in subs:
-        if not sub.user_id:
-            raise ValueError(f"Sub {sub.title} is missing user_id")
-        elif not sub.feed_id:
-            raise ValueError(f"Sub {sub.title} is missing feed_id")
-
-    for sub in subs:
-        if not sub.id:
-            sub.id = sub.build_key()
-        sub.updated = now_in_iso()
-        bulk_queue.enqueue_tuple((sub.doc(), sub))

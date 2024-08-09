@@ -50,6 +50,6 @@ def wrap_folder(folder: Folder) -> map:
     return {
         "_id": build_key("folder", folder.id),
         "doc_type": "folder",
-        "content": folder.doc(),
+        "content": folder.as_dict(),
         "updated": now_in_iso(),
     }
