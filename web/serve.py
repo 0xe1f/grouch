@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from common.datetime import now_in_iso
 from common.lists import first_or_none
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
@@ -111,17 +112,17 @@ def set_property():
         return Error("FIXME!!").as_dict()
 
     if arg.is_set != (arg.prop_name in article.props):
-        bulk_q = BulkUpdateQueue(conn)
-        if arg.prop_name == Article.PROP_UNREAD:
-            # Need to also update sub
-            sub = first_or_none(find_subs_by_id(conn, article.subscription_id))
-            if not sub:
-                return Error("FIXME!!").as_dict()
-            sub.unread_count += 1 if arg.is_set else -1
-            bulk_q.enqueue_tuple((sub.doc(), sub))
-        article.toggle_prop(arg.prop_name, arg.is_set)
-        bulk_q.enqueue_tuple((article.doc(), article))
-        bulk_q.flush()
+        with BulkUpdateQueue(conn) as bulk_q:
+            if arg.prop_name == Article.PROP_UNREAD:
+                # Need to also update sub
+                sub = first_or_none(find_subs_by_id(conn, article.subscription_id))
+                if not sub:
+                    return Error("FIXME!!").as_dict()
+                sub.unread_count += 1 if arg.is_set else -1
+                sub.updated = now_in_iso()
+                bulk_q.enqueue_flex(sub)
+            article.toggle_prop(arg.prop_name, arg.is_set)
+            bulk_q.enqueue_flex(article)
 
     return article.props
 
@@ -137,32 +138,30 @@ def rename():
     # FIXME!! validate title
 
     doc_type = FlexObject.extract_doc_type(arg.id)
-    bulk_q = BulkUpdateQueue(conn)
-    if doc_type == Subscription.DOC_TYPE:
-        owner_id = Subscription.extract_owner_id(arg.id)
-        if owner_id != user.id:
-            logging.warning(f"User not authorized ({owner_id}!={user.id})")
+    with BulkUpdateQueue(conn) as bulk_q:
+        if doc_type == Subscription.DOC_TYPE:
+            owner_id = Subscription.extract_owner_id(arg.id)
+            if owner_id != user.id:
+                logging.warning(f"User not authorized ({owner_id}!={user.id})")
+                return Error("FIXME!!").as_dict()
+            obj = first_or_none(find_subs_by_id(conn, arg.id))
+            if not obj:
+                return Error("FIXME!!").as_dict()
+            obj.title = arg.title
+            bulk_q.enqueue_flex(obj)
+        elif doc_type == Folder.DOC_TYPE:
+            owner_id = Folder.extract_owner_id(arg.id)
+            if owner_id != user.id:
+                logging.warning(f"User not authorized ({owner_id}!={user.id})")
+                return Error("FIXME!!").as_dict()
+            obj = first_or_none(find_folders_by_id(conn, arg.id))
+            if not obj:
+                return Error("FIXME!!").as_dict()
+            obj.title = arg.title
+            bulk_q.enqueue_flex(obj)
+        else:
+            logging.warning(f"Unrecognized doc_type: {doc_type}")
             return Error("FIXME!!").as_dict()
-        obj = first_or_none(find_subs_by_id(conn, arg.id))
-        if not obj:
-            return Error("FIXME!!").as_dict()
-        obj.title = arg.title
-        bulk_q.enqueue_tuple((obj.doc(), obj))
-    elif doc_type == Folder.DOC_TYPE:
-        owner_id = Folder.extract_owner_id(arg.id)
-        if owner_id != user.id:
-            logging.warning(f"User not authorized ({owner_id}!={user.id})")
-            return Error("FIXME!!").as_dict()
-        obj = first_or_none(find_folders_by_id(conn, arg.id))
-        if not obj:
-            return Error("FIXME!!").as_dict()
-        obj.title = arg.title
-        bulk_q.enqueue_tuple((obj.doc(), obj))
-    else:
-        logging.warning(f"Unrecognized doc_type: {doc_type}")
-        return Error("FIXME!!").as_dict()
-
-    bulk_q.flush()
 
     # FIXME!!: return the entire tree?
 

@@ -24,12 +24,3 @@ def find_entries_by_uid(conn: Connection, feed_id: str, *entry_uids: str):
     results = conn.db.view("maint/entries_by_feed", **options)
     for item in results:
         yield EntryContent(item["doc"])
-
-def enqueue_entries(bulk_queue: BulkUpdateQueue, *entries: EntryContent):
-    for entry in entries:
-        if not entry.id:
-            entry.id = entry.build_key()
-        entry.digest = entry.computed_digest()
-        entry.updated = now_in_iso()
-
-        bulk_queue.enqueue_tuple((entry.doc(), entry))
