@@ -13,14 +13,14 @@ def find_subs_by_id(conn: Connection, *ids: str) -> list[Subscription]:
 
 def find_user_subs(conn: Connection, user_id: str) -> list[Subscription]:
     matches = []
-    for item in conn.db.view("maint/sub-last-synced-by-user", start_key=[ user_id ], end_key=[ user_id, {} ], include_docs=True):
+    for item in conn.db.view("maint/sub_last_synced_by_user", start_key=[ user_id ], end_key=[ user_id, {} ], include_docs=True):
         matches.append(Subscription(item.doc))
 
     return matches
 
 def find_user_subs_synced(conn: Connection, user_id: str) -> list[tuple[str, str, str]]:
     matches = []
-    for doc in conn.db.view("maint/sub-last-synced-by-user", start_key=[ user_id ], end_key=[ user_id, {} ]):
+    for doc in conn.db.view("maint/sub_last_synced_by_user", start_key=[ user_id ], end_key=[ user_id, {} ]):
         matches.append((doc.id, doc.value["feed_id"], doc.value.get("last_sync")))
 
     return matches

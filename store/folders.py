@@ -41,7 +41,7 @@ def write_folders(conn: Connection, *folders: Folder) -> list[Folder]:
 
 def find_folders_by_user_id(conn: Connection, user_id: str) -> map:
     matches = {}
-    for item in conn.db.view("maint/folders-by-user", key=user_id):
+    for item in conn.db.view("maint/folders_by_user", key=user_id):
         matches[item.value] = item.id
 
     return matches

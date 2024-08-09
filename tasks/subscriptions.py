@@ -1,10 +1,11 @@
+from common import first_or_none
 from common import now_in_iso
 from datatype import Article
 from datatype import Subscription
 from itertools import batched
 from store import enqueue_articles
 from store import enqueue_subs
-from store import fetch_sub
+from store import find_subs_by_id
 from store import find_articles_by_entry
 from store import find_entries_fetched_since
 from store import find_feed_ids_by_url
@@ -60,7 +61,7 @@ def sync_subs(conn: Connection, user_id: str):
 
         # Update sub, if there were changes
         if updated_article_count:
-            sub = fetch_sub(conn, sub_id)
+            sub = first_or_none(find_subs_by_id(conn, sub_id))
             sub.last_synced = max_synced
             sub.unread_count += marked_unread
             enqueue_subs(bulk_q, sub)

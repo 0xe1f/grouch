@@ -47,7 +47,7 @@ def create_user(conn: Connection, user: User) -> bool:
     return True
 
 def _email_address_count(conn: Connection, email_address: str) -> bool:
-    result = conn.db.view("maint/users-by-email", reduce=True, group=True, limit=1)
+    result = conn.db.view("maint/users_by_email", reduce=True, group=True, limit=1)
     next_item = next(result[email_address].__iter__(), None)
 
     if next_item:

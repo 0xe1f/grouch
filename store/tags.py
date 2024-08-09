@@ -7,6 +7,6 @@ def find_tags_by_user(conn: Connection, user_id: str):
         "reduce": True,
         "group": True,
     }
-    for item in conn.db.view("maint/tags-by-user", **options):
+    for item in conn.db.view("maint/tags_by_user", **options):
         if item.key and len(item.key) >= 2:
             yield item.key[1]

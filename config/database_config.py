@@ -1,12 +1,10 @@
 class DatabaseConfig:
 
-
     def __init__(self, **item):
         self.__dict__.update(item)
 
-        if not self.port:
+        if not hasattr(self, "port"):
             self.port = 5984
-
 
     def validate(self):
         if not self.name:
