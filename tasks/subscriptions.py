@@ -12,7 +12,6 @@ from store import BulkUpdateQueue
 from store import Connection
 from subscribe import SubSource
 from tasks import import_feeds
-from time import sleep
 import logging
 
 def sync_subs(conn: Connection, user_id: str):

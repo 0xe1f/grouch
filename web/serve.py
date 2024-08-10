@@ -232,10 +232,22 @@ def move_sub():
         if dest_owner_id != user.id:
             app.logger.warning(f"Unauthorized destination ({dest_owner_id}!={user.id})")
             return Error("FIXME!!").as_dict()
+        folder = first_or_none(find_folders_by_id(conn, arg.destination))
+        if not folder:
+            app.logger.warning(f"Destination ({arg.destination}) does not exist")
+            return Error("FIXME!!").as_dict()
 
-    executor.submit(tasks.move_sub, conn, arg.id, arg.destination)
+    with BulkUpdateQueue(conn) as bulk_q:
+        sub = first_or_none(find_subs_by_id(conn, arg.id))
+        if not sub:
+            app.logger.warning(f"Sub ({arg.id}) does not exist")
+            return Error("FIXME!!").as_dict()
+        sub.folder_id = arg.destination
+        bulk_q.enqueue_flex(sub)
 
-    return responses.MoveSubResponse().as_dict()
+    return responses.MoveSubResponse(
+        toc=_fetch_table_of_contents(),
+    ).as_dict()
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)

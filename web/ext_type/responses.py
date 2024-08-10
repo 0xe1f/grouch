@@ -23,8 +23,12 @@ class CreateFolderResponse(JsonObject):
 
 class MoveSubResponse(JsonObject):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
+            },
+        )
 
 class RenameResponse(JsonObject):
 

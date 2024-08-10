@@ -107,6 +107,15 @@ class Connection:
                     }
                 """
             },
+            subs_by_folder={
+                "map": """
+                    function (doc) {
+                        if (doc.doc_type == 'sub' && doc.folder_id) {
+                            emit(doc.folder_id);
+                        }
+                    }
+                """
+            },
             articles_by_user={
                 "map": """
                     function (doc) {
