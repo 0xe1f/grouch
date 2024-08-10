@@ -37,6 +37,14 @@ class Article(FlexObject):
         self.set_prop("entry_id", val)
 
     @property
+    def folder_id(self) -> str:
+        return self.get_prop("folder_id")
+
+    @folder_id.setter
+    def folder_id(self, val: str):
+        self.set_prop("folder_id", val)
+
+    @property
     def subscription_id(self) -> str:
         return self.get_prop("subscription_id")
 

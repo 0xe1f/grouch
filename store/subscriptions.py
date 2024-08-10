@@ -20,6 +20,6 @@ def find_subs_by_user(conn: Connection, user_id: str) -> list[Subscription]:
 def find_user_subs_synced(conn: Connection, user_id: str) -> list[tuple[str, str, str]]:
     matches = []
     for doc in conn.db.view(views.SUBS_BY_USER_BY_SYNC, start_key=[ user_id ], end_key=[ user_id, {} ]):
-        matches.append((doc.id, doc.value["feed_id"], doc.value.get("last_sync")))
+        matches.append((doc.id, doc.value["feed_id"], doc.value.get("folder_id"), doc.value.get("last_sync")))
 
     return matches

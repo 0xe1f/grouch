@@ -107,3 +107,34 @@ def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
         doc = item.get("doc")
         if doc:
             yield Article(doc)
+
+def find_articles_by_folder(conn: Connection, sub_id: str, start: str=None, unread_only: bool=False, limit: int=40) -> ArticlePage:
+    options = {
+        "end_key": [sub_id],
+        "start_key": start if start else [sub_id, {}],
+        "include_docs": True,
+        "limit": limit + 1,
+        "descending": True,
+    }
+
+    next_start = None
+    matches = []
+    view_name = views.ARTICLES_BY_FOLDER_UNREAD if unread_only else views.ARTICLES_BY_FOLDER
+
+    for item in conn.db.view(view_name, **options):
+        if len(matches) < limit:
+            matches.append(Article(item.doc))
+        else:
+            next_start = item.key
+            break
+
+    return matches, next_start
+
+def generate_articles_by_sub(conn: Connection, sub_id: str, batch_size: int=40):
+    options = {
+        "start_key": [sub_id],
+        "end_key": [sub_id, {}],
+        "include_docs": True,
+    }
+    for item in conn.db.iterview(views.ARTICLES_BY_SUB, batch_size, **options):
+        yield Article(item.doc)

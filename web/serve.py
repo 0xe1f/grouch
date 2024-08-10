@@ -16,6 +16,7 @@ from json import loads
 from store import BulkUpdateQueue
 from store import Connection
 from store import fetch_user
+from store import find_articles_by_folder
 from store import find_articles_by_id
 from store import find_articles_by_prop
 from store import find_articles_by_tag
@@ -69,7 +70,10 @@ def articles():
         except ValueError:
             app.logger.error("Filter is not valid JSON")
 
-    if "s" in filter:
+    if "f" in filter:
+        unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
+        articles, next_start = find_articles_by_folder(conn, filter["f"], start, unread_only=unread_only)
+    elif "s" in filter:
         unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
         articles, next_start = find_articles_by_sub(conn, filter["s"], start, unread_only=unread_only)
     elif "p" in filter:
@@ -237,6 +241,7 @@ def move_sub():
             app.logger.warning(f"Destination ({arg.destination}) does not exist")
             return Error("FIXME!!").as_dict()
 
+    # Move the subscription
     with BulkUpdateQueue(conn) as bulk_q:
         sub = first_or_none(find_subs_by_id(conn, arg.id))
         if not sub:
@@ -244,6 +249,10 @@ def move_sub():
             return Error("FIXME!!").as_dict()
         sub.folder_id = arg.destination
         bulk_q.enqueue_flex(sub)
+
+    # Move the articles asynchronously
+    if bulk_q.written_count > 0:
+        executor.submit(tasks.move_articles, conn, arg.id, arg.destination)
 
     return responses.MoveSubResponse(
         toc=_fetch_table_of_contents(),

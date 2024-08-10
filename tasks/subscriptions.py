@@ -17,7 +17,8 @@ import logging
 def sync_subs(conn: Connection, user_id: str):
     # TODO: mayhap split this across multiple executors
     with BulkUpdateQueue(conn) as bulk_q:
-        for sub_id, feed_id, synced in find_user_subs_synced(conn, user_id):
+        # FIXME: migrate to iterview
+        for sub_id, feed_id, folder_id, synced in find_user_subs_synced(conn, user_id):
             max_synced = ""
             read_batch_size = 40
 
@@ -50,6 +51,7 @@ def sync_subs(conn: Connection, user_id: str):
                     article = Article()
                     article.user_id = user_id
                     article.subscription_id = sub_id
+                    article.folder_id = folder_id
                     article.entry_id = entry.id
                     article.toggle_prop(Article.PROP_UNREAD, True)
                     article.synced = entry.updated
@@ -92,7 +94,6 @@ def move_sub(conn: Connection, sub_id: str, dest_folder_id: str|None):
     logging.info(f"Moving {sub_id} to {dest_folder_id}")
     for x in range(5):
         logging.info("sleeping")
-        sleep(2)
     logging.info("ALL DONE")
 
 # Returns subs that could not be subscribed to (no matching feed)

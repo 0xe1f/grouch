@@ -134,6 +134,33 @@ class Connection:
                     }
                 """
             },
+            articles_by_sub_unread={
+                "map": """
+                    function (doc) {
+                        if (doc.doc_type == 'article' && doc.props.includes('unread')) {
+                            emit([doc.subscription_id, doc.published, doc.updated]);
+                        }
+                    }
+                """
+            },
+            articles_by_folder={
+                "map": """
+                    function (doc) {
+                        if (doc.doc_type == 'article' && doc.folder_id) {
+                            emit([doc.folder_id, doc.published, doc.updated]);
+                        }
+                    }
+                """
+            },
+            articles_by_folder_unread={
+                "map": """
+                    function (doc) {
+                        if (doc.doc_type == 'article' && doc.folder_id && doc.props.includes('unread')) {
+                            emit([doc.folder_id, doc.published, doc.updated]);
+                        }
+                    }
+                """
+            },
             articles_by_prop={
                 "map": """
                     function (doc) {
@@ -141,15 +168,6 @@ class Connection:
                             doc.props.forEach((prop) => {
                                 emit([doc.user_id, prop, doc.published, doc.updated])
                             });
-                        }
-                    }
-                """
-            },
-            articles_by_sub_unread={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article' && doc.props.includes('unread')) {
-                            emit([doc.subscription_id, doc.published, doc.updated]);
                         }
                     }
                 """

@@ -285,7 +285,6 @@ $().ready(function() {
         'getRef': function() {
             return {
                 's': this.id,
-                'f': this.parent ? this.parent : undefined,
             };
         },
         'getFilter': function() {

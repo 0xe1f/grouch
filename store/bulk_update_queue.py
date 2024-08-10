@@ -7,7 +7,7 @@ import logging
 # Not thread-safe
 class BulkUpdateQueue:
 
-    def __init__(self, conn: Connection, max_size: int=40):
+    def __init__(self, conn: Connection, max_size: int=40, track_ids: bool=True):
         self._max_size = max_size
         self._docs = []
         self._conn = conn
@@ -15,6 +15,7 @@ class BulkUpdateQueue:
         self._success_count = 0
         self._conflict_count = 0
         self._success_ids = []
+        self._track_ids = track_ids
 
     def __enter__(self):
         return self
@@ -57,6 +58,8 @@ class BulkUpdateQueue:
         return self._conflict_count
 
     def pop_written_ids(self) -> list[str]:
+        if not self._track_ids:
+            return []
         success_ids = self._success_ids
         self._success_ids = []
         return success_ids
@@ -70,7 +73,8 @@ class BulkUpdateQueue:
             success, id, status = result
             if success:
                 self._success_count += 1
-                self._success_ids.append(id)
+                if self._track_ids:
+                    self._success_ids.append(id)
             elif not type(status) is ResourceConflict:
                 raise status
             else:

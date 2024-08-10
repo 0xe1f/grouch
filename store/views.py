@@ -1,5 +1,7 @@
 ALL_DOCS = "_all_docs"
 
+ARTICLES_BY_FOLDER = "maint/articles_by_folder"
+ARTICLES_BY_FOLDER_UNREAD = "maint/articles_by_folder_unread"
 ARTICLES_BY_PROP = "maint/articles_by_prop"
 ARTICLES_BY_SUB = "maint/articles_by_sub"
 ARTICLES_BY_SUB_UNREAD = "maint/articles_by_sub_unread"

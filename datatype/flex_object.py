@@ -40,8 +40,12 @@ class FlexObject:
     def get_prop(self, name: str) -> object:
         return self._doc.get(name)
 
-    def set_prop(self, name: str, val: object):
-        self._doc[name] = val
+    def set_prop(self, name: str, val: object|None):
+        if val != None:
+            self._doc[name] = val
+        else:
+            # Delete null values
+            self._doc.pop(name, None)
 
     def new_key(self) -> str|None:
         return None
