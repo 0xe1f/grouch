@@ -138,3 +138,12 @@ def generate_articles_by_sub(conn: Connection, sub_id: str, batch_size: int=40):
     }
     for item in conn.db.iterview(views.ARTICLES_BY_SUB, batch_size, **options):
         yield Article(item.doc)
+
+def generate_articles_by_tag(conn: Connection, user_id: str, tag: str, batch_size: int=40):
+    options = {
+        "start_key": [user_id, tag],
+        "end_key": [[user_id, tag], {}],
+        "include_docs": True,
+    }
+    for item in conn.db.iterview(views.ARTICLES_BY_TAG, batch_size, **options):
+        yield Article(item.doc)

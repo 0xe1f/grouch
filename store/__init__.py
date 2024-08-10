@@ -6,6 +6,7 @@ from store.articles import find_articles_by_sub
 from store.articles import find_articles_by_tag
 from store.articles import find_articles_by_user
 from store.articles import generate_articles_by_sub
+from store.articles import generate_articles_by_tag
 from store.articles import ArticlePage
 from store.articles import ArticlePageMarker
 from store.bulk_update_queue import BulkUpdateQueue

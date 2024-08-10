@@ -95,15 +95,15 @@ def articles():
 def set_property():
     arg = requests.SetPropertyRequest(request.json)
     if not arg:
-        app.logger.warning(f"Invalid setProperty request {request.json}")
+        app.logger.error(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.article_id:
-        app.logger.warning(f"Missing article id for {request.json}")
+        app.logger.error(f"Missing article id for {request.json}")
         return Error("FIXME!!").as_dict()
 
     owner_id = Article.extract_owner_id(arg.article_id)
     if owner_id != user.id:
-        app.logger.warning(f"Unauthorized article ({owner_id}!={user.id})")
+        app.logger.error(f"Unauthorized article ({owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     article = first_or_none(find_articles_by_id(conn, arg.article_id))
@@ -128,10 +128,10 @@ def set_property():
 def rename():
     arg = requests.RenameRequest(request.json)
     if not arg:
-        app.logger.warning(f"Invalid setProperty request {request.json}")
+        app.logger.error(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.id:
-        app.logger.warning(f"Missing object id for {request.json}")
+        app.logger.error(f"Missing object id for {request.json}")
         return Error("FIXME!!").as_dict()
     # FIXME!! validate title
 
@@ -140,7 +140,7 @@ def rename():
         if doc_type == Subscription.DOC_TYPE:
             owner_id = Subscription.extract_owner_id(arg.id)
             if owner_id != user.id:
-                app.logger.warning(f"Unauthorized sub ({owner_id}!={user.id})")
+                app.logger.error(f"Unauthorized sub ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
             obj = first_or_none(find_subs_by_id(conn, arg.id))
             if not obj:
@@ -150,7 +150,7 @@ def rename():
         elif doc_type == Folder.DOC_TYPE:
             owner_id = Folder.extract_owner_id(arg.id)
             if owner_id != user.id:
-                app.logger.warning(f"Unauthorized folder ({owner_id}!={user.id})")
+                app.logger.error(f"Unauthorized folder ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
             obj = first_or_none(find_folders_by_id(conn, arg.id))
             if not obj:
@@ -158,7 +158,7 @@ def rename():
             obj.title = arg.title
             bulk_q.enqueue_flex(obj)
         else:
-            app.logger.warning(f"Unrecognized doc_type: {doc_type}")
+            app.logger.error(f"Unrecognized doc_type: {doc_type}")
             return Error("FIXME!!").as_dict()
 
     return responses.RenameResponse(
@@ -169,18 +169,23 @@ def rename():
 def set_tags():
     arg = requests.SetTagsRequest(request.json)
     if not arg:
-        app.logger.warning(f"Invalid setTags request {request.json}")
+        app.logger.error(f"Invalid setTags request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.article_id:
-        app.logger.warning(f"Missing article id for {request.json}")
+        app.logger.error(f"Missing article id for {request.json}")
         return Error("FIXME!!").as_dict()
-    elif len(arg.tags) > 5:
-        app.logger.warning(f"Too many tags ({len(arg.tags)})")
-        return Error("FIXME!!").as_dict()
+
+    new_tags = []
+    if arg.tags:
+        # Extract unique tags, after trimming each for spaces
+        new_tags = list(set([tag.strip() for tag in arg.tags]))
+        if len(new_tags) > 5:
+            app.logger.error(f"Too many tags ({len(new_tags)})")
+            return Error("FIXME!!").as_dict()
 
     owner_id = Article.extract_owner_id(arg.article_id)
     if owner_id != user.id:
-        app.logger.warning(f"Unauthorized article ({owner_id}!={user.id})")
+        app.logger.error(f"Unauthorized article ({owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     article = first_or_none(find_articles_by_id(conn, arg.article_id))
@@ -188,7 +193,7 @@ def set_tags():
         return Error("FIXME!!").as_dict()
 
     with BulkUpdateQueue(conn) as bulk_q:
-        article.tags = [s.strip() for s in arg.tags]
+        article.tags = new_tags
         bulk_q.enqueue_flex(article)
 
     return responses.SetTagsResponse(
@@ -200,10 +205,10 @@ def set_tags():
 def create_folder():
     arg = requests.CreateFolderRequest(request.json)
     if not arg:
-        app.logger.warning(f"Invalid createFolder request {request.json}")
+        app.logger.error(f"Invalid createFolder request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.title:
-        app.logger.warning(f"Missing title for {request.json}")
+        app.logger.error(f"Missing title for {request.json}")
         return Error("FIXME!!").as_dict()
 
     with BulkUpdateQueue(conn) as bulk_q:
@@ -220,32 +225,32 @@ def create_folder():
 def move_sub():
     arg = requests.MoveSubRequest(request.json)
     if not arg:
-        app.logger.warning(f"Empty request")
+        app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
     elif not arg.id:
-        app.logger.warning(f"Missing id")
+        app.logger.error(f"Missing id")
         return Error("FIXME!!").as_dict()
 
     source_owner_id = Subscription.extract_owner_id(arg.id)
     if source_owner_id != user.id:
-        app.logger.warning(f"Unauthorized source ({source_owner_id}!={user.id})")
+        app.logger.error(f"Unauthorized source ({source_owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     if arg.destination:
         dest_owner_id = Folder.extract_owner_id(arg.destination)
         if dest_owner_id != user.id:
-            app.logger.warning(f"Unauthorized destination ({dest_owner_id}!={user.id})")
+            app.logger.error(f"Unauthorized destination ({dest_owner_id}!={user.id})")
             return Error("FIXME!!").as_dict()
         folder = first_or_none(find_folders_by_id(conn, arg.destination))
         if not folder:
-            app.logger.warning(f"Destination ({arg.destination}) does not exist")
+            app.logger.error(f"Destination ({arg.destination}) does not exist")
             return Error("FIXME!!").as_dict()
 
     # Move the subscription
     with BulkUpdateQueue(conn) as bulk_q:
         sub = first_or_none(find_subs_by_id(conn, arg.id))
         if not sub:
-            app.logger.warning(f"Sub ({arg.id}) does not exist")
+            app.logger.error(f"Sub ({arg.id}) does not exist")
             return Error("FIXME!!").as_dict()
         sub.folder_id = arg.destination
         bulk_q.enqueue_flex(sub)
@@ -257,6 +262,25 @@ def move_sub():
     return responses.MoveSubResponse(
         toc=_fetch_table_of_contents(),
     ).as_dict()
+
+@app.route('/removeTag', methods=['POST'])
+def remove_tag():
+    arg = requests.RemoveTagRequest(request.json)
+    if not arg:
+        app.logger.error(f"Empty request")
+        return Error("FIXME!!").as_dict()
+    elif not arg.tag:
+        app.logger.error(f"Missing tag")
+        return Error("FIXME!!").as_dict()
+
+    # Remove tags asynchronously
+    executor.submit(tasks.remove_tag_from_articles, conn, user.id, arg.tag)
+
+    # Remove it from the list manually
+    toc = _fetch_table_of_contents()
+    toc.remove_tag(arg.tag)
+
+    return responses.MoveSubResponse(toc).as_dict()
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)

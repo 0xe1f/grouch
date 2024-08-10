@@ -5,8 +5,8 @@ class Article(JsonObject):
 
     # 	Media []*EntryMedia   `datastore:"-" json:"media,omitempty"`
 
-    def __init__(self, article: datatype.Article|None=None, entry: datatype.EntryContent|None=None):
-        super().__init__()
+    def __init__(self, article: datatype.Article|None=None, entry: datatype.EntryContent|None=None, source: dict={}):
+        super().__init__(source)
         if article:
             self.set_prop("id", article.id)
             self.set_prop("properties", article.props)

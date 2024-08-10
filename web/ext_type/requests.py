@@ -22,6 +22,15 @@ class MoveSubRequest(JsonObject):
     def destination(self) -> str:
         return self.get_prop("destination")
 
+class RemoveTagRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def tag(self) -> str:
+        return self.get_prop("tag")
+
 class RenameRequest(JsonObject):
 
     def __init__(self, source: dict={}):

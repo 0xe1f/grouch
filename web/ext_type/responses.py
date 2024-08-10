@@ -30,6 +30,15 @@ class MoveSubResponse(JsonObject):
             },
         )
 
+class RemoveTagResponse(JsonObject):
+
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
+            },
+        )
+
 class RenameResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):

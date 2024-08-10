@@ -3,8 +3,8 @@ import datatype
 
 class Folder(JsonObject):
 
-    def __init__(self, folder: datatype.Folder|None):
-        super().__init__()
+    def __init__(self, folder: datatype.Folder|None, source: dict={}):
+        super().__init__(source)
         if folder:
             self.set_prop("id", folder.id)
             self.set_prop("title", folder.title)

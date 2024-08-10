@@ -5,7 +5,7 @@ from web.ext_type.tag import Tag
 
 class TableOfContents(JsonObject):
 
-    def __init__(self, source: dict={}, subs: list[Subscription]=[], folders: list[Folder]=[], tags: list[Tag]=[]):
+    def __init__(self, subs: list[Subscription]=[], folders: list[Folder]=[], tags: list[Tag]=[], source: dict={}):
         super().__init__(source)
         self.set_prop("subscriptions", [sub.as_dict() for sub in subs])
         self.set_prop("folders", [folder.as_dict() for folder in folders])
@@ -13,12 +13,15 @@ class TableOfContents(JsonObject):
 
     @property
     def subscriptions(self) -> list[Subscription]:
-        return [Subscription(sub) for sub in self._doc.get("subscriptions")]
+        return [Subscription(source=sub) for sub in self.get_prop("subscriptions", [])]
 
     @property
     def folders(self) -> list[Folder]:
-        return [Folder(folder) for folder in self._doc.get("folders")]
+        return [Folder(source=folder) for folder in self.get_prop("folders", [])]
 
     @property
-    def subscriptions(self) -> list[str]:
-        return self._doc.get("tags")
+    def tags(self) -> list[Tag]:
+        return [Tag(source=tag) for tag in self.get_prop("tags", [])]
+
+    def remove_tag(self, tag_title: str):
+        self.set_prop("tags", [tag.as_dict() for tag in self.tags if tag.title != tag_title])

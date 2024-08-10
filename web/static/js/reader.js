@@ -498,12 +498,18 @@ $().ready(function() {
         },
         'remove': function() {
             var tag = this;
-            $.post('removeTag', {
-                'tag': tag.title,
-            },
-            function(response) {
-                resetSubscriptionDom(response, false);
-            }, 'json');
+            $.ajax({
+                url: "removeTag",
+                type: "POST",
+                data: JSON.stringify({
+                    "tag": tag.title,
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    resetSubscriptionDom(response.subscriptions, false);
+                }
+            });
         },
     });
 
