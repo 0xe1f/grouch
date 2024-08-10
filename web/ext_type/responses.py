@@ -21,6 +21,11 @@ class CreateFolderResponse(JsonObject):
             },
         )
 
+class MoveSubResponse(JsonObject):
+
+    def __init__(self):
+        super().__init__()
+
 class RenameResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):

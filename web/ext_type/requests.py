@@ -9,6 +9,19 @@ class CreateFolderRequest(JsonObject):
     def title(self) -> str:
         return self.get_prop("title")
 
+class MoveSubRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def id(self) -> str:
+        return self.get_prop("id")
+
+    @property
+    def destination(self) -> str:
+        return self.get_prop("destination")
+
 class RenameRequest(JsonObject):
 
     def __init__(self, source: dict={}):

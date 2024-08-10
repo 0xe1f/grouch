@@ -423,16 +423,21 @@ $().ready(function() {
             }, 'json');
         },
         'moveTo': function(folder) {
-            var subscription = this;
-
-            $.post('moveSubscription', {
-                'subscription': subscription.id,
-                'folder':       subscription.parent ? subscription.parent : undefined,
-                'destination':  folder.id ? folder.id : undefined,
-            },
-            function(response) {
-                resetSubscriptionDom(response, false);
-            }, 'json');
+            var sub = this;
+            $.ajax({
+                url: "moveSub",
+                type: "POST",
+                data: JSON.stringify({
+                    "id": sub.id,
+                    "destination":  folder.id ? folder.id : undefined,
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    // FIXME!!
+                    // resetSubscriptionDom(response.subscriptions, false);
+                }
+            });
         },
     });
 

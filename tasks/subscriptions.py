@@ -12,6 +12,7 @@ from store import BulkUpdateQueue
 from store import Connection
 from subscribe import SubSource
 from tasks import import_feeds
+from time import sleep
 import logging
 
 def sync_subs(conn: Connection, user_id: str):
@@ -87,6 +88,13 @@ def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
         # FIXME - reconsider this when this becomes a task queue
         if remaining_sources:
             _subscribe_current_feeds(conn, user_id, *remaining_sources)
+
+def move_sub(conn: Connection, sub_id: str, dest_folder_id: str|None):
+    logging.info(f"Moving {sub_id} to {dest_folder_id}")
+    for x in range(5):
+        logging.info("sleeping")
+        sleep(2)
+    logging.info("ALL DONE")
 
 # Returns subs that could not be subscribed to (no matching feed)
 def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSource) -> set[SubSource]:

@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-from common.datetime import now_in_iso
 from common.lists import first_or_none
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
@@ -12,6 +11,7 @@ from datatype import FlexObject
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask_executor import Executor
 from json import loads
 from store import BulkUpdateQueue
 from store import Connection
@@ -38,8 +38,10 @@ from web.ext_type import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
 import logging
+import tasks
 
 app = Flask(__name__)
+executor = Executor(app)
 
 @app.route('/')
 def index():
@@ -65,7 +67,7 @@ def articles():
         try:
             filter = loads(rq_args["filter"])
         except ValueError:
-            logging.error("Filter is not valid JSON")
+            app.logger.error("Filter is not valid JSON")
 
     if "s" in filter:
         unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
@@ -89,15 +91,15 @@ def articles():
 def set_property():
     arg = requests.SetPropertyRequest(request.json)
     if not arg:
-        logging.warning(f"Invalid setProperty request {request.json}")
+        app.logger.warning(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.article_id:
-        logging.warning(f"Missing article id for {request.json}")
+        app.logger.warning(f"Missing article id for {request.json}")
         return Error("FIXME!!").as_dict()
 
     owner_id = Article.extract_owner_id(arg.article_id)
     if owner_id != user.id:
-        logging.warning(f"User not authorized ({owner_id}!={user.id})")
+        app.logger.warning(f"Unauthorized article ({owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     article = first_or_none(find_articles_by_id(conn, arg.article_id))
@@ -122,10 +124,10 @@ def set_property():
 def rename():
     arg = requests.RenameRequest(request.json)
     if not arg:
-        logging.warning(f"Invalid setProperty request {request.json}")
+        app.logger.warning(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.id:
-        logging.warning(f"Missing object id for {request.json}")
+        app.logger.warning(f"Missing object id for {request.json}")
         return Error("FIXME!!").as_dict()
     # FIXME!! validate title
 
@@ -134,7 +136,7 @@ def rename():
         if doc_type == Subscription.DOC_TYPE:
             owner_id = Subscription.extract_owner_id(arg.id)
             if owner_id != user.id:
-                logging.warning(f"User not authorized ({owner_id}!={user.id})")
+                app.logger.warning(f"Unauthorized sub ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
             obj = first_or_none(find_subs_by_id(conn, arg.id))
             if not obj:
@@ -144,7 +146,7 @@ def rename():
         elif doc_type == Folder.DOC_TYPE:
             owner_id = Folder.extract_owner_id(arg.id)
             if owner_id != user.id:
-                logging.warning(f"User not authorized ({owner_id}!={user.id})")
+                app.logger.warning(f"Unauthorized folder ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
             obj = first_or_none(find_folders_by_id(conn, arg.id))
             if not obj:
@@ -152,7 +154,7 @@ def rename():
             obj.title = arg.title
             bulk_q.enqueue_flex(obj)
         else:
-            logging.warning(f"Unrecognized doc_type: {doc_type}")
+            app.logger.warning(f"Unrecognized doc_type: {doc_type}")
             return Error("FIXME!!").as_dict()
 
     return responses.RenameResponse(
@@ -163,18 +165,18 @@ def rename():
 def set_tags():
     arg = requests.SetTagsRequest(request.json)
     if not arg:
-        logging.warning(f"Invalid setTags request {request.json}")
+        app.logger.warning(f"Invalid setTags request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.article_id:
-        logging.warning(f"Missing article id for {request.json}")
+        app.logger.warning(f"Missing article id for {request.json}")
         return Error("FIXME!!").as_dict()
     elif len(arg.tags) > 5:
-        logging.warning(f"Too many tags ({len(arg.tags)})")
+        app.logger.warning(f"Too many tags ({len(arg.tags)})")
         return Error("FIXME!!").as_dict()
 
     owner_id = Article.extract_owner_id(arg.article_id)
     if owner_id != user.id:
-        logging.warning(f"User not authorized ({owner_id}!={user.id})")
+        app.logger.warning(f"Unauthorized article ({owner_id}!={user.id})")
         return Error("FIXME!!").as_dict()
 
     article = first_or_none(find_articles_by_id(conn, arg.article_id))
@@ -194,10 +196,10 @@ def set_tags():
 def create_folder():
     arg = requests.CreateFolderRequest(request.json)
     if not arg:
-        logging.warning(f"Invalid createFolder request {request.json}")
+        app.logger.warning(f"Invalid createFolder request {request.json}")
         return Error("FIXME!!").as_dict()
     elif not arg.title:
-        logging.warning(f"Missing title for {request.json}")
+        app.logger.warning(f"Missing title for {request.json}")
         return Error("FIXME!!").as_dict()
 
     with BulkUpdateQueue(conn) as bulk_q:
@@ -209,6 +211,31 @@ def create_folder():
     return responses.CreateFolderResponse(
         toc=_fetch_table_of_contents(),
     ).as_dict()
+
+@app.route('/moveSub', methods=['POST'])
+def move_sub():
+    arg = requests.MoveSubRequest(request.json)
+    if not arg:
+        app.logger.warning(f"Empty request")
+        return Error("FIXME!!").as_dict()
+    elif not arg.id:
+        app.logger.warning(f"Missing id")
+        return Error("FIXME!!").as_dict()
+
+    source_owner_id = Subscription.extract_owner_id(arg.id)
+    if source_owner_id != user.id:
+        app.logger.warning(f"Unauthorized source ({source_owner_id}!={user.id})")
+        return Error("FIXME!!").as_dict()
+
+    if arg.destination:
+        dest_owner_id = Folder.extract_owner_id(arg.destination)
+        if dest_owner_id != user.id:
+            app.logger.warning(f"Unauthorized destination ({dest_owner_id}!={user.id})")
+            return Error("FIXME!!").as_dict()
+
+    executor.submit(tasks.move_sub, conn, arg.id, arg.destination)
+
+    return responses.MoveSubResponse().as_dict()
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)
