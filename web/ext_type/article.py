@@ -1,13 +1,12 @@
-from datatype.article import Article
-from datatype.entry_content import EntryContent
 from web.ext_type.json_object import JsonObject
+import datatype
 
-class PublicArticle(JsonObject):
+class Article(JsonObject):
 
     # 	Media []*EntryMedia   `datastore:"-" json:"media,omitempty"`
 
-    def __init__(self, article: Article|None=None, entry: EntryContent|None=None, source: dict={}):
-        super().__init__(source)
+    def __init__(self, article: datatype.Article|None=None, entry: datatype.EntryContent|None=None):
+        super().__init__()
         if article:
             self.set_prop("id", article.id)
             self.set_prop("properties", article.props)

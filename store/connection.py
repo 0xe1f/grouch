@@ -70,7 +70,7 @@ class Connection:
                 "map": """
                     function (doc) {
                         if (doc.doc_type == 'folder') {
-                            emit(doc.content.user_id, doc.content.title);
+                            emit(doc.user_id);
                         }
                     }
                 """
@@ -93,7 +93,7 @@ class Connection:
                     }
                 """
             },
-            sub_last_synced_by_user={
+            subs_by_user={
                 "map": """
                     function (doc) {
                         if (doc.doc_type == 'sub') {
@@ -136,6 +136,17 @@ class Connection:
                     function (doc) {
                         if (doc.doc_type == 'article' && doc.props.includes('unread')) {
                             emit([doc.subscription_id, doc.published, doc.updated]);
+                        }
+                    }
+                """
+            },
+            articles_by_tag={
+                "map": """
+                    function (doc) {
+                        if (doc.doc_type == 'article') {
+                            doc.tags.forEach((tag) => {
+                                emit([doc.user_id, tag, doc.published, doc.updated])
+                            });
                         }
                     }
                 """

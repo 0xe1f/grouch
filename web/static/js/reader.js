@@ -385,15 +385,13 @@ $().ready(function() {
                 url: "rename",
                 type: "POST",
                 data: JSON.stringify({
-                    'id': sub.id,
-                    'title': newName,
+                    "id": sub.id,
+                    "title": newName,
                 }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    sub.title = newName;
-                    // TODO: not good enough; need to sort
-                    sub.syncView();
+                    resetSubscriptionDom(response.subscriptions, false);
                 }
             });
         },
@@ -545,9 +543,9 @@ $().ready(function() {
                 url: "setProperty",
                 type: "POST",
                 data: JSON.stringify({
-                    'article': this.id,
-                    'property': propertyName,
-                    'set': propertyValue,
+                    "article": this.id,
+                    "property": propertyName,
+                    "set": propertyValue,
                 }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -1299,14 +1297,20 @@ $().ready(function() {
                 subscription.rename(newName);
         },
         'createFolder': function() {
-            var folderName = prompt(_l('Name of folder:'));
-            if (folderName) {
-                $.post('createFolder', {
-                    folderName : folderName,
-                },
-                function(response) {
-                    resetSubscriptionDom(response, false);
-                }, 'json');
+            var title = prompt(_l('Name of folder:'));
+            if (title) {
+                $.ajax({
+                    url: "createFolder",
+                    type: "POST",
+                    data: JSON.stringify({
+                        "title": title,
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        resetSubscriptionDom(response.subscriptions, false);
+                    }
+                });
             }
         },
         'unsubscribe': function(subscription) {
@@ -1438,21 +1442,30 @@ $().ready(function() {
             $$menu.hideAll();
         },
         'editTags': function(entry) {
-            var tagString = entry.tags.join(', ');
-            var tags = prompt(_l("Separate multiple tags with commas"), tagString);
-
-            if (tags != null) {
-                $.post('setTags', {
-                    'article':      entry.id,
-                    'subscription': entry.source,
-                    'folder':       entry.getSubscription().parent,
-                    'tags':         tags,
-                },
-                function(response) {
-                    resetSubscriptionDom(response.subscriptions, false);
-                    entry.tags = response.tags;
-                    entry.syncView();
-                }, 'json');
+            const currentTags = entry.tags.join(', ');
+            const enteredTags = prompt(
+                _l("Separate multiple tags with commas"),
+                currentTags
+            );
+            if (enteredTags != null && enteredTags != currentTags) {
+                $.ajax({
+                    url: "setTags",
+                    type: "POST",
+                    data: JSON.stringify({
+                        "articleId": entry.id,
+                        "tags": enteredTags
+                            .split(",")
+                            .map(x => x.trim())
+                            .filter(x => x),
+                        }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        resetSubscriptionDom(response.subscriptions, false);
+                        entry.tags = response.tags;
+                        entry.syncView();
+                    }
+                });
             }
         },
         'onScopeChanged': function() {

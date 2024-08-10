@@ -83,5 +83,8 @@ class FeedContent(FlexObject):
 
         return self._computed_digest
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
+        if not self.feed_url:
+            raise ValueError("Missing feed URL")
+
         return build_key(self.doc_type, self.feed_url)

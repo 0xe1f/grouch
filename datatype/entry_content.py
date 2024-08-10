@@ -100,5 +100,10 @@ class EntryContent(FlexObject):
 
         return self._computed_digest
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
+        if not self.feed_id:
+            raise ValueError("Missing feed id")
+        if not self.entry_uid:
+            raise ValueError("Missing entry uid")
+
         return build_key(self.doc_type, self.feed_id, self.entry_uid)

@@ -43,7 +43,7 @@ class FlexObject:
     def set_prop(self, name: str, val: object):
         self._doc[name] = val
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
         return None
 
     def as_dict(self):

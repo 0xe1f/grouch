@@ -1,20 +1,19 @@
 from common import format_iso
-from common import now_in_iso
 from datatype import FeedContent
-from store.bulk_update_queue import BulkUpdateQueue
+from store import views
 from store.connection import Connection
 from time import struct_time
 
 def find_feeds_by_id(conn: Connection, *feed_ids: str) -> list[FeedContent]:
     matches = []
-    for item in conn.db.view("_all_docs", keys=feed_ids, include_docs=True):
+    for item in conn.db.view(views.ALL_DOCS, keys=feed_ids, include_docs=True):
         matches.append(FeedContent(item.doc))
 
     return matches
 
 def find_feed_ids_by_url(conn: Connection, *urls: str) -> dict:
     matches = {}
-    for item in conn.db.view("maint/feeds_by_url", keys = urls):
+    for item in conn.db.view(views.FEEDS_BY_URL, keys = urls):
         matches[item.key] = item.id
 
     return matches

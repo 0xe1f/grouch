@@ -1,7 +1,6 @@
 from common import build_key
-from common import now_in_iso
 from datatype import Article
-from store.bulk_update_queue import BulkUpdateQueue
+from store import views
 from store.connection import Connection
 
 type ArticlePageMarker = tuple
@@ -9,7 +8,7 @@ type ArticlePage = tuple[list[Article], ArticlePageMarker|None]
 
 def find_articles_by_id(conn: Connection, *article_ids: str) -> list[Article]:
     matches = []
-    for item in conn.db.view("_all_docs", keys=article_ids, include_docs=True):
+    for item in conn.db.view(views.ALL_DOCS, keys=article_ids, include_docs=True):
         if "doc" in item:
             matches.append(Article(item["doc"]))
 
@@ -26,7 +25,7 @@ def find_articles_by_user(conn: Connection, user_id: str, start: str=None, limit
 
     next_start = None
     matches = []
-    for item in conn.db.view("maint/articles_by_user", **options):
+    for item in conn.db.view(views.ARTICLES_BY_USER, **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
         else:
@@ -47,7 +46,28 @@ def find_articles_by_prop(conn: Connection, user_id: str, prop: str, start: str=
     next_start = None
     matches = []
 
-    for item in conn.db.view("maint/articles_by_prop", **options):
+    for item in conn.db.view(views.ARTICLES_BY_PROP, **options):
+        if len(matches) < limit:
+            matches.append(Article(item.doc))
+        else:
+            next_start = item.key
+            break
+
+    return matches, next_start
+
+def find_articles_by_tag(conn: Connection, user_id: str, tag: str, start: str=None, limit: int=40) -> ArticlePage:
+    options = {
+        "end_key": [user_id, tag],
+        "start_key": start if start else [user_id, tag, {}],
+        "include_docs": True,
+        "limit": limit + 1,
+        "descending": True,
+    }
+
+    next_start = None
+    matches = []
+
+    for item in conn.db.view(views.ARTICLES_BY_TAG, **options):
         if len(matches) < limit:
             matches.append(Article(item.doc))
         else:
@@ -67,7 +87,7 @@ def find_articles_by_sub(conn: Connection, sub_id: str, start: str=None, unread_
 
     next_start = None
     matches = []
-    view_name = "maint/articles_by_sub_unread" if unread_only else "maint/articles_by_sub"
+    view_name = views.ARTICLES_BY_SUB_UNREAD if unread_only else views.ARTICLES_BY_SUB
 
     for item in conn.db.view(view_name, **options):
         if len(matches) < limit:
@@ -83,7 +103,7 @@ def find_articles_by_entry(conn: Connection, user_id: str, *entry_ids: str):
         "include_docs": True,
         "keys": [build_key("article", user_id, entry_id) for entry_id in entry_ids],
     }
-    for item in conn.db.view("_all_docs", **options):
+    for item in conn.db.view(views.ALL_DOCS, **options):
         doc = item.get("doc")
         if doc:
             yield Article(doc)

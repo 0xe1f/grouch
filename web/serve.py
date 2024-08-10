@@ -18,24 +18,25 @@ from store import Connection
 from store import fetch_user
 from store import find_articles_by_id
 from store import find_articles_by_prop
+from store import find_articles_by_tag
 from store import find_articles_by_sub
 from store import find_articles_by_user
 from store import find_entries_by_id
 from store import find_feeds_by_id
 from store import find_folders_by_id
+from store import find_folders_by_user
 from store import find_tags_by_user
 from store import find_subs_by_id
 from store import find_user_id
-from store import find_user_subs
+from store import find_subs_by_user
+from web.ext_type import Article as PubArticle
 from web.ext_type import Error
 from web.ext_type import Folder as PubFolder
-from web.ext_type import SetProperty
-from web.ext_type import ArticlePage
-from web.ext_type import PublicArticle
-from web.ext_type import PublicSub
-from web.ext_type import Rename
+from web.ext_type import Subscription as PubSub
 from web.ext_type import TableOfContents
-from web.ext_type import Tag
+from web.ext_type import Tag as PubTag
+from web.ext_type import requests
+from web.ext_type import responses
 import logging
 
 app = Flask(__name__)
@@ -49,17 +50,7 @@ def index():
 
 @app.route('/subscriptions')
 def subscriptions():
-    subs = find_user_subs(conn, user.id)
-    feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
-    feed_map = { feed.id:feed for feed in feeds }
-    # FIXME!!: limit to a max
-    tags = [Tag(tag) for tag in find_tags_by_user(conn, user.id)]
-
-    return TableOfContents(
-        subs=[PublicSub(sub, feed_map[sub.feed_id]) for sub in subs],
-        folders=[PubFolder()],
-        tags=tags,
-    ).as_dict()
+    return _fetch_table_of_contents().as_dict()
 
 @app.route('/articles')
 def articles():
@@ -81,20 +72,22 @@ def articles():
         articles, next_start = find_articles_by_sub(conn, filter["s"], start, unread_only=unread_only)
     elif "p" in filter:
         articles, next_start = find_articles_by_prop(conn, user.id, filter["p"], start)
+    elif "t" in filter:
+        articles, next_start = find_articles_by_tag(conn, user.id, filter["t"], start)
     else:
         articles, next_start = find_articles_by_user(conn, user.id, start)
 
     entries = find_entries_by_id(conn, *[article.entry_id for article in articles])
     entry_map = { entry.id:entry for entry in entries }
 
-    return ArticlePage(
+    return responses.ArticlesResponse(
+        articles=[PubArticle(article=article, entry=entry_map[article.entry_id]) for article in articles],
         next_start=obfuscate_json(next_start) if next_start else None,
-        articles=[PublicArticle(article=article, entry=entry_map[article.entry_id]) for article in articles],
     ).as_dict()
 
 @app.route('/setProperty', methods=['POST'])
 def set_property():
-    arg = SetProperty(request.json)
+    arg = requests.SetPropertyRequest(request.json)
     if not arg:
         logging.warning(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
@@ -119,7 +112,6 @@ def set_property():
                 if not sub:
                     return Error("FIXME!!").as_dict()
                 sub.unread_count += 1 if arg.is_set else -1
-                sub.updated = now_in_iso()
                 bulk_q.enqueue_flex(sub)
             article.toggle_prop(arg.prop_name, arg.is_set)
             bulk_q.enqueue_flex(article)
@@ -128,7 +120,7 @@ def set_property():
 
 @app.route('/rename', methods=['POST'])
 def rename():
-    arg = Rename(request.json)
+    arg = requests.RenameRequest(request.json)
     if not arg:
         logging.warning(f"Invalid setProperty request {request.json}")
         return Error("FIXME!!").as_dict()
@@ -163,9 +155,73 @@ def rename():
             logging.warning(f"Unrecognized doc_type: {doc_type}")
             return Error("FIXME!!").as_dict()
 
-    # FIXME!!: return the entire tree?
+    return responses.RenameResponse(
+        toc=_fetch_table_of_contents(),
+    ).as_dict()
 
-    return {}
+@app.route('/setTags', methods=['POST'])
+def set_tags():
+    arg = requests.SetTagsRequest(request.json)
+    if not arg:
+        logging.warning(f"Invalid setTags request {request.json}")
+        return Error("FIXME!!").as_dict()
+    elif not arg.article_id:
+        logging.warning(f"Missing article id for {request.json}")
+        return Error("FIXME!!").as_dict()
+    elif len(arg.tags) > 5:
+        logging.warning(f"Too many tags ({len(arg.tags)})")
+        return Error("FIXME!!").as_dict()
+
+    owner_id = Article.extract_owner_id(arg.article_id)
+    if owner_id != user.id:
+        logging.warning(f"User not authorized ({owner_id}!={user.id})")
+        return Error("FIXME!!").as_dict()
+
+    article = first_or_none(find_articles_by_id(conn, arg.article_id))
+    if not article:
+        return Error("FIXME!!").as_dict()
+
+    with BulkUpdateQueue(conn) as bulk_q:
+        article.tags = [s.strip() for s in arg.tags]
+        bulk_q.enqueue_flex(article)
+
+    return responses.SetTagsResponse(
+        toc=_fetch_table_of_contents(),
+        tags=article.tags,
+    ).as_dict()
+
+@app.route('/createFolder', methods=['POST'])
+def create_folder():
+    arg = requests.CreateFolderRequest(request.json)
+    if not arg:
+        logging.warning(f"Invalid createFolder request {request.json}")
+        return Error("FIXME!!").as_dict()
+    elif not arg.title:
+        logging.warning(f"Missing title for {request.json}")
+        return Error("FIXME!!").as_dict()
+
+    with BulkUpdateQueue(conn) as bulk_q:
+        folder = Folder()
+        folder.title = arg.title
+        folder.user_id = user.id
+        bulk_q.enqueue_flex(folder)
+
+    return responses.CreateFolderResponse(
+        toc=_fetch_table_of_contents(),
+    ).as_dict()
+
+def _fetch_table_of_contents() -> TableOfContents:
+    subs = find_subs_by_user(conn, user.id)
+    feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
+    folders = find_folders_by_user(conn, user.id)
+    feed_map = { feed.id:feed for feed in feeds }
+    tags = find_tags_by_user(conn, user.id)
+
+    return TableOfContents(
+        subs=[PubSub(sub, feed_map[sub.feed_id]) for sub in subs],
+        folders=[PubFolder(folder) for folder in folders],
+        tags=[PubTag(tag) for tag in tags],
+    )
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

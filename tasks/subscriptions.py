@@ -41,7 +41,6 @@ def sync_subs(conn: Connection, user_id: str):
                     article.toggle_prop(Article.PROP_UNREAD, True)
                     article.synced = entry.updated
                     article.published = entry.published
-                    article.updated = now_in_iso()
                     bulk_q.enqueue_flex(article)
 
                 # Batch new articles
@@ -55,8 +54,6 @@ def sync_subs(conn: Connection, user_id: str):
                     article.toggle_prop(Article.PROP_UNREAD, True)
                     article.synced = entry.updated
                     article.published = entry.published
-                    article.id = article.build_key()
-                    article.updated = now_in_iso()
                     bulk_q.enqueue_flex(article)
 
             # Update sub, if there were changes
@@ -64,8 +61,6 @@ def sync_subs(conn: Connection, user_id: str):
                 sub = first_or_none(find_subs_by_id(conn, sub_id))
                 sub.last_synced = max_synced
                 sub.unread_count += marked_unread
-                sub.id = sub.build_key()
-                sub.updated = now_in_iso()
                 bulk_q.enqueue_flex(sub)
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written")
@@ -107,13 +102,11 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSo
             sub = Subscription()
             sub.user_id = user_id
             sub.feed_id = feed_id
-            sub.id = sub.build_key()
             # FIXME!!
             # if sub_source.parent_id:
             #     sub.folder_id = folder_id_map[sub_source.parent_id]
             sub.title = sub_source.title
             sub.subscribed = now_in_iso()
-            sub.updated = now_in_iso()
 
             bulk_q.enqueue_flex(sub)
             all_subs.remove(sub_source)

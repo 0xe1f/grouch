@@ -47,5 +47,8 @@ class User(FlexObject):
         self.hashed_password = bcrypt.hashpw(plaintext.encode(), salt).hex()
         self.salt = salt.hex()
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
+        if not self.username:
+            raise ValueError("Missing username")
+
         return build_key(self.doc_type, self.username)

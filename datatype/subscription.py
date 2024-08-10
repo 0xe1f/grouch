@@ -69,7 +69,12 @@ class Subscription(FlexObject):
     def user_id(self, val: str):
         self.set_prop("user_id", val)
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
+        if not self.user_id:
+            raise ValueError("Missing user id")
+        if not self.feed_id:
+            raise ValueError("Missing entry feed id")
+
         return build_key(self.doc_type, self.user_id, self.feed_id)
 
     @staticmethod

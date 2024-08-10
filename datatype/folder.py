@@ -10,14 +10,8 @@ class Folder(FlexObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
-
-    @property
-    def id(self) -> str:
-        return self._doc.get("id")
-
-    @id.setter
-    def id(self, val: str):
-        self._doc["id"] = val
+        if not source:
+            self.doc_type = __class__.DOC_TYPE
 
     @property
     def title(self) -> str:
@@ -35,7 +29,7 @@ class Folder(FlexObject):
     def user_id(self, val: int):
         self._doc["user_id"] = val
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
         return build_key(self.doc_type, self.user_id,  uuid4().hex)
 
     @staticmethod

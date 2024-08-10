@@ -87,7 +87,12 @@ class Article(FlexObject):
     def synced(self, val: str):
         self.set_prop("synced", val)
 
-    def build_key(self) -> str|None:
+    def new_key(self) -> str|None:
+        if not self.user_id:
+            raise ValueError("Missing user id")
+        if not self.entry_id:
+            raise ValueError("Missing entry id")
+
         return build_key(self.doc_type, self.user_id, self.entry_id)
 
     @staticmethod

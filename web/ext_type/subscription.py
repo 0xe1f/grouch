@@ -1,11 +1,10 @@
-from datatype.feed_content import FeedContent
-from datatype.subscription import Subscription
 from web.ext_type.json_object import JsonObject
+import datatype
 
-class PublicSub(JsonObject):
+class Subscription(JsonObject):
 
-    def __init__(self, sub: Subscription|None=None, feed: FeedContent|None=None, source: dict={}):
-        super().__init__(source)
+    def __init__(self, sub: datatype.Subscription|None=None, feed: datatype.FeedContent|None=None):
+        super().__init__()
         if sub:
             self.set_prop("id", sub.id)
             self.set_prop("title", sub.title)

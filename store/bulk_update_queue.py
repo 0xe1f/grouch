@@ -1,3 +1,4 @@
+from common import now_in_iso
 from datatype import FlexObject
 from couchdb.http import ResourceConflict
 from store.connection import Connection
@@ -6,8 +7,8 @@ import logging
 # Not thread-safe
 class BulkUpdateQueue:
 
-    def __init__(self, conn: Connection, size: int=40):
-        self._size = size
+    def __init__(self, conn: Connection, max_size: int=40):
+        self._max_size = max_size
         self._docs = []
         self._conn = conn
         self._enqueued_count = 0
@@ -22,19 +23,25 @@ class BulkUpdateQueue:
         self.flush()
 
     def enqueue_flex(self, *objs: FlexObject):
-        self._docs.extend([obj.as_dict() for obj in objs])
-        pending = []
-        if len(self._docs) > self._size:
-            pending = self._docs[:self._size]
-            self._docs = self._docs[self._size:]
+        # Update update time & attach an id
+        for obj in objs:
+            if not obj.id:
+                obj.id = obj.new_key()
+            obj.updated = now_in_iso()
+            self._docs.append(obj.as_dict())
 
         self._enqueued_count += len(objs)
-        if pending:
-            self._bulk_write(pending)
+
+        # If queue overflows, write
+        if len(self._docs) > self._max_size:
+            pending = self._docs[:self._max_size]
+            self._docs = self._docs[self._max_size:]
+            if pending:
+                self._bulk_write(pending)
 
     def flush(self):
-        pending = self._docs.copy()
-        self._docs.clear()
+        pending = self._docs
+        self._docs = []
         self._bulk_write(pending)
 
     @property

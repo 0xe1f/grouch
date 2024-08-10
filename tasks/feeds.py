@@ -26,20 +26,14 @@ def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
             feed_count += 1
             id_url_map[feed.id] = feed.feed_url
 
-            if not feed.id:
-                feed.id = feed.build_key()
-
             feed.digest = feed.computed_digest()
-            feed.updated = now_in_iso()
 
             bulk_q.enqueue_flex(feed)
 
             entry_count += len(result.entries)
             for entry in result.entries:
                 entry.feed_id = result.feed.id
-                entry.id = entry.build_key()
                 entry.digest = entry.computed_digest()
-                entry.updated = now_in_iso()
 
                 bulk_q.enqueue_flex(entry)
 
@@ -87,7 +81,6 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
             remote_feed.rev = local_feed.rev
             remote_feed.id = local_feed.id
             remote_feed.digest = remote_feed.computed_digest()
-            remote_feed.updated = now_in_iso()
 
             bulk_q.enqueue_flex(remote_feed)
 
@@ -99,7 +92,6 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
                 remote_entry.rev = local_entry.rev
                 remote_entry.id = local_entry.id
                 remote_entry.digest = remote_entry.computed_digest()
-                remote_entry.updated = now_in_iso()
 
                 bulk_q.enqueue_flex(remote_entry)
                 entries_changed += 1
@@ -109,9 +101,7 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
 
         for remote_entry in remote_entry_map.values():
             remote_entry.feed_id = local_feed.id
-            remote_entry.id = remote_entry.build_key()
             remote_entry.digest = remote_entry.computed_digest()
-            remote_entry.updated = now_in_iso()
             bulk_q.enqueue_flex(remote_entry)
             entries_changed += 1
 

@@ -2,6 +2,7 @@ from store.articles import find_articles_by_entry
 from store.articles import find_articles_by_id
 from store.articles import find_articles_by_prop
 from store.articles import find_articles_by_sub
+from store.articles import find_articles_by_tag
 from store.articles import find_articles_by_user
 from store.articles import ArticlePage
 from store.articles import ArticlePageMarker
@@ -14,10 +15,10 @@ from store.feeds import find_feeds_by_id
 from store.feeds import find_feed_ids_by_url
 from store.feeds import stale_feeds
 from store.folders import find_folders_by_id
-from store.folders import find_folders_by_user_id
+from store.folders import find_folders_by_user
 from store.folders import write_folders
 from store.subscriptions import find_subs_by_id
-from store.subscriptions import find_user_subs
+from store.subscriptions import find_subs_by_user
 from store.subscriptions import find_user_subs_synced
 from store.tags import find_tags_by_user
 from store.users import create_user
