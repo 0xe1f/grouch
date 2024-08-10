@@ -2,9 +2,12 @@ from config import DatabaseConfig
 import couchdb
 import logging
 
-class Connection:
+_METADATA_KEY = "$store_metadata"
+_METADATA_SCHEMA_VERSION = "schema_version"
 
-    SCHEMA_VERSION = 1
+_SCHEMA_VERSION_CURRENT = 1
+
+class Connection:
 
     def __init__(self):
         pass
@@ -21,18 +24,20 @@ class Connection:
         else:
             self.db = self.server[database_name]
 
-        if "grouch_metadata" in self.db:
-            metadata = self.db["grouch_metadata"]
+        if _METADATA_KEY in self.db:
+            metadata = self.db[_METADATA_KEY]
         else:
             metadata = {
-                "schema_version": 0
+                "_id": _METADATA_KEY,
+                _METADATA_SCHEMA_VERSION: 0
             }
 
-        if metadata["schema_version"] < __class__.SCHEMA_VERSION:
-            logging.info(f"Upgrading schema from version {metadata["schema_version"]} to {__class__.SCHEMA_VERSION}")
-            self.update_schema(metadata["schema_version"])
-            metadata["schema_version"] = __class__.SCHEMA_VERSION
-            self.db["grouch_metadata"] = metadata
+        stored_version = metadata[_METADATA_SCHEMA_VERSION]
+        if stored_version < _SCHEMA_VERSION_CURRENT:
+            logging.info(f"Upgrading schema from version {stored_version} to {_SCHEMA_VERSION_CURRENT}")
+            self.update_schema(stored_version)
+            metadata[_METADATA_SCHEMA_VERSION] = _SCHEMA_VERSION_CURRENT
+            self.db.save(metadata)
 
     def update_schema(self, from_ver: int):
         design_doc = self.get_design_doc("maint")

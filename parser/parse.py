@@ -2,7 +2,10 @@ from common import format_iso
 from datatype import EntryContent
 from datatype import FeedContent
 from parser import ParseResult
+from parser import sanitizer
 import feedparser
+
+_MAX_SUMMARY_LEN = 400
 
 def parse_feed(url: str) -> ParseResult:
     doc = feedparser.parse(url)
@@ -39,18 +42,21 @@ def create_feed_content(url, feed):
     return content
 
 def create_entry_content(entry):
+    html_content = sanitizer.sanitize_html(entry.description)
+    text_content = sanitizer.extract_text(html_content, max_len=_MAX_SUMMARY_LEN)
+
     content = EntryContent()
     content.entry_uid = entry.id
     content.title = entry.title
     if "author" in entry:
         content.author = entry.author
     content.link = entry.link
-    content.text_body = entry.description
+    content.text_body = html_content
     if "updated" in entry:
         content.published = format_iso(entry.updated_parsed)
     elif "published" in entry:
         content.published = format_iso(entry.published_parsed)
-    content.summary = "Abc123"
+    content.text_summary = text_content
     content.digest = content.computed_digest()
 
     return content
