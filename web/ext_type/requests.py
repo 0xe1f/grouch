@@ -9,6 +9,15 @@ class CreateFolderRequest(JsonObject):
     def title(self) -> str:
         return self.get_prop("title")
 
+class DeleteFolderRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def id(self) -> str:
+        return self.get_prop("id")
+
 class MoveSubRequest(JsonObject):
 
     def __init__(self, source: dict[str, str]={}):
@@ -73,3 +82,12 @@ class SetTagsRequest(JsonObject):
     @property
     def tags(self) -> list[str]:
         return self.get_prop("tags")
+
+class UnsubscribeRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def id(self) -> str:
+        return self.get_prop("id")

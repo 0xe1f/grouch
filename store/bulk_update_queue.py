@@ -17,6 +17,10 @@ class BulkUpdateQueue:
         self._success_ids = []
         self._track_ids = track_ids
 
+    @property
+    def connection(self) -> Connection:
+        return self._conn
+
     def __enter__(self):
         return self
 
@@ -52,6 +56,10 @@ class BulkUpdateQueue:
     @property
     def written_count(self) -> int:
         return self._success_count
+
+    @property
+    def pending_count(self) -> int:
+        return len(self._docs)
 
     @property
     def conflict_count(self) -> int:

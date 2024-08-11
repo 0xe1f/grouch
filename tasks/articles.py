@@ -29,3 +29,18 @@ def remove_tag_from_articles(conn: Connection, user_id: str, tag: str):
                 bulk_q.enqueue_flex(article)
 
     logging.info(f"Removed tag from {bulk_q.written_count} articles ({time() - start_time:.2}s)")
+
+def remove_articles_by_sub(bulk_q: BulkUpdateQueue, sub_id: str) -> bool:
+    pending_count = bulk_q.pending_count
+    written_count = bulk_q.written_count
+    enqueued_count = bulk_q.enqueued_count
+
+    for article in generate_articles_by_sub(bulk_q.connection, sub_id):
+        article.mark_deleted()
+        bulk_q.enqueue_flex(article)
+    bulk_q.flush()
+
+    written_count = bulk_q.written_count - written_count - pending_count
+    enqueued_count = bulk_q.enqueued_count - enqueued_count
+
+    return written_count == enqueued_count

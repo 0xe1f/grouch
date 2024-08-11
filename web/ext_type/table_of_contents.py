@@ -25,3 +25,10 @@ class TableOfContents(JsonObject):
 
     def remove_tag(self, tag_title: str):
         self.set_prop("tags", [tag.as_dict() for tag in self.tags if tag.title != tag_title])
+
+    def remove_folder(self, folder_id: str):
+        self.set_prop("folders", [folder.as_dict() for folder in self.folders if folder.id != folder_id])
+        self.set_prop("subscriptions", [sub.as_dict() for sub in self.subscriptions if sub.folder_id != folder_id])
+
+    def remove_subscription(self, sub_id: str):
+        self.set_prop("subscriptions", [sub.as_dict() for sub in self.subscriptions if sub.id != sub_id])

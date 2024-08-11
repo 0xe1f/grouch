@@ -20,6 +20,7 @@ from store.feeds import stale_feeds
 from store.folders import find_folders_by_id
 from store.folders import find_folders_by_user
 from store.folders import write_folders
+from store.subscriptions import find_sub_ids_by_folder
 from store.subscriptions import find_subs_by_id
 from store.subscriptions import find_subs_by_user
 from store.subscriptions import find_user_subs_synced

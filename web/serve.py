@@ -282,6 +282,52 @@ def remove_tag():
 
     return responses.MoveSubResponse(toc).as_dict()
 
+@app.route('/unsubscribe', methods=['POST'])
+def unsubscribe():
+    arg = requests.UnsubscribeRequest(request.json)
+    if not arg:
+        app.logger.error(f"Empty request")
+        return Error("FIXME!!").as_dict()
+
+    if not arg.id:
+        app.logger.error(f"Missing id")
+        return Error("FIXME!!").as_dict()
+
+    owner_id = Subscription.extract_owner_id(arg.id)
+    if owner_id != user.id:
+        app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+        return Error("FIXME!!").as_dict()
+
+    executor.submit(tasks.unsubscribe, conn, arg.id)
+    toc = _fetch_table_of_contents()
+    # Actual deletion will happen asynchronously
+    toc.remove_subscription(arg.id)
+
+    return responses.UnsubscribeResponse(toc).as_dict()
+
+@app.route('/deleteFolder', methods=['POST'])
+def delete_folder():
+    arg = requests.DeleteFolderRequest(request.json)
+    if not arg:
+        app.logger.error(f"Empty request")
+        return Error("FIXME!!").as_dict()
+
+    if not arg.id:
+        app.logger.error(f"Missing id")
+        return Error("FIXME!!").as_dict()
+
+    owner_id = Folder.extract_owner_id(arg.id)
+    if owner_id != user.id:
+        app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+        return Error("FIXME!!").as_dict()
+
+    executor.submit(tasks.delete_folder, conn, arg.id)
+    toc = _fetch_table_of_contents()
+    # Actual deletion will happen asynchronously
+    toc.remove_folder(arg.id)
+
+    return responses.DeleteFolderResponse(toc).as_dict()
+
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])

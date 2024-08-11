@@ -14,6 +14,7 @@ FEEDS_BY_URL = "maint/feeds_by_url"
 
 FOLDERS_BY_USER = "maint/folders_by_user"
 
+SUBS_BY_FOLDER = "maint/subs_by_folder"
 SUBS_BY_USER = "maint/subs_by_user"
 SUBS_BY_USER_BY_SYNC = "maint/subs_by_user"
 

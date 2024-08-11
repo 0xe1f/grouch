@@ -53,6 +53,13 @@ class FlexObject:
     def as_dict(self):
         return self._doc.copy()
 
+    def mark_deleted(self):
+        self._doc = {
+            "_id": self._doc["_id"],
+            "_rev": self._doc["_rev"],
+            "_deleted": True,
+        }
+
     @staticmethod
     def extract_doc_type(obj_id: str) -> str|None:
         doc_type, _ = decompose_key(obj_id)

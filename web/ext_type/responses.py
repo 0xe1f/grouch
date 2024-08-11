@@ -21,6 +21,15 @@ class CreateFolderResponse(JsonObject):
             },
         )
 
+class DeleteFolderResponse(JsonObject):
+
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
+            },
+        )
+
 class MoveSubResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):
@@ -55,5 +64,14 @@ class SetTagsResponse(JsonObject):
             {
                 "subscriptions": toc.as_dict(),
                 "tags": tags,
+            },
+        )
+
+class UnsubscribeResponse(JsonObject):
+
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
             },
         )

@@ -11,7 +11,9 @@ from store import find_user_subs_synced
 from store import BulkUpdateQueue
 from store import Connection
 from subscribe import SubSource
-from tasks import import_feeds
+from tasks.feeds import import_feeds
+from tasks.articles import remove_articles_by_sub
+from time import time
 import logging
 
 def sync_subs(conn: Connection, user_id: str):
@@ -90,11 +92,32 @@ def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
         if remaining_sources:
             _subscribe_current_feeds(conn, user_id, *remaining_sources)
 
-def move_sub(conn: Connection, sub_id: str, dest_folder_id: str|None):
-    logging.info(f"Moving {sub_id} to {dest_folder_id}")
-    for x in range(5):
-        logging.info("sleeping")
-    logging.info("ALL DONE")
+def unsubscribe(conn: Connection, *sub_ids: int):
+    start_time = time()
+
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+        remove_subscriptions(bulk_q, *sub_ids)
+
+    logging.info(f"Unsub {len(sub_ids)} subs: {bulk_q.written_count}/{bulk_q.enqueued_count} objects written ({time() - start_time:.2}s)")
+
+def remove_subscriptions(bulk_q: BulkUpdateQueue, *sub_ids: int) -> bool:
+    pending_count = bulk_q.pending_count
+    written_count = bulk_q.written_count
+    enqueued_count = bulk_q.enqueued_count
+
+    for sub_id in sub_ids:
+        if remove_articles_by_sub(bulk_q, sub_id):
+            sub = first_or_none(find_subs_by_id(bulk_q.connection, sub_id))
+            sub.mark_deleted()
+            bulk_q.enqueue_flex(sub)
+
+    bulk_q.flush()
+    written_count = bulk_q.written_count - written_count - pending_count
+    enqueued_count = bulk_q.enqueued_count - enqueued_count
+
+    # If all_articles_removed, but enqueued_count != written_count,
+    # then at least one subscription failed to write
+    return enqueued_count == written_count
 
 # Returns subs that could not be subscribed to (no matching feed)
 def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSource) -> set[SubSource]:

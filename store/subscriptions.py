@@ -10,6 +10,13 @@ def find_subs_by_id(conn: Connection, *ids: str) -> list[Subscription]:
 
     return matches
 
+def find_sub_ids_by_folder(conn: Connection, folder_id: str) -> list[str]:
+    matches = []
+    for item in conn.db.view(views.SUBS_BY_FOLDER, key=folder_id):
+        matches.append(item.id)
+
+    return matches
+
 def find_subs_by_user(conn: Connection, user_id: str) -> list[Subscription]:
     matches = []
     for item in conn.db.view(views.SUBS_BY_USER, start_key=[ user_id ], end_key=[ user_id, {} ], include_docs=True):
