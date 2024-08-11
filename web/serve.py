@@ -25,7 +25,9 @@ from datatype import FlexObject
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import send_file
 from flask_executor import Executor
+from io import BytesIO
 from json import loads
 from store import BulkUpdateQueue
 from store import Connection
@@ -53,6 +55,7 @@ from web.ext_type import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
 import logging
+import port
 import tasks
 
 app = Flask(__name__)
@@ -104,6 +107,25 @@ def articles():
         articles=[PubArticle(article=article, entry=entry_map[article.entry_id]) for article in articles],
         next_start=obfuscate_json(next_start) if next_start else None,
     ).as_dict()
+
+@app.route('/exportOpml')
+def export_opml():
+    subs = find_subs_by_user(conn, user.id)
+    feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
+    feed_map = { feed.id:feed for feed in feeds }
+
+    output = port.export_opml(
+        title=f"{user.username} subscriptions in grouch",
+        subs=[(sub, feed_map[sub.feed_id]) for sub in subs],
+        folders=find_folders_by_user(conn, user.id),
+    )
+
+    return send_file(
+        BytesIO(output.encode()),
+        as_attachment=True,
+        download_name="subscriptions.xml",
+        mimetype="application/xml",
+    )
 
 @app.route('/setProperty', methods=['POST'])
 def set_property():

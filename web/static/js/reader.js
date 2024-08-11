@@ -1190,7 +1190,7 @@
             $('#import-subscriptions').showModal(true);
         },
         'exportSubscriptions': function() {
-            window.location.href = '/export';
+            window.location.href = '/exportOpml';
         },
         'showAbout': function() {
             $('#about').showModal(true);
