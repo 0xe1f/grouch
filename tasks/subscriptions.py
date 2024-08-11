@@ -22,11 +22,16 @@ from store import find_articles_by_entry
 from store import find_entries_fetched_since
 from store import find_feed_ids_by_url
 from store import find_user_subs_synced
+from store import generate_subscriptions_by_folder
+from store import generate_subscriptions_by_user
 from store import BulkUpdateQueue
 from store import Connection
 from subscribe import SubSource
 from tasks.feeds import import_feeds
 from tasks.articles import remove_articles_by_sub
+from tasks.articles import mark_articles_as_read_by_folder
+from tasks.articles import mark_articles_as_read_by_sub
+from tasks.articles import mark_articles_as_read_by_user
 from time import time
 import logging
 
@@ -132,6 +137,42 @@ def remove_subscriptions(bulk_q: BulkUpdateQueue, *sub_ids: int) -> bool:
     # If all_articles_removed, but enqueued_count != written_count,
     # then at least one subscription failed to write
     return enqueued_count == written_count
+
+def mark_subs_read_by_user(conn: Connection, user_id: str):
+    start_time = time()
+    logging.debug(f"Marking {user_id}'s subs as read")
+
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+        mark_articles_as_read_by_user(bulk_q, user_id)
+        for sub in generate_subscriptions_by_user(bulk_q.connection, user_id):
+            sub.unread_count = 0
+            bulk_q.enqueue_flex(sub)
+
+    logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
+
+def mark_subs_read_by_folder(conn: Connection, folder_id: str):
+    start_time = time()
+    logging.debug(f"Marking {folder_id} as read")
+
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+        mark_articles_as_read_by_folder(bulk_q, folder_id)
+        for sub in generate_subscriptions_by_folder(bulk_q.connection, folder_id):
+            sub.unread_count = 0
+            bulk_q.enqueue_flex(sub)
+
+    logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
+
+def mark_sub_read(conn: Connection, sub_id: str) -> bool:
+    start_time = time()
+    logging.debug(f"Marking {sub_id} as read")
+
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+        changed = mark_articles_as_read_by_sub(bulk_q, sub_id)
+        if sub := first_or_none(find_subs_by_id(bulk_q.connection, sub_id)):
+            sub.unread_count -= changed
+            bulk_q.enqueue_flex(sub)
+
+    logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
 # Returns subs that could not be subscribed to (no matching feed)
 def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSource) -> set[SubSource]:

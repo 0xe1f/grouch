@@ -342,6 +342,49 @@ def delete_folder():
 
     return responses.DeleteFolderResponse(toc).as_dict()
 
+@app.route('/markAllAsRead', methods=['POST'])
+def mark_all_as_read():
+    arg = requests.MarkAllAsReadRequest(request.json)
+    if not arg:
+        app.logger.error(f"Empty request")
+        return Error("FIXME!!").as_dict()
+
+    match arg.scope:
+        case requests.MarkAllAsReadRequest.SCOPE_ALL:
+            executor.submit(tasks.mark_subs_read_by_user, conn, user.id)
+        case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
+            if not arg.id:
+                app.logger.error(f"Missing id")
+                return Error("FIXME!!").as_dict()
+            owner_id = Folder.extract_owner_id(arg.id)
+            if owner_id != user.id:
+                app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+                return Error("FIXME!!").as_dict()
+
+            executor.submit(tasks.mark_subs_read_by_folder, conn, arg.id)
+        case requests.MarkAllAsReadRequest.SCOPE_SUB:
+            if not arg.id:
+                app.logger.error(f"Missing id")
+                return Error("FIXME!!").as_dict()
+
+            owner_id = Subscription.extract_owner_id(arg.id)
+            if owner_id != user.id:
+                app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+                return Error("FIXME!!").as_dict()
+
+            executor.submit(tasks.mark_sub_read, conn, arg.id)
+
+    toc = _fetch_table_of_contents()
+    match arg.scope:
+        case requests.MarkAllAsReadRequest.SCOPE_ALL:
+            toc.mark_all_as_read()
+        case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
+            toc.mark_folder_as_read(arg.id)
+        case requests.MarkAllAsReadRequest.SCOPE_SUB:
+            toc.mark_sub_as_read(arg.id)
+
+    return responses.MarkAllAsReadResponse(toc).as_dict()
+
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
@@ -365,4 +408,5 @@ if __name__ == '__main__':
     user_id = find_user_id(conn, "foo")
     user = fetch_user(conn, user_id)
 
+    app.config['EXECUTOR_PROPAGATE_EXCEPTIONS'] = True
     app.run(host='0.0.0.0', port='8080', debug=True)

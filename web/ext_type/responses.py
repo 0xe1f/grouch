@@ -44,6 +44,15 @@ class DeleteFolderResponse(JsonObject):
             },
         )
 
+class MarkAllAsReadResponse(JsonObject):
+
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
+            },
+        )
+
 class MoveSubResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):

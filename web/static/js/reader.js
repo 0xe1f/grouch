@@ -429,19 +429,27 @@
                 });
             }
         },
-        'markAllAsRead': function(filter) {
-            var subscription = this;
-
-            $.post('markAllAsRead', {
-                'subscription': subscription.isFolder() ? undefined : subscription.id,
-                'folder':       subscription.isFolder() ? subscription.id : subscription.parent,
-                'filter':       filter,
-            },
-            function(response) {
-                ui.showToast(response.message);
-                if (response.done)
-                    refresh();
-            }, 'json');
+        'markAllAsRead': function() {
+            var sub = this;
+            $.ajax({
+                url: "markAllAsRead",
+                type: "POST",
+                data: JSON.stringify({
+                    "scope": sub.isRoot()
+                        ? "all"
+                        : (sub.isFolder()
+                            ? "folder"
+                            : "subscription"
+                        ),
+                    "id": sub.id ? sub.id : undefined,
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    resetSubscriptionDom(response.subscriptions, false);
+                    // FIXME: mark visible entries as read
+                }
+            });
         },
         'moveTo': function(folder) {
             var sub = this;
@@ -1367,8 +1375,7 @@
                 return;
             }
 
-            var filter = $('.group-filter.selected-menu-item').data('value');
-            subscription.markAllAsRead(filter);
+            subscription.markAllAsRead();
         },
         'removeFolder': function(folder) {
             if (!confirm(_l("You will be unsubscribed from all subscriptions in this folder. Delete %s?", [folder.title])))

@@ -32,6 +32,23 @@ class DeleteFolderRequest(JsonObject):
     def id(self) -> str:
         return self.get_prop("id")
 
+class MarkAllAsReadRequest(JsonObject):
+
+    SCOPE_ALL = "all"
+    SCOPE_SUB = "subscription"
+    SCOPE_FOLDER = "folder"
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def id(self) -> str:
+        return self.get_prop("id")
+
+    @property
+    def scope(self) -> str:
+        return self.get_prop("scope")
+
 class MoveSubRequest(JsonObject):
 
     def __init__(self, source: dict[str, str]={}):

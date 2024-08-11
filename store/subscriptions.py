@@ -44,3 +44,22 @@ def find_user_subs_synced(conn: Connection, user_id: str) -> list[tuple[str, str
         matches.append((doc.id, doc.value["feed_id"], doc.value.get("folder_id"), doc.value.get("last_sync")))
 
     return matches
+
+def generate_subscriptions_by_folder(conn: Connection, folder_id: str, batch_size: int=40):
+    options = {
+        "key": folder_id,
+        "descending": True,
+        "include_docs": True,
+    }
+    for item in conn.db.iterview(views.SUBS_BY_FOLDER, batch_size, **options):
+        yield Subscription(item.doc)
+
+def generate_subscriptions_by_user(conn: Connection, user_id: str, batch_size: int=40):
+    options = {
+        "end_key": [ user_id ],
+        "start_key":[ user_id, {}],
+        "descending": True,
+        "include_docs": True,
+    }
+    for item in conn.db.iterview(views.SUBS_BY_USER, batch_size, **options):
+        yield Subscription(item.doc)

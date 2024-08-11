@@ -19,8 +19,10 @@ from store.articles import find_articles_by_prop
 from store.articles import find_articles_by_sub
 from store.articles import find_articles_by_tag
 from store.articles import find_articles_by_user
+from store.articles import generate_articles_by_folder
 from store.articles import generate_articles_by_sub
 from store.articles import generate_articles_by_tag
+from store.articles import generate_articles_by_user
 from store.articles import ArticlePage
 from store.articles import ArticlePageMarker
 from store.bulk_update_queue import BulkUpdateQueue
@@ -38,6 +40,8 @@ from store.subscriptions import find_sub_ids_by_folder
 from store.subscriptions import find_subs_by_id
 from store.subscriptions import find_subs_by_user
 from store.subscriptions import find_user_subs_synced
+from store.subscriptions import generate_subscriptions_by_folder
+from store.subscriptions import generate_subscriptions_by_user
 from store.tags import find_tags_by_user
 from store.users import create_user
 from store.users import fetch_user

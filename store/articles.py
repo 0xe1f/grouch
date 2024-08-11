@@ -126,9 +126,9 @@ def find_articles_by_folder(conn: Connection, sub_id: str, start: str=None, unre
     options = {
         "end_key": [sub_id],
         "start_key": start if start else [sub_id, {}],
+        "descending": True,
         "include_docs": True,
         "limit": limit + 1,
-        "descending": True,
     }
 
     next_start = None
@@ -144,13 +144,52 @@ def find_articles_by_folder(conn: Connection, sub_id: str, start: str=None, unre
 
     return matches, next_start
 
-def generate_articles_by_sub(conn: Connection, sub_id: str, batch_size: int=40):
+def generate_articles_by_sub(conn: Connection, sub_id: str, unread_only: bool=False, batch_size: int=40):
     options = {
-        "start_key": [sub_id],
-        "end_key": [sub_id, {}],
+        "end_key": [sub_id],
+        "start_key":[sub_id, {}],
+        "descending": True,
         "include_docs": True,
     }
-    for item in conn.db.iterview(views.ARTICLES_BY_SUB, batch_size, **options):
+    if unread_only:
+        view = views.ARTICLES_BY_SUB_UNREAD
+    else:
+        view = views.ARTICLES_BY_SUB
+    for item in conn.db.iterview(view, batch_size, **options):
+        yield Article(item.doc)
+
+def generate_articles_by_folder(conn: Connection, folder_id: str, unread_only: bool=False, batch_size: int=40):
+    options = {
+        "end_key": [folder_id],
+        "start_key":[folder_id, {}],
+        "descending": True,
+        "include_docs": True,
+    }
+    if unread_only:
+        view = views.ARTICLES_BY_FOLDER_UNREAD
+    else:
+        view = views.ARTICLES_BY_FOLDER
+    for item in conn.db.iterview(view, batch_size, **options):
+        yield Article(item.doc)
+
+def generate_articles_by_user(conn: Connection, user_id: str, unread_only: bool=False, batch_size: int=40):
+    options = {
+        "descending": True,
+        "include_docs": True,
+    }
+    if unread_only:
+        view = views.ARTICLES_BY_PROP
+        options = options | {
+            "end_key": [user_id, Article.PROP_UNREAD],
+            "start_key":[user_id, Article.PROP_UNREAD, {}],
+        }
+    else:
+        view = views.ARTICLES_BY_USER
+        options = options | {
+            "end_key": [user_id],
+            "start_key":[user_id, {}],
+        }
+    for item in conn.db.iterview(view, batch_size, **options):
         yield Article(item.doc)
 
 def generate_articles_by_tag(conn: Connection, user_id: str, tag: str, batch_size: int=40):

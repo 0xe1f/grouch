@@ -44,6 +44,10 @@ class Subscription(JsonObject):
     def unread_count(self) -> int:
         return self._doc.get("unread")
 
+    @unread_count.setter
+    def unread_count(self, val: int):
+        self.set_prop("unread", val)
+
     @property
     def favicon_url(self) -> str:
         return self._doc.get("faviconUrl")

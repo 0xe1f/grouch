@@ -20,3 +20,6 @@ from tasks.folders import delete_folder
 from tasks.subscriptions import subscribe_user
 from tasks.subscriptions import unsubscribe
 from tasks.subscriptions import sync_subs
+from tasks.subscriptions import mark_sub_read
+from tasks.subscriptions import mark_subs_read_by_folder
+from tasks.subscriptions import mark_subs_read_by_user

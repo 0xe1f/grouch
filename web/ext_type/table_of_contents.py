@@ -46,3 +46,26 @@ class TableOfContents(JsonObject):
 
     def remove_subscription(self, sub_id: str):
         self.set_prop("subscriptions", [sub.as_dict() for sub in self.subscriptions if sub.id != sub_id])
+
+    def mark_sub_as_read(self, sub_id: str):
+        subs = []
+        for sub in self.subscriptions:
+            if sub.id == sub_id:
+                sub.unread_count = 0
+            subs.append(sub.as_dict())
+        self.set_prop("subscriptions", subs)
+
+    def mark_folder_as_read(self, folder_id: str):
+        subs = []
+        for sub in self.subscriptions:
+            if sub.folder_id == folder_id:
+                sub.unread_count = 0
+            subs.append(sub.as_dict())
+        self.set_prop("subscriptions", subs)
+
+    def mark_all_as_read(self):
+        subs = []
+        for sub in self.subscriptions:
+            sub.unread_count = 0
+            subs.append(sub.as_dict())
+        self.set_prop("subscriptions", subs)
