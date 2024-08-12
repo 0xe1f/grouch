@@ -18,6 +18,8 @@ from store import views
 from store.connection import Connection
 from time import struct_time
 
+FeedMeta = tuple[str, str]
+
 def find_feeds_by_id(conn: Connection, *feed_ids: str) -> list[FeedContent]:
     matches = []
     for item in conn.db.view(views.ALL_DOCS, keys=feed_ids, include_docs=True):
@@ -25,10 +27,10 @@ def find_feeds_by_id(conn: Connection, *feed_ids: str) -> list[FeedContent]:
 
     return matches
 
-def find_feed_ids_by_url(conn: Connection, *urls: str) -> dict:
+def find_feed_meta_by_url(conn: Connection, *urls: str) -> dict[str, FeedMeta]:
     matches = {}
     for item in conn.db.view(views.FEEDS_BY_URL, keys = urls):
-        matches[item.key] = item.id
+        matches[item.key] = (item.id, item.value)
 
     return matches
 

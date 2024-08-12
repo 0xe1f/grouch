@@ -114,6 +114,19 @@ class SetTagsRequest(JsonObject):
     def tags(self) -> list[str]:
         return self.get_prop("tags")
 
+class SubscribeRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def url(self) -> str:
+        return self.get_prop("url")
+
+    @property
+    def folder_id(self) -> str:
+        return self.get_prop("folderId")
+
 class UnsubscribeRequest(JsonObject):
 
     def __init__(self, source: dict[str, str]={}):

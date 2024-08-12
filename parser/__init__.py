@@ -14,3 +14,4 @@
 
 from parser.parse_result import ParseResult
 from parser.parse import parse_feed
+from parser.parse import parse_url

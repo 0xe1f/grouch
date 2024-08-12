@@ -14,7 +14,7 @@
 
 class Base:
 
-    def __init__(self, id: str=None, title: str=None):
+    def __init__(self, id: str|None=None, title: str|None=None):
         self._id = id
         self._title = title
 
@@ -36,13 +36,14 @@ class Base:
 
 class Group(Base):
 
-    def __init__(self, id: str=None, title: str=None):
+    def __init__(self, id: str|None=None, title: str|None=None):
         super().__init__(id, title)
 
 class Source(Base):
 
-    def __init__(self, id: str=None, title: str=None):
+    def __init__(self, id: str|None=None, title: str|None=None, feed_url: str|None=None):
         super().__init__(id, title)
+        self._feed_url = feed_url
 
     @property
     def feed_url(self) -> str:

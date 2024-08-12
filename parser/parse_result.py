@@ -17,11 +17,11 @@ from datatype import FeedContent
 
 class ParseResult:
 
-    def __init__(self, url: str, error: str=None, feed: FeedContent=None, entries: list[EntryContent]=None):
+    def __init__(self, url: str, feed: FeedContent=None, entries: list[EntryContent]=None, alts: list[str]|None=None):
         self._url = url
         self._feed = feed
         self._entries = entries
-        self._error = error
+        self._alternatives = alts
 
     @property
     def url(self) -> str:
@@ -36,8 +36,8 @@ class ParseResult:
         return self._entries
 
     @property
-    def error(self) -> str|None:
-        return self._error
+    def alternatives(self) -> list[str]|None:
+        return self._alternatives
 
     def success(self) -> bool:
-        return not self.error
+        return self._alternatives == None and self._feed

@@ -80,7 +80,7 @@ class Connection:
                 "map": """
                     function (doc) {
                         if (doc.doc_type == 'feed') {
-                            emit(doc.feed_url);
+                            emit(doc.feed_url, doc.title);
                         }
                     }
                 """

@@ -26,21 +26,22 @@ import time
 
 def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
     successful, _ = _fetch_feeds(*feed_urls)
-    if not len(successful):
+    import_feed_results(conn, successful)
+
+    return [result.url for result in successful]
+
+def import_feed_results(conn: Connection, *results: ParseResult):
+    if not results:
         return set()
 
     feed_count = 0
     entry_count = 0
-    id_url_map = {}
 
-    with BulkUpdateQueue(conn) as bulk_q:
-        for result in successful:
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+        for result in results:
             feed = result.feed
             feed_count += 1
-            id_url_map[feed.id] = feed.feed_url
-
             feed.digest = feed.computed_digest()
-
             bulk_q.enqueue_flex(feed)
 
             entry_count += len(result.entries)
@@ -50,12 +51,7 @@ def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
 
                 bulk_q.enqueue_flex(entry)
 
-    for id in bulk_q.pop_written_ids():
-        id_url_map.pop(id, None)
-
     logging.debug(f"Wrote {bulk_q.written_count} objects; {feed_count}/{entry_count} feeds/entries")
-
-    return id_url_map.values()
 
 def refresh_feeds(conn: Connection, freshness_seconds: int):
     now = time.mktime(time.localtime())
@@ -64,16 +60,13 @@ def refresh_feeds(conn: Connection, freshness_seconds: int):
     pending_fetch = []
     fetch_batch_max = 40
 
-    with BulkUpdateQueue(conn) as bulk_q:
+    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
         # TODO: probably good to set some sort of max limit
         for feed in stale_feeds(conn, stale_start=stale_start):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
                 _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
                 pending_fetch.clear()
-
-            # Don't let it grow too large
-            bulk_q.pop_written_ids()
 
         if pending_fetch:
             _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)

@@ -479,15 +479,20 @@
             return null;
         },
         'subscribe': function(url) {
-            var params = {
-                'url': url,
-            };
-            if (this.id)
-                params['folder'] = this.id;
-
-            $.post('subscribe', params, function(response) {
-                resetSubscriptionDom(response, false);
-            }, 'json');
+            const folderId = this.id;
+            $.ajax({
+                url: "subscribe",
+                type: "POST",
+                data: JSON.stringify({
+                    "url": url,
+                    "folderId": folderId ? folderId : undefined,
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    resetSubscriptionDom(response.subscriptions, false);
+                }
+            });
         },
         'isFolder': function() {
             return true;

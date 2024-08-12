@@ -90,6 +90,15 @@ class SetTagsResponse(JsonObject):
             },
         )
 
+class SubscribeResponse(JsonObject):
+
+    def __init__(self, toc: TableOfContents):
+        super().__init__(
+            {
+                "subscriptions": toc.as_dict(),
+            },
+        )
+
 class UnsubscribeResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):

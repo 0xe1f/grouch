@@ -12,32 +12,76 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from common import first_or_none
 from common import format_iso
 from datatype import EntryContent
 from datatype import FeedContent
 from parser import ParseResult
 from parser import sanitizer
 import feedparser
+import logging
 
 _MAX_SUMMARY_LEN = 400
+_FEED_TYPES = [
+    "application/atom+xml",
+    "application/rss+xml",
+]
+
+def parse_url(url: str) -> ParseResult:
+    if not (doc := feedparser.parse(url)):
+        logging.error(f"FeedParser returned nothing for '{url}'")
+        return None
+
+    if "version" not in doc:
+        if "bozo_exception" in doc:
+            logging.error(f"FeedParser returned an error for '{url}': '{doc.bozo_exception}'")
+        else:
+            logging.error(f"FeedParser returned an error for '{url}'")
+        return None
+
+    if doc.version:
+        # URL represents an actual feed
+        return _parse_feed(doc, url)
+
+    # Possibly an HTML doc? Try to extract an RSS feed
+    if "feed" not in doc:
+        logging.error(f"No feed content and no feed node for '{url}'")
+        return None
+    elif "links" not in doc.feed:
+        logging.error(f"No feed content and no links node for '{url}'")
+        return None
+
+    # Extract RSS feed, and attempt to parse it
+    alt_urls = [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]
+    if not alt_urls:
+        logging.error(f"No feeds for '{url}'")
+        return None
+
+    return ParseResult(url, alts=alt_urls)
 
 def parse_feed(url: str) -> ParseResult:
-    doc = feedparser.parse(url)
-    if not doc:
-        return ParseResult(url, error="No document to parse")
-    if "feed" not in doc:
-        return ParseResult(url, error="Document is missing feed")
-    if not doc.entries:
-        return ParseResult(url, error="Document is missing entries")
-    if "title" not in doc.feed:
-        return ParseResult(url, error="Feed is missing a title")
+    if not (doc := feedparser.parse(url)):
+        logging.error(f"No document available for '{url}'")
+        return None
 
-    feed = create_feed_content(url, doc.feed)
-    entries = [create_entry_content(entry) for entry in doc.entries]
+    return _parse_feed(doc, url)
+
+def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
+    if not doc:
+        logging.error(f"No document to parse ({url})")
+    if "feed" not in doc:
+        logging.error(f"Document is missing feed ({url})")
+    if not doc.entries:
+        logging.error(f"Document is missing entries ({url})")
+    if "title" not in doc.feed:
+        logging.error(f"Document is missing title ({url})")
+
+    feed = _create_feed_content(url, doc.feed)
+    entries = [_create_entry_content(entry) for entry in doc.entries]
 
     return ParseResult(url, feed=feed, entries=entries)
 
-def create_feed_content(url, feed):
+def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedContent:
     content = FeedContent()
     content.feed_url = url
     content.title = feed.title
@@ -55,7 +99,7 @@ def create_feed_content(url, feed):
 
     return content
 
-def create_entry_content(entry):
+def _create_entry_content(entry: feedparser.FeedParserDict) -> EntryContent:
     html_content = sanitizer.sanitize_html(entry.description)
     text_content = sanitizer.extract_text(html_content, max_len=_MAX_SUMMARY_LEN)
 

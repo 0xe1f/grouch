@@ -29,6 +29,7 @@ from flask import send_file
 from flask_executor import Executor
 from io import BytesIO
 from json import loads
+import port.objects
 from store import BulkUpdateQueue
 from store import Connection
 from store import fetch_user
@@ -55,6 +56,7 @@ from web.ext_type import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
 import logging
+import parser
 import port
 import tasks
 
@@ -126,6 +128,37 @@ def export_opml():
         download_name="subscriptions.xml",
         mimetype="application/xml",
     )
+
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    arg = requests.SubscribeRequest(request.json)
+    if not arg:
+        app.logger.error(f"Empty request")
+        return Error("FIXME!!").as_dict()
+    elif not arg.url:
+        app.logger.error(f"Missing URL")
+        return Error("FIXME!!").as_dict()
+
+    # FIXME!! check already-present feeds
+
+    # Parse contents of URL
+    result = parser.parse_url(arg.url)
+    if not result:
+        app.logger.error(f"No valid feeds available for '{arg.url}'")
+        return Error("FIXME!!").as_dict()
+
+    if result.success():
+        # URL successfully parsed as feed
+        executor.submit(tasks.subscribe_user_parsed, conn, user_id, result)
+    elif alts := result.alternatives:
+        # Not a feed, but alternatives are available
+        # FIXME: len > 1?
+        source = port.Source(feed_url=alts[0])
+        executor.submit(tasks.subscribe_user, conn, user.id, source)
+
+    return responses.SubscribeResponse(
+        toc=_fetch_table_of_contents(),
+    ).as_dict()
 
 @app.route('/setProperty', methods=['POST'])
 def set_property():

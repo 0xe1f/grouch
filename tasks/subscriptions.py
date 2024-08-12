@@ -17,17 +17,19 @@ from common import now_in_iso
 from datatype import Article
 from datatype import Subscription
 from itertools import batched
+from parser import ParseResult
+from port import Source
 from store import find_subs_by_id
 from store import find_articles_by_entry
 from store import find_entries_fetched_since
-from store import find_feed_ids_by_url
+from store import find_feed_meta_by_url
 from store import find_user_subs_synced
 from store import generate_subscriptions_by_folder
 from store import generate_subscriptions_by_user
 from store import BulkUpdateQueue
 from store import Connection
-from subscribe import SubSource
 from tasks.feeds import import_feeds
+from tasks.feeds import import_feed_results
 from tasks.articles import remove_articles_by_sub
 from tasks.articles import mark_articles_as_read_by_folder
 from tasks.articles import mark_articles_as_read_by_sub
@@ -88,12 +90,12 @@ def sync_subs(conn: Connection, user_id: str):
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written")
 
-def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
+def subscribe_user(conn: Connection, user_id: str, *sub_sources: Source):
     # Subscribe to all available feeds, get list of remaining
     remaining_sources = _subscribe_current_feeds(conn, user_id, *sub_sources)
 
     # Remainder needs to be fetched
-    new_feed_urls = [source.url for source in remaining_sources]
+    new_feed_urls = [source.feed_url for source in remaining_sources]
 
     # Create folders
     # FIXME!! skip folders for now
@@ -107,9 +109,13 @@ def subscribe_user(conn: Connection, user_id: str, *sub_sources: SubSource):
         remaining_sources.difference_update(imported)
 
         # Attempt resubscribing again
-        # FIXME - reconsider this when this becomes a task queue
         if remaining_sources:
             _subscribe_current_feeds(conn, user_id, *remaining_sources)
+
+def subscribe_user_parsed(conn: Connection, user_id: str, *results: ParseResult):
+    successful = [result for result in results if result.success()]
+    import_feed_results(conn, *successful)
+    _subscribe_current_feeds(conn, user_id, *[Source(feed_url=result.url) for result in successful])
 
 def unsubscribe(conn: Connection, *sub_ids: int):
     start_time = time()
@@ -175,15 +181,16 @@ def mark_sub_read(conn: Connection, sub_id: str) -> bool:
     logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
 # Returns subs that could not be subscribed to (no matching feed)
-def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSource) -> set[SubSource]:
-    source_dict = { source.url:source for source in sub_sources }
+def _subscribe_current_feeds(conn: Connection, user_id: str, *sources: Source) -> set[Source]:
+    source_dict = { source.feed_url:source for source in sources }
     all_subs = set(source_dict.values())
-    existing_feeds_by_url = find_feed_ids_by_url(conn, *source_dict.keys())
+    existing_feeds_by_url = find_feed_meta_by_url(conn, *source_dict.keys())
+    print(f"HIYA! {existing_feeds_by_url}")
     if not existing_feeds_by_url:
         return all_subs
 
     with BulkUpdateQueue(conn) as bulk_q:
-        for url, feed_id in existing_feeds_by_url.items():
+        for url, (feed_id, title) in existing_feeds_by_url.items():
             sub_source = source_dict[url]
             sub = Subscription()
             sub.user_id = user_id
@@ -191,7 +198,7 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sub_sources: SubSo
             # FIXME!!
             # if sub_source.parent_id:
             #     sub.folder_id = folder_id_map[sub_source.parent_id]
-            sub.title = sub_source.title
+            sub.title = sub_source.title or title
             sub.subscribed = now_in_iso()
 
             bulk_q.enqueue_flex(sub)

@@ -13,3 +13,6 @@
 # limitations under the License.
 
 from port.generator import export_opml
+from port.objects import Group
+from port.objects import PortDoc
+from port.objects import Source
