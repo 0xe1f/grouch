@@ -184,9 +184,8 @@ def mark_sub_read(conn: Connection, sub_id: str) -> bool:
 def _subscribe_current_feeds(conn: Connection, user_id: str, *sources: Source) -> set[Source]:
     source_dict = { source.feed_url:source for source in sources }
     all_subs = set(source_dict.values())
-    existing_feeds_by_url = find_feed_meta_by_url(conn, *source_dict.keys())
-    print(f"HIYA! {existing_feeds_by_url}")
-    if not existing_feeds_by_url:
+
+    if not (existing_feeds_by_url := find_feed_meta_by_url(conn, *source_dict.keys())):
         return all_subs
 
     with BulkUpdateQueue(conn) as bulk_q:

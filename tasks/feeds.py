@@ -26,7 +26,7 @@ import time
 
 def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
     successful, _ = _fetch_feeds(*feed_urls)
-    import_feed_results(conn, successful)
+    import_feed_results(conn, *successful)
 
     return [result.url for result in successful]
 
