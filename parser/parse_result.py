@@ -38,6 +38,3 @@ class ParseResult:
     @property
     def alternatives(self) -> list[str]|None:
         return self._alternatives
-
-    def success(self) -> bool:
-        return self._alternatives == None and self._feed

@@ -52,12 +52,12 @@ def parse_url(url: str) -> ParseResult:
         return None
 
     # Extract RSS feed, and attempt to parse it
-    alt_urls = [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]
-    if not alt_urls:
-        logging.error(f"No feeds for '{url}'")
-        return None
+    if (alt_urls := [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]):
+        logging.debug(f"No feeds for '{url}', but found {len(alt_urls)} alternatives")
+        return ParseResult(url, alts=alt_urls)
 
-    return ParseResult(url, alts=alt_urls)
+    logging.error(f"No feeds for '{url}'")
+    return None
 
 def parse_feed(url: str) -> ParseResult:
     if not (doc := feedparser.parse(url)):
@@ -78,7 +78,6 @@ def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
 
     feed = _create_feed_content(url, doc.feed)
     entries = [_create_entry_content(entry) for entry in doc.entries]
-
     return ParseResult(url, feed=feed, entries=entries)
 
 def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedContent:

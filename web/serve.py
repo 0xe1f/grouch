@@ -139,26 +139,12 @@ def subscribe():
         app.logger.error(f"Missing URL")
         return Error("FIXME!!").as_dict()
 
-    # FIXME!! check already-present feeds
+    # FIXME: validate url
 
-    # Parse contents of URL
-    result = parser.parse_url(arg.url)
-    if not result:
-        app.logger.error(f"No valid feeds available for '{arg.url}'")
-        return Error("FIXME!!").as_dict()
+    # Kick off a task
+    executor.submit(tasks.subscribe_user_unknown_url, conn, user_id, arg.url)
 
-    if result.success():
-        # URL successfully parsed as feed
-        executor.submit(tasks.subscribe_user_parsed, conn, user_id, result)
-    elif alts := result.alternatives:
-        # Not a feed, but alternatives are available
-        # FIXME: len > 1?
-        source = port.Source(feed_url=alts[0])
-        executor.submit(tasks.subscribe_user, conn, user.id, source)
-
-    return responses.SubscribeResponse(
-        toc=_fetch_table_of_contents(),
-    ).as_dict()
+    return responses.SubscribeResponse().as_dict()
 
 @app.route('/setProperty', methods=['POST'])
 def set_property():

@@ -490,7 +490,8 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    resetSubscriptionDom(response.subscriptions, false);
+                    // Meh
+                    // resetSubscriptionDom(response.subscriptions, false);
                 }
             });
         },
