@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common.lists import first_or_none
+from common import first_or_none
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
 from config import read_config
@@ -22,6 +22,9 @@ from datatype import Article
 from datatype import Folder
 from datatype import Subscription
 from datatype import FlexObject
+from datetime import UTC
+from datetime import datetime
+from datetime import timedelta
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -29,7 +32,6 @@ from flask import send_file
 from flask_executor import Executor
 from io import BytesIO
 from json import loads
-import port.objects
 from store import BulkUpdateQueue
 from store import Connection
 from store import fetch_user
@@ -56,12 +58,13 @@ from web.ext_type import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
 import logging
-import parser
 import port
 import tasks
 
 app = Flask(__name__)
 executor = Executor(app)
+
+FEED_SYNC_TIMEOUT = 600 # 10 min
 
 @app.route('/')
 def index():
@@ -425,6 +428,31 @@ def mark_all_as_read():
             toc.mark_sub_as_read(arg.id)
 
     return responses.MarkAllAsReadResponse(toc).as_dict()
+
+@app.route('/syncFeeds', methods=['POST'])
+def sync_feeds():
+    now = datetime.now(UTC)
+    if last_sync := user.last_sync:
+        last_sync_dt = datetime.fromisoformat(last_sync)
+        delta = now - last_sync_dt
+        if delta.total_seconds() < FEED_SYNC_TIMEOUT:
+            return responses.SyncFeedsResponse(
+                next_sync=(now + delta).isoformat(timespec='microseconds'),
+            ).as_dict()
+        else:
+           last_sync = None
+
+    if not last_sync:
+        user.last_sync = now.isoformat(timespec='microseconds')
+        with BulkUpdateQueue(conn) as bulk_q:
+            bulk_q.enqueue_flex(user)
+
+    executor.submit(tasks.sync_subs, conn, user.id)
+
+    return responses.SyncFeedsResponse(
+        toc=_fetch_table_of_contents(),
+        next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).isoformat(timespec='microseconds'),
+    ).as_dict()
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)

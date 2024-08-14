@@ -15,7 +15,7 @@
 class JsonObject:
 
     def __init__(self, source: dict={}):
-        self._doc = source.copy()
+        self._doc = { k:v for k, v in source.items() if v != None }
 
     def get_prop(self, name: str, default: object=None) -> object:
         return self._doc.get(name, default)

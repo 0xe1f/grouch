@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import first_or_none
-from common import format_iso
 from datatype import EntryContent
 from datatype import FeedContent
 from parser import ParseResult
 from parser import sanitizer
+import datetime
 import feedparser
 import logging
+import time
 
 _MAX_SUMMARY_LEN = 400
 _FEED_TYPES = [
@@ -91,9 +91,9 @@ def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedConte
     # TODO content.favicon_url = None
     content.site_url = feed.link
     if "updated" in feed:
-        content.published = format_iso(feed.updated_parsed)
+        content.published = _utc_struct_as_iso(feed.updated_parsed)
     elif "published" in feed:
-        content.published = format_iso(feed.published_parsed)
+        content.published = _utc_struct_as_iso(feed.published_parsed)
     content.digest = content.computed_digest()
 
     return content
@@ -110,10 +110,15 @@ def _create_entry_content(entry: feedparser.FeedParserDict) -> EntryContent:
     content.link = entry.link
     content.text_body = html_content
     if "updated" in entry:
-        content.published = format_iso(entry.updated_parsed)
+        content.published = _utc_struct_as_iso(entry.updated_parsed)
     elif "published" in entry:
-        content.published = format_iso(entry.published_parsed)
+        content.published = _utc_struct_as_iso(entry.published_parsed)
     content.text_summary = text_content
     content.digest = content.computed_digest()
 
     return content
+
+def _utc_struct_as_iso(t: time.struct_time) -> str:
+    yr, mo, dy, hr, min, sec, *_ = t
+    dt = datetime.datetime(yr, mo, dy, hr, min, sec, tzinfo=datetime.UTC)
+    return dt.isoformat(timespec='microseconds')

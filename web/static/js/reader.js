@@ -1933,15 +1933,20 @@
 
             lastRefresh = now;
 
-            $.post('syncFeeds', {
-            },
-            function(response) {
-                resetSubscriptionDom(response, false);
-                if (console && console.debug)
-                    console.debug("Refresh succeeded");
-            }, 'json')
-            .always(function() {
-                timeoutId = setTimeout(feedUpdater, 600000); // 10 minutes
+            $.ajax({
+                url: "syncFeeds",
+                type: "POST",
+                data: JSON.stringify({}),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response.subscriptions) {
+                        resetSubscriptionDom(response, false);
+                    }
+                    if (console && console.debug) {
+                        console.debug("Refresh succeeded");
+                    }
+                }
             });
         })();
     };

@@ -21,6 +21,7 @@ from store import BulkUpdateQueue
 from store import Connection
 from store import find_entries_by_uid
 from store import stale_feeds
+import datetime
 import logging
 import time
 
@@ -54,15 +55,15 @@ def import_feed_results(conn: Connection, *results: ParseResult):
     logging.debug(f"Wrote {bulk_q.written_count} objects; {feed_count}/{entry_count} feeds/entries")
 
 def refresh_feeds(conn: Connection, freshness_seconds: int):
-    now = time.mktime(time.localtime())
-    stale_start = time.gmtime(now - freshness_seconds)
+    now = datetime.datetime.now(datetime.UTC)
+    stale_start = now - datetime.timedelta(seconds=freshness_seconds)
 
     pending_fetch = []
     fetch_batch_max = 40
 
     with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
         # TODO: probably good to set some sort of max limit
-        for feed in stale_feeds(conn, stale_start=stale_start):
+        for feed in stale_feeds(conn, stale_start=stale_start.isoformat(timespec='microseconds')):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
                 _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
@@ -124,7 +125,7 @@ def _fetch_feeds(*feed_urls: str) -> tuple[list[ParseResult], list[ParseResult]]
             url = future_to_url[future]
             try:
                 result = future.result()
-                if result.success():
+                if result.feed:
                     successful.append(result)
                 else:
                     failed.append(result)

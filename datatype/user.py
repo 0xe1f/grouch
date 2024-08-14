@@ -57,6 +57,14 @@ class User(FlexObject):
     def email_address(self, val: str):
         self.set_prop("email_address", val)
 
+    @property
+    def last_sync(self) -> str:
+        return self.get_prop("last_sync")
+
+    @last_sync.setter
+    def last_sync(self, val: str):
+        self.set_prop("last_sync", val)
+
     def set_hashed_password(self, plaintext: str, salt: bytes):
         self.hashed_password = bcrypt.hashpw(plaintext.encode(), salt).hex()
         self.salt = salt.hex()

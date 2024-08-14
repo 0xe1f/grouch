@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import format_iso
 from datatype import FeedContent
 from store import views
 from store.connection import Connection
-from time import struct_time
 
 FeedMeta = tuple[str, str]
 
@@ -34,14 +32,14 @@ def find_feed_meta_by_url(conn: Connection, *urls: str) -> dict[str, FeedMeta]:
 
     return matches
 
-def stale_feeds(conn: Connection, stale_start: struct_time=None):
+def stale_feeds(conn: Connection, stale_start: str=None):
     batch_limit = 40
     options = {
         "descending": True,
         "include_docs": True,
     }
     if stale_start:
-        options.update(startkey=format_iso(stale_start))
+        options.update(startkey=stale_start)
 
     iterable = conn.db.iterview("maint/updated_feeds", batch_limit, **options)
     for item in iterable:
