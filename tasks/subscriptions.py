@@ -18,6 +18,7 @@ from datatype import Article
 from datatype import Subscription
 from itertools import batched
 from parser import ParseResult
+from port import PortDoc
 from port import Source
 from store import find_subs_by_id
 from store import find_articles_by_entry
@@ -112,6 +113,13 @@ def subscribe_user_unknown_url(conn: Connection, user_id: str, url: str):
         # Not a feed, but alternatives are available. Use first available
         # TODO: allow selection from multiple feeds
         _subscribe_user(conn, user_id, Source(feed_url=alts[0]))
+
+def subscribe_port_doc(conn: Connection, user_id: str, doc: PortDoc):
+    # FIXME!!
+    for foo in doc.groups:
+        print(f"$ {foo.__dict__}")
+    for foo in doc.sources:
+        print(f"*** {foo.__dict__}")
 
 def unsubscribe(conn: Connection, *sub_ids: int):
     start_time = time()

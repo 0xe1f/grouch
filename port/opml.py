@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from port.objects import Group
 from port.objects import PortDoc
 from port.objects import Source
 from opml import OpmlDocument
 from opml.outlinable import Outlinable
+from uuid import uuid4
 
-def generate_opml(doc: PortDoc, title: str) -> str:
+def write_opml(doc: PortDoc, title: str) -> str:
     opml = OpmlDocument()
     opml.title = title
     _write_outlinable(opml, doc.find_sources())
@@ -30,6 +32,14 @@ def generate_opml(doc: PortDoc, title: str) -> str:
 
     return opml.dumps(pretty=True)
 
+def read_opml(file) -> PortDoc:
+    if opml := OpmlDocument.load(file):
+        doc = PortDoc()
+        _read_outlinable(opml, doc)
+        return doc
+
+    return None
+
 def _write_outlinable(outline: Outlinable, sources: list[Source]):
     for source in sources:
         outline.add_rss(
@@ -38,3 +48,24 @@ def _write_outlinable(outline: Outlinable, sources: list[Source]):
             html_url=source.html_url,
             xml_url=source.feed_url
         )
+
+def _read_outlinable(outlinable: Outlinable, doc: PortDoc, parent_id: str|None=None):
+    for outline in outlinable.outlines:
+        if not outline.xml_url:
+            # Group
+            group = Group(
+                id=uuid4().hex,
+                title=outline.title,
+            )
+            doc.append_group(group)
+            _read_outlinable(outline, doc, group.id)
+        elif outline.type == "rss":
+            # Source
+            source = Source(
+                title=outline.title,
+                feed_url=outline.xml_url,
+                parent_id=parent_id,
+            )
+            doc.append_source(source)
+
+    return doc

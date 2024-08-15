@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from port.generator import export_opml
+from port.common import export_opml
+from port.common import import_opml
 from port.objects import Group
 from port.objects import PortDoc
 from port.objects import Source

@@ -6,10 +6,9 @@
 		<link href="{{ url_for("static", filename="style/reader.css") }}" type="text/css" rel="stylesheet"/>
 		<link rel="shortcut icon" href="{{ url_for("static", filename="favicon.ico") }}">
 		<script src="{{ url_for("static", filename="js/sprintf.min.js") }}" type="text/javascript"></script>
-		<script src="{{ url_for("static", filename="js/jquery-1.9.1.min.js") }}" type="text/javascript"></script>
+		<script src="{{ url_for("static", filename="js/jquery-3.7.1.min.js") }}" type="text/javascript"></script>
 		<script src="{{ url_for("static", filename="js/jquery.hotkeys.js") }}" type="text/javascript"></script>
 		<script src="{{ url_for("static", filename="js/jquery.cookie.js") }}" type="text/javascript"></script>
-		<script src="{{ url_for("static", filename="js/jquery.form.min.js") }}" type="text/javascript"></script>
 		<script src="{{ url_for("static", filename="js/jquery.scrollintoview.min.js") }}" type="text/javascript"></script>
 		<script src="{{ url_for("static", filename="js/l10n/default.js") }}" type="text/javascript"></script>
 		<script src="{{ url_for("static", filename="js/l10n/en-us.js") }}" type="text/javascript"></script>
@@ -59,10 +58,9 @@
 		<div class="modal-blocker"></div>
 		<div id="import-subscriptions" class="modal">
 			<h1 class="_l">Upload OPML file</h1>
-			<form enctype="multipart/form-data" action="#" method="post">
+			<form enctype="multipart/form-data" method="post">
 				<div>
-					<input name="opml" type="file" />
-					<input name="client" type="hidden" value="" />
+					<input name="file" type="file" />
 				</div>
 			</form>
 			<div class="buttons">

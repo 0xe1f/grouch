@@ -14,60 +14,41 @@
 
 class Base:
 
-    def __init__(self, id: str|None=None, title: str|None=None):
-        self._id = id
+    def __init__(self, title: str|None=None):
         self._title = title
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @id.setter
-    def id(self, val: str):
-        self._id = val
 
     @property
     def title(self) -> str:
         return self._title
 
-    @title.setter
-    def title(self, val: str):
-        self._title = val
-
 class Group(Base):
 
     def __init__(self, id: str|None=None, title: str|None=None):
-        super().__init__(id, title)
+        super().__init__(title)
+        self._id = id
+
+    @property
+    def id(self) -> str:
+        return self._id
 
 class Source(Base):
 
-    def __init__(self, id: str|None=None, title: str|None=None, feed_url: str|None=None):
-        super().__init__(id, title)
+    def __init__(self, title: str|None=None, feed_url: str|None=None, parent_id: str|None=None):
+        super().__init__(title)
         self._feed_url = feed_url
+        self._parent_id = parent_id
 
     @property
     def feed_url(self) -> str:
         return self._feed_url
 
-    @feed_url.setter
-    def feed_url(self, val: str):
-        self._feed_url = val
-
     @property
     def html_url(self) -> str:
         return self._html_url
 
-    @html_url.setter
-    def html_url(self, val: str):
-        self._html_url = val
-
     @property
     def parent_id(self) -> str:
         return self._parent_id
-
-    @parent_id.setter
-    def parent_id(self, val: str):
-        self._parent_id = val
 
 class PortDoc:
 

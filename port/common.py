@@ -18,13 +18,17 @@ from datatype.subscription import Subscription
 from port.objects import PortDoc
 from port.objects import Group
 from port.objects import Source
-from port.opml import generate_opml
+from port.opml import write_opml
+from port.opml import read_opml
 
 SubMeta = tuple[Subscription, FeedContent]
 
 def export_opml(title: str, subs: list[SubMeta], folders: list[Folder]) -> str:
     doc = _to_doc(subs, folders)
-    return generate_opml(doc, title)
+    return write_opml(doc, title)
+
+def import_opml(fp) -> PortDoc:
+    return read_opml(fp)
 
 def _to_doc(subs: list[SubMeta], folders: list[Folder]) -> PortDoc:
     doc = PortDoc()

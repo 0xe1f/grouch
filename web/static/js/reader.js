@@ -164,13 +164,17 @@
             lastContinued = continueFrom;
 
             var subscription = this;
-            $.getJSON('articles', {
-                'filter':   JSON.stringify(subscription.getFilter()),
-                'continue': continueFrom ? continueFrom : undefined,
-            })
-            .success(function(response) {
-                continueFrom = response.continue;
-                subscription.addPage(response.articles, response.continue);
+            $.ajax({
+                url: "articles",
+                data: JSON.stringify({
+                    "filter": JSON.stringify(subscription.getFilter()),
+                    "continue": continueFrom ? continueFrom : undefined,
+                }),
+                dataType: "json",
+                success: function(response) {
+                    continueFrom = response.continue;
+                    subscription.addPage(response.articles, response.continue);
+                }
             });
         },
         'refresh': function() {
@@ -838,16 +842,20 @@
         },
         'loadExtras': function() {
             var entry = this;
-            $.getJSON('articleExtras', {
-                'article':      this.id,
-                'subscription': this.source,
-                'folder':       this.getSubscription().parent,
-            })
-            .success(function(response) {
-                entry.extras = response;
-                entry.areExtrasDirty = false;
-
-                entry.syncView();
+            // FIXME: this call is missing
+            $.ajax({
+                url: "articleExtras",
+                data: JSON.stringify({
+                    "article": this.id,
+                    "subscription": this.source,
+                    "folder": this.getSubscription().parent,
+                }),
+                dataType: "json",
+                success: function(response) {
+                    entry.extras = response;
+                    entry.areExtrasDirty = false;
+                    entry.syncView();
+                }
             });
         },
     };
@@ -948,23 +956,19 @@
                     return;
                 }
 
-                // Get upload URL
-                $.post('authUpload', {
-                },
-                function(response) {
-                    // Upload the file
-                    $form
-                        .attr('action', response.uploadUrl)
-                        .ajaxSubmit( {
-                            success: function(response) {
-                                ui.showToast(response.message, false);
-                            },
-                            dataType: 'json',
-                        });
-
-                    // Dismiss the modal
-                    $modal.showModal(false);
-                }, 'json');
+                $.ajax({
+                    url: "importFeeds",
+                    type: "POST",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: new FormData($form[0]),
+                    success: function(){
+                        // resetSubscriptionDom(response.subscriptions, false);
+                        $modal.showModal(false);
+                        // ui.showToast(response.message, false);
+                    }
+                });
             });
         },
         'initMenus': function() {
@@ -1904,10 +1908,13 @@
     };
 
     var refresh = function(reloadItems) {
-        $.getJSON('subscriptions', {
-        })
-        .success(function(response) {
-            resetSubscriptionDom(response, reloadItems);
+        $.ajax({
+            url: "subscriptions",
+            data: JSON.stringify({}),
+            dataType: "json",
+            success: function(response) {
+                resetSubscriptionDom(response, reloadItems);
+            }
         });
     };
 
@@ -1941,7 +1948,7 @@
                 dataType: "json",
                 success: function(response) {
                     if (response.subscriptions) {
-                        resetSubscriptionDom(response, false);
+                        resetSubscriptionDom(response.subscriptions, false);
                     }
                     if (console && console.debug) {
                         console.debug("Refresh succeeded");

@@ -58,13 +58,16 @@ from web.ext_type import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
 import logging
+import os.path
 import port
 import tasks
+import tempfile
 
 app = Flask(__name__)
 executor = Executor(app)
 
 FEED_SYNC_TIMEOUT = 600 # 10 min
+UPLOAD_ALLOWED_TYPES = [ ".xml" ]
 
 @app.route('/')
 def index():
@@ -453,6 +456,36 @@ def sync_feeds():
         toc=_fetch_table_of_contents(),
         next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).isoformat(timespec='microseconds'),
     ).as_dict()
+
+@app.route('/importFeeds', methods=['POST'])
+def import_feeds():
+    # Check individual files
+    if "file" not in request.files:
+        app.logger.error(f"No file in request")
+        return Error("FIXME!!").as_dict()
+
+    if not (file := request.files["file"]) or file.filename == "":
+        app.logger.error(f"No filename in file")
+        return Error("FIXME!!").as_dict()
+
+    _, ext = os.path.splitext(file.filename)
+    if ext not in UPLOAD_ALLOWED_TYPES:
+        app.logger.error(f"Unsupported file type: '{ext}'")
+        return Error("FIXME!!").as_dict()
+
+    with tempfile.TemporaryFile() as tmp:
+        file.save(tmp)
+        tmp.seek(0)
+
+        doc = port.import_opml(tmp)
+
+    if not doc:
+        app.logger.error(f"Unable to import document")
+        return Error("FIXME!!").as_dict()
+
+    executor.submit(tasks.subscribe_port_doc, conn, user.id, doc)
+
+    return responses.ImportFeedsResponse().as_dict()
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)
