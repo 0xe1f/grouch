@@ -25,7 +25,7 @@ class Article(FlexObject):
 
     DOC_TYPE = "article"
 
-    def __init__(self, source: dict[str, str]={}):
+    def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
             self.doc_type = Article.DOC_TYPE
@@ -94,19 +94,19 @@ class Article(FlexObject):
             self.props.remove(name)
 
     @property
-    def published(self) -> str:
+    def published(self) -> int:
         return self.get_prop("published")
 
     @published.setter
-    def published(self, val: str):
+    def published(self, val: int):
         self.set_prop("published", val)
 
     @property
-    def synced(self) -> str:
+    def synced(self) -> int:
         return self.get_prop("synced")
 
     @synced.setter
-    def synced(self, val: str):
+    def synced(self, val: int):
         self.set_prop("synced", val)
 
     def new_key(self) -> str|None:

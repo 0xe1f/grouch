@@ -91,15 +91,16 @@ def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedConte
     # TODO content.favicon_url = None
     content.site_url = feed.link
     if "updated" in feed:
-        content.published = _utc_struct_as_iso(feed.updated_parsed)
+        content.published = _utc_struct_as_timestamp(feed.updated_parsed)
     elif "published" in feed:
-        content.published = _utc_struct_as_iso(feed.published_parsed)
+        content.published = _utc_struct_as_timestamp(feed.published_parsed)
     content.digest = content.computed_digest()
 
     return content
 
 def _create_entry_content(entry: feedparser.FeedParserDict) -> EntryContent:
-    html_content = sanitizer.sanitize_html(entry.description)
+    body = _entry_body(entry)
+    html_content = sanitizer.sanitize_html(body)
     text_content = sanitizer.extract_text(html_content, max_len=_MAX_SUMMARY_LEN)
 
     content = EntryContent()
@@ -110,15 +111,25 @@ def _create_entry_content(entry: feedparser.FeedParserDict) -> EntryContent:
     content.link = entry.link
     content.text_body = html_content
     if "updated" in entry:
-        content.published = _utc_struct_as_iso(entry.updated_parsed)
+        content.published = _utc_struct_as_timestamp(entry.updated_parsed)
     elif "published" in entry:
-        content.published = _utc_struct_as_iso(entry.published_parsed)
+        content.published = _utc_struct_as_timestamp(entry.published_parsed)
     content.text_summary = text_content
     content.digest = content.computed_digest()
 
     return content
 
-def _utc_struct_as_iso(t: time.struct_time) -> str:
+def _entry_body(entry: feedparser.FeedParserDict) -> str:
+    if "content" in entry and len(entry.content):
+        if (content := entry.content[0]) and "value" in content:
+            return content.value
+    elif "summary_detail" in entry:
+        if (summary_detail := entry.summary_detail) and "value" in summary_detail:
+            return summary_detail.value
+
+    return entry.description
+
+def _utc_struct_as_timestamp(t: time.struct_time) -> int:
     yr, mo, dy, hr, min, sec, *_ = t
     dt = datetime.datetime(yr, mo, dy, hr, min, sec, tzinfo=datetime.UTC)
-    return dt.isoformat(timespec='microseconds')
+    return dt.timestamp()

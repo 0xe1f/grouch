@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from common import first_or_none
-from common import now_in_iso
 from datatype import Article
 from datatype import Subscription
+from datetime import datetime
 from itertools import batched
 from parser import ParseResult
 from port import PortDoc
@@ -47,7 +47,7 @@ def sync_subs(conn: Connection, user_id: str, feed_ids: set[str]|None=None):
             if feed_ids and feed_id not in feed_ids:
                 continue
 
-            max_synced = ""
+            max_synced = 0
             read_batch_size = 40
 
             # Fetch entries that have updated
@@ -114,7 +114,7 @@ def subscribe_user_unknown_url(conn: Connection, user_id: str, url: str):
         # TODO: allow selection from multiple feeds
         _subscribe_user(conn, user_id, Source(feed_url=alts[0]))
 
-def subscribe_port_doc(conn: Connection, user_id: str, doc: PortDoc):
+def import_user_subs(conn: Connection, user_id: str, doc: PortDoc):
     # FIXME!!
     for foo in doc.groups:
         print(f"$ {foo.__dict__}")
@@ -230,7 +230,7 @@ def _subscribe_current_feeds(conn: Connection, user_id: str, *sources: Source) -
             # if sub_source.parent_id:
             #     sub.folder_id = folder_id_map[sub_source.parent_id]
             sub.title = sub_source.title or title
-            sub.subscribed = now_in_iso()
+            sub.subscribed = datetime.now().timestamp()
 
             bulk_q.enqueue_flex(sub)
             subbed_feed_ids.add(feed_id)

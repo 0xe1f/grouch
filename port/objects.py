@@ -37,18 +37,23 @@ class Source(Base):
         super().__init__(title)
         self._feed_url = feed_url
         self._parent_id = parent_id
+        self._html_url = None
 
     @property
     def feed_url(self) -> str:
         return self._feed_url
 
     @property
+    def parent_id(self) -> str:
+        return self._parent_id
+
+    @property
     def html_url(self) -> str:
         return self._html_url
 
-    @property
-    def parent_id(self) -> str:
-        return self._parent_id
+    @html_url.setter
+    def html_url(self, val: str):
+        self._html_url = val
 
 class PortDoc:
 
@@ -70,7 +75,7 @@ class PortDoc:
         return self._group_map.get(group_id)
 
     def find_sources(self, parent_id: str|None=None) -> list[Source]|None:
-        return self._source_map.get(parent_id)
+        return self._source_map.get(parent_id, [])
 
     def append_group(self, group: Group):
         self._groups.append(group)

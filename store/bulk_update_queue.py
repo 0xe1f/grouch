@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import now_in_iso
 from datatype import FlexObject
+from datetime import datetime
 from couchdb.http import ResourceConflict
 from store.connection import Connection
 import logging
@@ -46,7 +46,7 @@ class BulkUpdateQueue:
         for obj in objs:
             if not obj.id:
                 obj.id = obj.new_key()
-            obj.updated = now_in_iso()
+            obj.updated = datetime.now().timestamp()
             self._docs.append(obj.as_dict())
 
         self._enqueued_count += len(objs)

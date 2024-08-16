@@ -19,7 +19,7 @@ import json
 
 class EntryContent(FlexObject):
 
-    def __init__(self, source: dict[str, str]={}):
+    def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
             self.doc_type = "entry"
@@ -88,11 +88,11 @@ class EntryContent(FlexObject):
         self._computed_digest = None
 
     @property
-    def published(self) -> str:
+    def published(self) -> int:
         return self.get_prop("published")
 
     @published.setter
-    def published(self, val: str):
+    def published(self, val: int):
         self.set_prop("published", val)
         self._computed_digest = None
 

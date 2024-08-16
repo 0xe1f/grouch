@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from common import build_key
-from common import now_in_iso
 from couchdb.http import ResourceConflict
 from datatype import User
+from datetime import datetime
 from store.connection import Connection
 from store import views
 import logging
@@ -43,7 +43,8 @@ def create_user(conn: Connection, user: User) -> bool:
         logging.error(f"User with email address {user.email_address} already exists")
         return False
 
-    user.updated = now_in_iso()
+    user.created = datetime.now().timestamp()
+    user.updated = user.created
 
     try:
         new_id, _ = conn.db.save(user.as_dict())

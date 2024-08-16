@@ -55,7 +55,7 @@ def import_feed_results(conn: Connection, *results: ParseResult):
     logging.debug(f"Wrote {bulk_q.written_count} objects; {feed_count}/{entry_count} feeds/entries")
 
 def refresh_feeds(conn: Connection, freshness_seconds: int):
-    now = datetime.datetime.now(datetime.UTC)
+    now = datetime.datetime.now()
     stale_start = now - datetime.timedelta(seconds=freshness_seconds)
 
     pending_fetch = []
@@ -63,7 +63,7 @@ def refresh_feeds(conn: Connection, freshness_seconds: int):
 
     with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
         # TODO: probably good to set some sort of max limit
-        for feed in stale_feeds(conn, stale_start=stale_start.isoformat(timespec='microseconds')):
+        for feed in stale_feeds(conn, stale_start=stale_start.timestamp()):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
                 _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)

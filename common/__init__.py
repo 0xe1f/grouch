@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common.datetime import now_in_iso
 from common.keys import build_key
 from common.keys import decompose_key
 from common.keys import decompose_key

@@ -166,10 +166,10 @@
             var subscription = this;
             $.ajax({
                 url: "articles",
-                data: JSON.stringify({
+                data: {
                     "filter": JSON.stringify(subscription.getFilter()),
                     "continue": continueFrom ? continueFrom : undefined,
-                }),
+                },
                 dataType: "json",
                 success: function(response) {
                     continueFrom = response.continue;

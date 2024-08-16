@@ -21,7 +21,7 @@ class Subscription(FlexObject):
 
     DOC_TYPE = "sub"
 
-    def __init__(self, source: dict[str, str]={}):
+    def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
             self.doc_type = __class__.DOC_TYPE
@@ -44,11 +44,11 @@ class Subscription(FlexObject):
         self.set_prop("unread_count", val)
 
     @property
-    def subscribed(self) -> str:
+    def subscribed(self) -> int:
         return self.get_prop("subscribed")
 
     @subscribed.setter
-    def subscribed(self, val: str):
+    def subscribed(self, val: int):
         self.set_prop("subscribed", val)
 
     @property
@@ -68,11 +68,11 @@ class Subscription(FlexObject):
         self.set_prop("folder_id", val)
 
     @property
-    def last_synced(self) -> str:
+    def last_synced(self) -> int:
         return self.get_prop("last_synced")
 
     @last_synced.setter
-    def last_synced(self, val: str):
+    def last_synced(self, val: int):
         self.set_prop("last_synced", val)
 
     @property

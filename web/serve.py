@@ -434,19 +434,20 @@ def mark_all_as_read():
 
 @app.route('/syncFeeds', methods=['POST'])
 def sync_feeds():
-    now = datetime.now(UTC)
+    now = datetime.now()
     if last_sync := user.last_sync:
-        last_sync_dt = datetime.fromisoformat(last_sync)
+        last_sync_dt = datetime.fromtimestamp(last_sync)
         delta = now - last_sync_dt
+        logging.info(f"HIYA! {delta}")
         if delta.total_seconds() < FEED_SYNC_TIMEOUT:
             return responses.SyncFeedsResponse(
-                next_sync=(now + delta).isoformat(timespec='microseconds'),
+                next_sync=(now + delta).timestamp(),
             ).as_dict()
         else:
            last_sync = None
 
     if not last_sync:
-        user.last_sync = now.isoformat(timespec='microseconds')
+        user.last_sync = now.timestamp()
         with BulkUpdateQueue(conn) as bulk_q:
             bulk_q.enqueue_flex(user)
 
@@ -454,7 +455,7 @@ def sync_feeds():
 
     return responses.SyncFeedsResponse(
         toc=_fetch_table_of_contents(),
-        next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).isoformat(timespec='microseconds'),
+        next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).timestamp(),
     ).as_dict()
 
 @app.route('/importFeeds', methods=['POST'])
@@ -483,7 +484,7 @@ def import_feeds():
         app.logger.error(f"Unable to import document")
         return Error("FIXME!!").as_dict()
 
-    executor.submit(tasks.subscribe_port_doc, conn, user.id, doc)
+    executor.submit(tasks.import_user_subs, conn, user.id, doc)
 
     return responses.ImportFeedsResponse().as_dict()
 

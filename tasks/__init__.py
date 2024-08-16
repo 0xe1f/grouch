@@ -21,7 +21,7 @@ from tasks.folders import delete_folder
 from tasks.subscriptions import mark_sub_read
 from tasks.subscriptions import mark_subs_read_by_folder
 from tasks.subscriptions import mark_subs_read_by_user
-from tasks.subscriptions import subscribe_port_doc
+from tasks.subscriptions import import_user_subs
 from tasks.subscriptions import subscribe_user_unknown_url
 from tasks.subscriptions import sync_subs
 from tasks.subscriptions import unsubscribe

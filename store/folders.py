@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from common import build_key
-from common import now_in_iso
+from datetime import datetime
 from uuid import uuid4
 from couchdb.http import ResourceConflict
 from datatype import Folder
@@ -66,5 +66,5 @@ def wrap_folder(folder: Folder) -> map:
         "_id": build_key("folder", folder.id),
         "doc_type": "folder",
         "content": folder.as_dict(),
-        "updated": now_in_iso(),
+        "updated": datetime.now().timestamp(),
     }

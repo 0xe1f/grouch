@@ -37,9 +37,7 @@ def _to_doc(subs: list[SubMeta], folders: list[Folder]) -> PortDoc:
         doc.append_group(group)
 
     for sub, feed in subs:
-        source = Source(sub.id, sub.title)
-        source.parent_id = sub.folder_id
-        source.feed_url = feed.feed_url
+        source = Source(sub.title, feed.feed_url, sub.folder_id)
         source.html_url = feed.site_url
         doc.append_source(source)
 

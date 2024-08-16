@@ -16,7 +16,7 @@ from common import decompose_key
 
 class FlexObject:
 
-    def __init__(self, source: dict[str, str]={}):
+    def __init__(self, source: dict={}):
         self._doc = source.copy()
 
     @property
@@ -36,11 +36,11 @@ class FlexObject:
         self.set_prop("_rev", val)
 
     @property
-    def updated(self) -> str:
+    def updated(self) -> int:
         return self.get_prop("updated")
 
     @updated.setter
-    def updated(self, val: str):
+    def updated(self, val: int):
         self.set_prop("updated", val)
 
     @property

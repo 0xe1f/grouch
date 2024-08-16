@@ -22,7 +22,7 @@ class Folder(FlexObject):
 
     DOC_TYPE = "folder"
 
-    def __init__(self, source: dict[str, str]={}):
+    def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
             self.doc_type = __class__.DOC_TYPE
