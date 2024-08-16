@@ -116,7 +116,7 @@ class Connection:
                 "map": """
                     function (doc) {
                         if (doc.doc_type == 'sub') {
-                            emit([ doc.user_id, doc.last_synced ], { "feed_id": doc.feed_id, "last_sync": doc.last_synced });
+                            emit([ doc.user_id, doc.last_synced ], { "feed_id": doc.feed_id, "folder_id": doc.folder_id, "last_sync": doc.last_synced });
                         }
                     }
                 """

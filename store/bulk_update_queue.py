@@ -28,6 +28,7 @@ class BulkUpdateQueue:
         self._enqueued_count = 0
         self._success_count = 0
         self._conflict_count = 0
+        self._commit_count = 0
         self._success_ids = []
         self._track_ids = track_ids
 
@@ -56,12 +57,12 @@ class BulkUpdateQueue:
             pending = self._docs[:self._max_size]
             self._docs = self._docs[self._max_size:]
             if pending:
-                self._bulk_write(pending)
+                self._commit(pending)
 
     def flush(self):
         pending = self._docs
         self._docs = []
-        self._bulk_write(pending)
+        self._commit(pending)
 
     @property
     def enqueued_count(self) -> int:
@@ -79,6 +80,10 @@ class BulkUpdateQueue:
     def conflict_count(self) -> int:
         return self._conflict_count
 
+    @property
+    def commit_count(self) -> int:
+        return self._commit_count
+
     def pop_written_ids(self) -> list[str]:
         if not self._track_ids:
             return []
@@ -86,11 +91,12 @@ class BulkUpdateQueue:
         self._success_ids = []
         return success_ids
 
-    def _bulk_write(self, docs: list):
+    def _commit(self, docs: list):
         if not len(docs):
             # logging.debug("Nothing to write")
             return
 
+        self._commit_count += 1
         for result in self._conn.db.update(docs):
             success, id, status = result
             if success:

@@ -62,23 +62,32 @@ def parse_url(url: str) -> ParseResult:
 def parse_feed(url: str) -> ParseResult:
     if not (doc := feedparser.parse(url)):
         logging.error(f"No document available for '{url}'")
-        return None
+        return ParseResult(url)
 
     return _parse_feed(doc, url)
 
 def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
-    if not doc:
+    if "status" in doc and doc.status == 404:
+        logging.error(f"Doc not found (404) ({url})")
+        return ParseResult(url)
+    elif not doc:
         logging.error(f"No document to parse ({url})")
-    if "feed" not in doc:
+        return ParseResult(url)
+    elif "feed" not in doc:
         logging.error(f"Document is missing feed ({url})")
-    if not doc.entries:
+        return ParseResult(url)
+    elif "entries" not in doc:
         logging.error(f"Document is missing entries ({url})")
-    if "title" not in doc.feed:
+        return ParseResult(url)
+    elif "title" not in doc.feed:
         logging.error(f"Document is missing title ({url})")
+        return ParseResult(url)
 
-    feed = _create_feed_content(url, doc.feed)
-    entries = [_create_entry_content(entry) for entry in doc.entries]
-    return ParseResult(url, feed=feed, entries=entries)
+    return ParseResult(
+        url,
+        feed=_create_feed_content(url, doc.feed),
+        entries=[_create_entry_content(entry) for entry in doc.entries],
+    )
 
 def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedContent:
     content = FeedContent()

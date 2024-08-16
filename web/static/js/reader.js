@@ -1910,7 +1910,7 @@
     var refresh = function(reloadItems) {
         $.ajax({
             url: "subscriptions",
-            data: JSON.stringify({}),
+            data: {},
             dataType: "json",
             success: function(response) {
                 resetSubscriptionDom(response, reloadItems);

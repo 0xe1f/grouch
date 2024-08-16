@@ -438,7 +438,6 @@ def sync_feeds():
     if last_sync := user.last_sync:
         last_sync_dt = datetime.fromtimestamp(last_sync)
         delta = now - last_sync_dt
-        logging.info(f"HIYA! {delta}")
         if delta.total_seconds() < FEED_SYNC_TIMEOUT:
             return responses.SyncFeedsResponse(
                 next_sync=(now + delta).timestamp(),

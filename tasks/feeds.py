@@ -25,34 +25,31 @@ import datetime
 import logging
 import time
 
-def import_feeds(conn: Connection, *feed_urls: str) -> set[str]:
+def import_feeds(bulk_q: BulkUpdateQueue, *feed_urls: str) -> set[str]:
     successful, _ = _fetch_feeds(*feed_urls)
-    import_feed_results(conn, *successful)
+    import_feed_results(bulk_q, *successful)
 
     return [result.url for result in successful]
 
-def import_feed_results(conn: Connection, *results: ParseResult):
+def import_feed_results(bulk_q: BulkUpdateQueue, *results: ParseResult):
     if not results:
         return set()
 
     feed_count = 0
     entry_count = 0
 
-    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
-        for result in results:
-            feed = result.feed
-            feed_count += 1
-            feed.digest = feed.computed_digest()
-            bulk_q.enqueue_flex(feed)
+    for result in results:
+        feed = result.feed
+        feed_count += 1
+        feed.digest = feed.computed_digest()
+        bulk_q.enqueue_flex(feed)
 
-            entry_count += len(result.entries)
-            for entry in result.entries:
-                entry.feed_id = result.feed.id
-                entry.digest = entry.computed_digest()
+        entry_count += len(result.entries)
+        for entry in result.entries:
+            entry.feed_id = result.feed.id
+            entry.digest = entry.computed_digest()
 
-                bulk_q.enqueue_flex(entry)
-
-    logging.debug(f"Wrote {bulk_q.written_count} objects; {feed_count}/{entry_count} feeds/entries")
+            bulk_q.enqueue_flex(entry)
 
 def refresh_feeds(conn: Connection, freshness_seconds: int):
     now = datetime.datetime.now()

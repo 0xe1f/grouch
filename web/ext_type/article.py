@@ -33,7 +33,8 @@ class Article(JsonObject):
             self.set_prop("author", entry.author)
             self.set_prop("summary", entry.text_summary)
             self.set_prop("content", entry.text_body)
-            self.set_prop("published", datetime.datetime.fromtimestamp(entry.published, datetime.UTC).isoformat())
+            if published := entry.published:
+                self.set_prop("published", datetime.datetime.fromtimestamp(published, datetime.UTC).isoformat())
 
     @property
     def id(self) -> str:

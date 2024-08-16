@@ -26,6 +26,15 @@ class Folder(FlexObject):
         super().__init__(source)
         if not source:
             self.doc_type = __class__.DOC_TYPE
+            self.uid = uuid4().hex
+
+    @property
+    def uid(self) -> str:
+        return self._doc.get("uid")
+
+    @uid.setter
+    def uid(self, val: str):
+        self._doc["uid"] = val
 
     @property
     def title(self) -> str:
@@ -44,7 +53,7 @@ class Folder(FlexObject):
         self._doc["user_id"] = val
 
     def new_key(self) -> str|None:
-        return build_key(self.doc_type, self.user_id,  uuid4().hex)
+        return build_key(self.doc_type, self.user_id, self.uid)
 
     @staticmethod
     def extract_owner_id(obj_id: str) -> str|None:

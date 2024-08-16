@@ -17,7 +17,7 @@ from datatype import FeedContent
 
 class ParseResult:
 
-    def __init__(self, url: str, feed: FeedContent=None, entries: list[EntryContent]=None, alts: list[str]|None=None):
+    def __init__(self, url: str, feed: FeedContent|None=None, entries: list[EntryContent]|None=None, alts: list[str]|None=None):
         self._url = url
         self._feed = feed
         self._entries = entries
