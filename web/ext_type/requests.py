@@ -14,6 +14,31 @@
 
 from web.ext_type.json_object import JsonObject
 
+class ArticlesRequest(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def start(self) -> str:
+        return self.get_prop("start")
+
+    @property
+    def folder(self) -> str:
+        return self.get_prop("folder")
+
+    @property
+    def prop(self) -> str:
+        return self.get_prop("prop")
+
+    @property
+    def sub(self) -> str:
+        return self.get_prop("sub")
+
+    @property
+    def tag(self) -> str:
+        return self.get_prop("tag")
+
 class CreateFolderRequest(JsonObject):
 
     def __init__(self, source: dict[str, str]={}):

@@ -85,29 +85,22 @@ def subscriptions():
 
 @app.route('/articles')
 def articles():
-    rq_args = request.args
+    arg = requests.ArticlesRequest(request.args)
 
     start = None
-    if "continue" in rq_args:
-        start = deobfuscate_json(rq_args["continue"])
+    if arg.start:
+        start = deobfuscate_json(arg.start)
 
-    filter = {}
-    if "filter" in rq_args:
-        try:
-            filter = loads(rq_args["filter"])
-        except ValueError:
-            app.logger.error("Filter is not valid JSON")
-
-    if "f" in filter:
-        unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
-        articles, next_start = find_articles_by_folder(conn, filter["f"], start, unread_only=unread_only)
-    elif "s" in filter:
-        unread_only = "p" in filter and Article.PROP_UNREAD in filter["p"]
-        articles, next_start = find_articles_by_sub(conn, filter["s"], start, unread_only=unread_only)
-    elif "p" in filter:
-        articles, next_start = find_articles_by_prop(conn, user.id, filter["p"], start)
-    elif "t" in filter:
-        articles, next_start = find_articles_by_tag(conn, user.id, filter["t"], start)
+    if arg.folder:
+        unread_only = arg.prop == Article.PROP_UNREAD
+        articles, next_start = find_articles_by_folder(conn, arg.folder, start, unread_only=unread_only)
+    elif arg.sub:
+        unread_only = arg.prop == Article.PROP_UNREAD
+        articles, next_start = find_articles_by_sub(conn, arg.sub, start, unread_only=unread_only)
+    elif arg.prop:
+        articles, next_start = find_articles_by_prop(conn, user.id, arg.prop, start)
+    elif arg.tag:
+        articles, next_start = find_articles_by_tag(conn, user.id, arg.tag, start)
     else:
         articles, next_start = find_articles_by_user(conn, user.id, start)
 

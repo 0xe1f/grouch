@@ -163,13 +163,14 @@
         'loadEntries': function() {
             lastContinued = continueFrom;
 
-            var subscription = this;
+            const subscription = this;
+            const filter = subscription.getFilter();
+            if (continueFrom) {
+                $.extend(filter, { "start": continueFrom });
+            }
+
             $.ajax({
-                url: "articles",
-                data: {
-                    "filter": JSON.stringify(subscription.getFilter()),
-                    "continue": continueFrom ? continueFrom : undefined,
-                },
+                url: "articles" + (filter ? `?${$.param(filter)}` : ""),
                 dataType: "json",
                 success: function(response) {
                     continueFrom = response.continue;
@@ -302,23 +303,13 @@
     };
 
     var subscriptionMethods = $.extend({}, articleGroupingMethods, {
-        // FIXME: get rid
-        'getRef': function() {
-            return {
-                's': this.id,
-            };
-        },
         'getFilter': function() {
-            var filter = this.getRef();
-            var selectedPropertyFilter =
-                $('.group-filter.selected-menu-item').data('value');
+            const selectedPropertyFilter = $('.group-filter.selected-menu-item').data('value');
 
+            const filter = { "sub": this.id };
             if (selectedPropertyFilter) {
-                $.extend(filter, {
-                    'p': selectedPropertyFilter,
-                });
+                $.extend(filter, { "prop": selectedPropertyFilter });
             }
-
             return filter;
         },
         'supportsAggregateActions': function() {
@@ -474,10 +465,17 @@
     });
 
     var folderMethods = $.extend({}, subscriptionMethods, {
-        'getRef': function() {
-            return {
-                'f': this.id ? this.id : undefined,
-            };
+        'getFilter': function() {
+            var selectedPropertyFilter = $('.group-filter.selected-menu-item').data('value');
+
+            const filter = {};
+            if (this.id) {
+                $.extend(filter, { "folder": this.id });
+            }
+            if (selectedPropertyFilter) {
+                $.extend(filter, { "prop": selectedPropertyFilter });
+            }
+            return filter;
         },
         'getSourceUrl': function() {
             return null;
@@ -531,7 +529,7 @@
 
     var tagMethods = $.extend({}, articleGroupingMethods, {
         'getFilter': function() {
-            return { 't': this.title, };
+            return { "tag": this.title, };
         },
         'getSourceUrl': function() {
             return null;
@@ -1655,13 +1653,13 @@
             'domId':  'sf-liked',
             'type':   'liked',
             'title':  _l("Liked items"),
-            'filter': { 'p': 'like', },
+            'filter': { "prop": "like" },
         }, {
             'id':    'sf-starred',
             'domId': 'sf-starred',
             'type':  'starred',
             'title': _l("Starred items"),
-            'filter': { 'p': 'star', },
+            'filter': { "prop": "star" },
         }];
 
         $.each(specialFolders, function(index, specialFolder) {
