@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" media="screen" href="/~d/styles/rss2full.xsl"?>
+<?xml-stylesheet type="text/css" media="screen" href="http://feeds.arstechnica.com/~d/styles/itemcontent.css"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" version="2.0">
+  <channel>
+    <title>Ars Technica</title>
+    <link>https://arstechnica.com</link>
+    <description>Serving the Technologist for more than a decade. IT news, reviews, and analysis.</description>
+    <lastBuildDate>Sun, 23 Aug 2020 23:48:25 +0000</lastBuildDate>
+    <language>en-US</language>
+    <sy:updatePeriod>hourly</sy:updatePeriod>
+    <sy:updateFrequency>1</sy:updateFrequency>
+    <generator>https://wordpress.org/?v=4.9.15</generator>
+    <image>
+      <url>https://cdn.arstechnica.net/wp-content/uploads/2016/10/cropped-ars-logo-512_480-32x32.png</url>
+      <title>Ars Technica</title>
+      <link>https://arstechnica.com</link>
+      <width>32</width>
+      <height>32</height>
+    </image>
+    <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feeds.arstechnica.com/arstechnica/index" />
+    <feedburner:info xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" uri="arstechnica/index" />
+    <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" />
+    <item>
+      <title>Trump announces a COVID-19 Emergency Use Authorization for blood plasma</title>
+      <link>https://arstechnica.com/?p=1700815</link>
+      <pubDate>Sun, 23 Aug 2020 23:26:43 +0000</pubDate>
+      <dc:creator><![CDATA[John Timmer]]></dc:creator>
+      <category><![CDATA[Policy]]></category>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[antibodies]]></category>
+      <category><![CDATA[COVID-19]]></category>
+      <category><![CDATA[Emergency Use Authorization]]></category>
+      <category><![CDATA[fda]]></category>
+      <category><![CDATA[plasma]]></category>
+      <category><![CDATA[SARS-CoV-2]]></category>
+      <category><![CDATA[Trump]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700815</guid>
+      <description><![CDATA[Move reportedly happens over objections of health officials about limited data.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1220853125-800x604.jpg" alt="Image of a man gesturing towards another."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1220853125.jpg" class="enlarge-link" data-height="773" data-width="1024">Enlarge</a> <span class="sep">/</span> Donald Trump gestures to Stephen Hahn, head of the FDA, at an earlier press conference. (credit: <a rel="nofollow" class="caption-link" href="https://www.gettyimages.com/detail/news-photo/president-donald-trump-and-stephen%C2%A0hahn-director-of-the-news-photo/1220853125?adppopup=true">Drew Angerer</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Today, President Trump held a news conference to announce that the FDA has granted an Emergency Use Authorization for the treatment of COVID-19 cases using blood plasma from those formerly infected. The move comes despite significant uncertainty regarding just how effective this treatment is, and comes just days after Trump attacked the FDA for delaying its work as part of a plot to sabotage his re-election.</p>
+<h2>In the blood</h2>
+<p>Plasma is the liquid portion of the blood, which (among other things) contains antibodies. It has been used to treat other infections, as some antibodies can be capable of neutralizing the infecting pathogen—binding to the bacteria or virus in a way that prevents it from entering cells. Early studies have indicated that it's relatively common for those who have had a SARS-CoV-2 infection to generate antibodies that can neutralize the virus in lab tests, although the antibody response to the virus is also <a href="https://arstechnica.com/science/2020/06/antibody-testing-suggests-immune-response-post-covid-is-very-variable/">highly variable</a>.</p>
+<p>In the absence of any effective treatments, people started testing this "convalescent plasma" <a href="https://arstechnica.com/science/2020/03/hospitals-in-nyc-will-start-testing-therapy-using-plasma-of-those-infected/">as early as March</a>, and testing has been expanded as the pool of post-infected individuals has continued to grow. But so far, the evidence has been mixed. One of the largest studies, led by researchers at the Mayo Clinic and including over 35,000 patients, <a href="https://doi.org/10.1101/2020.08.12.20169359">did see an effect</a>, but it was a very mild one: mortality dropped from 11.9 percent in people who received plasma four days or more after starting treatment, compared with 8.7 percent if treatment was started earlier than that. But, critically, the study lacked a control group, leaving its authors talking about "signatures of efficacy," rather than actual evidence of efficacy.</p></div><p><a href="https://arstechnica.com/?p=1700815#p3">Read 7 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700815&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=P614tPda1Eo:cpKHHEXnQ5w:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=P614tPda1Eo:cpKHHEXnQ5w:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=P614tPda1Eo:cpKHHEXnQ5w:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=P614tPda1Eo:cpKHHEXnQ5w:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=P614tPda1Eo:cpKHHEXnQ5w:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=P614tPda1Eo:cpKHHEXnQ5w:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>This COVID-19 summer’s must-watch show is… an NBA rookie’s YouTube page?</title>
+      <link>https://arstechnica.com/?p=1700681</link>
+      <pubDate>Sun, 23 Aug 2020 14:00:54 +0000</pubDate>
+      <dc:creator><![CDATA[Nathan Mattise]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <category><![CDATA[NBA]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700681</guid>
+      <description><![CDATA[NBA player/amateur filmmaker Matisse Thybulle has created essential epidemiological viewing.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+
+
+
+
+
+<div><a name="page-1"></a></div>
+      <ul class="gallery shortcode-gallery gallery-wide"><li>
+        <div class="gallery-item-content">
+        <div class="gallery-image"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1227682696-980x653.jpg" alt=""></div>
+        <p>
+          Philadelphia 76ers guard Matisse Thybulle in his natural habitat: camera in hand.                       [credit:
+                        Joe Murphy/NBAE via Getty Images                        ]
+                  </p>
+        </div>
+      </li>
+      </ul><p>Even if you don't like sports, the <a href="https://en.wikipedia.org/wiki/2020_NBA_Bubble">NBA bubble</a> in Orlando has been a fascinating epidemiological experiment: if you had seemingly infinite resources available and every participant willingly agreed to follow protocols based on our best understanding of a nascent viral pandemic, could you construct a truly safe environment? Take note, US government, as so far the answer has been, "Yes." <a href="https://www.cbssports.com/nba/news/nba-announces-zero-players-tested-positive-for-covid-19-inside-disney-bubble-for-fifth-straight-week/">As of August 19</a>, the NBA has officially had zero new COVID-19 infections to report over the league's five-week restart. And that's with the league needing to utilize contingency quarantine protocols for players unexpectedly leaving and traveling (which they've done for everything from family emergencies to, um, <a href="https://www.clipsnation.com/2020/7/25/21338750/la-clippers-lou-williams-reportedly-gentlemans-club-outside-bubble-quarantine-excused-absence">lemon-pepper chicken wings</a>?).</p>
+<p>Traditional media has been <a href="https://open.spotify.com/episode/50onhT8DciMsEiV0HSo3an?si=aT3Y4V3XT6S-3pWqjS3mCA">invited inside to an extent</a> in order to document this unprecedented playoff season, and the NBA has relied heavily on Zoom access to players for other reporters. Twitter, naturally, has also <a href="https://www.nytimes.com/2020/07/20/sports/basketball/nba-bubble-life-twitter.html">birthed an aggregator account</a> that will bring you all the <a href="https://bleacherreport.com/articles/2899916-video-watch-pelicans-jj-redick-shotgun-beer-after-twitter-challenge">beer-chugging player social media</a> you desire. But nearly all of these glimpses into bubble life remain limited—the league has <a href="https://open.spotify.com/episode/2KXk5YYrq24oNjThLGF0bB?si=uXVqePbZR2y_9FitdeBtbg">shifted access areas</a> for press on a dime, and player interviews have time restrictions (and often <a href="https://sports.yahoo.com/jonathan-isaacs-protest-couldve-been-applauded-if-his-explanation-wasnt-nonsense-043917236.html">PR personnel on the line</a> to step in if things get into unwanted territory).</p>
+<p>All of this makes Philadelphia 76ers guard <a href="https://www.youtube.com/c/Matisse/videos">Matisse Thybulle's ongoing video diary</a> remarkable and essential viewing. I've never been one to get into YouTube series or personalities, but his eight-episodes-and-counting of <em>Welcome To The Bubble</em> has been the can't-miss viewing experience of the summer.</p></div><p><a href="https://arstechnica.com/?p=1700681#p3">Read 9 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700681&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=PnIcAW7tfsI:w4cBb9KyFWg:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=PnIcAW7tfsI:w4cBb9KyFWg:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=PnIcAW7tfsI:w4cBb9KyFWg:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=PnIcAW7tfsI:w4cBb9KyFWg:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=PnIcAW7tfsI:w4cBb9KyFWg:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=PnIcAW7tfsI:w4cBb9KyFWg:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Researchers propose a supernova triggered the Late Devonian mass extinction</title>
+      <link>https://arstechnica.com/?p=1700454</link>
+      <pubDate>Sun, 23 Aug 2020 12:25:31 +0000</pubDate>
+      <dc:creator><![CDATA[Jim Salter]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[Uncategorized]]></category>
+      <category><![CDATA[astrophysics]]></category>
+      <category><![CDATA[mass extinction]]></category>
+      <category><![CDATA[mass extinctions]]></category>
+      <category><![CDATA[space]]></category>
+      <category><![CDATA[supernova]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700454</guid>
+      <description><![CDATA[Astrophysicist Brian Fields models the impact of distant supernova events.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/2048px-Cassiopeia_A_Spitzer_Crop-800x609.jpg" alt="The Cassiopeia A supernova which left this remnant behind occurred about 11,000 light years away—much too far to pose a significant threat—and its wavefront likely reached Earth about 300 years ago."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/2048px-Cassiopeia_A_Spitzer_Crop.jpg" class="enlarge-link" data-height="1559" data-width="2048">Enlarge</a> <span class="sep">/</span> The Cassiopeia A supernova which left this remnant behind occurred about 11,000 light years away—much too far to pose a significant threat—and its wavefront likely reached Earth about 300 years ago. (credit: <a rel="nofollow" class="caption-link" href="http://gallery.spitzer.caltech.edu/Imagegallery/image.php?image_name=ssc2005-14c">NASA/JPL-Caltech</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>A paper released this week by University of Illinois Urbana-Champaign astronomy and physics professor Brian Fields makes a case for distant supernovae as a cause of a past mass extinction event—specifically, the Hangenberg event, which marks the boundary between the Devonian and Carboniferous periods. Fields has <a href="https://www.liebertpub.com/doi/10.1089/ast.2017.1730">proposed this sort of thing before</a>, and both this and his earlier piece are fascinating exercises of "what-if." Each models the effects a supernova could have on Earth's biosphere, and how we might go looking for evidence that it happened.</p>
+<p>It's important to understand, however, that neither of these papers should be taken as indications that <em>there is</em> evidence that the events referenced were caused by a supernova, or as representative of any general scientific consensus to that effect. They're simply intriguing proposals, and they indicate what sort of evidence we should look for.</p>
+<h2>Existential threats</h2>
+<p>If you say "mass extinction" and "space" in the same sentence, the first thing on most peoples' minds is an asteroid impact with the Earth—even if dinosaur fans think of the <a href="https://arstechnica.com/science/2019/09/heres-what-happened-in-the-impact-crater-the-day-it-did-in-the-dinos/">Chicxulub crater</a>, and pop culture fans think instead of movies such as <em>Deep Impact</em> or <em>Armageddon</em>.</p></div><p><a href="https://arstechnica.com/?p=1700454#p3">Read 12 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700454&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=309R5ZJP__w:4MgOUdIEgvA:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=309R5ZJP__w:4MgOUdIEgvA:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=309R5ZJP__w:4MgOUdIEgvA:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=309R5ZJP__w:4MgOUdIEgvA:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=309R5ZJP__w:4MgOUdIEgvA:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=309R5ZJP__w:4MgOUdIEgvA:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>DiceKeys creates a master password for life with one roll</title>
+      <link>https://arstechnica.com/?p=1700647</link>
+      <pubDate>Sun, 23 Aug 2020 11:45:51 +0000</pubDate>
+      <dc:creator><![CDATA[WIRED]]></dc:creator>
+      <category><![CDATA[Tech]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700647</guid>
+      <description><![CDATA[A new kit leaves your cryptographic destiny up to 25 cubes in a plastic box.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/throwing_png_project-body.jpg" alt="Not a board game, a security tool."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/throwing_png_project-body.jpg" class="enlarge-link" data-height="675" data-width="748">Enlarge</a> <span class="sep">/</span> Not a board game, a security tool. (credit: <a rel="nofollow" class="caption-link" href="https://www.crowdsupply.com/dicekeys/dicekeys">DiceKeys</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Modern cybersecurity, done with properly paranoid best practices, requires meeting some tough demands: Carry a <a href="https://www.wired.com/story/how-to-use-a-yubikey/">physical two-factor key</a> to plug in and authenticate yourself on a new computer, but if you lose or break that tiny piece of plastic you could be locked out of your accounts. Use <a href="https://www.wired.com/story/7-steps-to-password-perfection/">different, totally unguessable passwords</a> for every website, without repeating them or writing them down. And even if you opt for a <a href="https://www.wired.com/story/best-password-managers/">password manager</a>—<a href="https://www.wired.com/story/coronavirus-quarantine-start-using-password-manager/">as you should</a>—you'll need to remember a long master password for years, or risk losing access to the rest of them.</p>
+<p>Or you could reduce all of that complexity to a single roll of 25 dice into a plastic box. This week Stuart Schechter, a computer scientist at the University of California, Berkeley, is launching DiceKeys, a simple kit for physically generating a single super-secure key that can serve as the basis for creating all the most important passwords in your life for years or even decades to come. With little more than a plastic contraption that looks a bit like a Boggle set and an accompanying web app to scan the resulting dice roll, DiceKeys creates a highly random, mathematically unguessable key. You can then use that key to derive master passwords for password managers, as the seed to create a U2F key for two-factor authentication, or even as the <a href="https://www.wired.com/story/how-to-keep-bitcoin-safe-and-secure/">secret key for cryptocurrency wallets</a>. Perhaps most importantly, the box of dice is designed to serve as a permanent, offline key to regenerate that master password, crypto key, or U2F token if it gets lost, forgotten, or broken.</p>
+<p></p></div><p><a href="https://arstechnica.com/?p=1700647#p3">Read 10 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700647&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ix-VFWPA9dE:hP41J5MQCP0:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=ix-VFWPA9dE:hP41J5MQCP0:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ix-VFWPA9dE:hP41J5MQCP0:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=ix-VFWPA9dE:hP41J5MQCP0:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ix-VFWPA9dE:hP41J5MQCP0:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ix-VFWPA9dE:hP41J5MQCP0:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>HBO Max drops first trailer for Zack Snyder’s Justice League</title>
+      <link>https://arstechnica.com/?p=1700695</link>
+      <pubDate>Sun, 23 Aug 2020 00:58:17 +0000</pubDate>
+      <dc:creator><![CDATA[Jennifer Ouellette]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <category><![CDATA[DC Universe]]></category>
+      <category><![CDATA[DCEU]]></category>
+      <category><![CDATA[entertainment]]></category>
+      <category><![CDATA[film]]></category>
+      <category><![CDATA[hbo max]]></category>
+      <category><![CDATA[Justice League]]></category>
+      <category><![CDATA[Zack Snyder]]></category>
+      <category><![CDATA[Zack Snyder's Justice League]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700695</guid>
+      <description><![CDATA[Restored version will air in four one-hour installments on the streaming platform.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+
+
+
+
+
+<div><a name="page-1"></a></div>
+<div class="video"><div class="wrapper" style="display:block" type="text/html" width="980" height="550" src="https://www.youtube.com/embed/z6512XKKNkU?start=0&amp;wmode=transparent" frameborder="0" allowfullscreen></div><p class="caption" style="font-size:0.8em">The first teaser for <em>Zack Snyder's Justice League</em> is set to Leonard Cohen's "Hallelujah." </p></div>
+<p>Fans who have been clamoring to see Zack Snyder's director's cut of the disappointing 2017 film <a href="https://en.wikipedia.org/wiki/Justice_League_(film)"><em>Justice League</em></a> will finally get their wish, as HBO Max released a two-minute trailer for <a href="https://en.wikipedia.org/wiki/Zack_Snyder%27s_Justice_League"><em>Zack Snyder's Justice League</em></a> during the virtual DC Fandome event. The trailer actually leaked online before the panel but was quickly pulled until the official release.</p>
+<p><strong>(Some spoilers for the 2017 <em>Justice League</em> below.)</strong></p>
+<p>The original <em>Justice League</em> was the third film in a trilogy that included <a href="https://en.wikipedia.org/wiki/Man_of_Steel_(film)"><em>Man of Steel</em></a> (2013) and <a href="https://en.wikipedia.org/wiki/Batman_v_Superman:_Dawn_of_Justice"><em>Batman v. Superman: Dawn of Justice</em></a> (2016). It brought together Ben Affleck's Batman and Henry Cavill's Superman with Wonder Woman (Gal Gadot), Aquaman (Jason Momoa), The Flash (Ezra Miller), and Cyborg (Ray Fisher). They are on a mission to save the world from arch-villain Steppenwolf (Ciarán Hinds), a New God in search of three "Mother Boxes" that will enable him to terraform the Earth into something more hospitable to him and his army of Parademons.</p></div><p><a href="https://arstechnica.com/?p=1700695#p3">Read 8 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700695&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=DbtFI6r9N7w:IHGhaX68roU:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=DbtFI6r9N7w:IHGhaX68roU:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=DbtFI6r9N7w:IHGhaX68roU:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=DbtFI6r9N7w:IHGhaX68roU:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=DbtFI6r9N7w:IHGhaX68roU:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=DbtFI6r9N7w:IHGhaX68roU:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>New Wonder Woman 1984 trailer offers first look at Kristen Wiig’s Cheetah</title>
+      <link>https://arstechnica.com/?p=1700655</link>
+      <pubDate>Sat, 22 Aug 2020 21:08:29 +0000</pubDate>
+      <dc:creator><![CDATA[Jennifer Ouellette]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <category><![CDATA[DC Universe]]></category>
+      <category><![CDATA[entertainment]]></category>
+      <category><![CDATA[film trailers]]></category>
+      <category><![CDATA[Warner Bros.]]></category>
+      <category><![CDATA[Wonder Woman 1984]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700655</guid>
+      <description><![CDATA[Bonus: Chris Pines’ Steve Trevor rocks some ’80s parachute pants.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+
+
+
+
+
+<div><a name="page-1"></a></div>
+<div class="video"><div class="wrapper" style="display:block" type="text/html" width="980" height="550" src="https://www.youtube.com/embed/XW2E2Fnh52w?start=0&amp;wmode=transparent" frameborder="0" allowfullscreen></div><p class="caption" style="font-size:0.8em">Diana Prince (Gal Gadot) fights crime in the 1980s in <em>Wonder Woman 1984</em>. </p></div>
+<p>Warner Bros. dropped the latest trailer for <a href="https://en.wikipedia.org/wiki/Wonder_Woman_1984"><em>Wonder Woman 1984</em></a> today during the <a href="https://www.dcfandome.com/live">DC Fandome</a> online <a href="https://deadline.com/2020/08/how-to-watch-dc-fandome-online-today-the-complete-lineup-1203020566/">event</a>, giving us our first real look at Kristen Wiig's villainous Cheetah. Bonus: we get to see a miraculously revived Steve Trevor (Chris Pine) don parachute pants in an attempt to blend with the times, much to the amusement of Gal Gadot's Diana Prince.</p>
+<p>Inspired by the comic book heroine created by <a href="https://en.wikipedia.org/wiki/William_Moulton_Marston">William Moulton Marston</a> in the 1940s for DC Comics, Wonder Woman made her big-screen debut in the DCEU with 2016's <a href="https://en.wikipedia.org/wiki/Batman_v_Superman:_Dawn_of_Justice"><em>Batman v Superman: Dawn of Justice</em></a>, followed by 2017's <a href="https://en.wikipedia.org/wiki/Justice_League_(film)"><em>Justice League</em></a>. As we reported previously, the first fell short of box office expectations; the second bombed outright. So when Jenkins took on Wonder Woman's origin story, she deliberately departed from the grim humorlessness and dark sensibility of those earlier films, bringing a brighter energy and wit to her tale, along with the usual action. That vision paid off: <em>Wonder Woman</em> went on to gross $821 million worldwide and earned critical raves, making it the most successful of the DCEU films thus far. </p>
+<p>Since we're now in the 1980s, Diana is operating in a Cold War scenario, taking on Pedro Pascal's villainous <a href="https://en.wikipedia.org/wiki/Maxwell_Lord">Maxwell Lord</a>, a shrewd and powerful businessman. Wiig plays Barbara Ann Minerva, a British archaeologist who will eventually evolve into her <a href="https://en.wikipedia.org/wiki/Cheetah_(comics)#Barbara_Ann_Minerva">arch-nemesis Cheetah</a>.</p></div><p><a href="https://arstechnica.com/?p=1700655#p3">Read 6 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700655&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=gXUry-hcjtY:PzlSL8YGpZ0:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=gXUry-hcjtY:PzlSL8YGpZ0:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=gXUry-hcjtY:PzlSL8YGpZ0:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=gXUry-hcjtY:PzlSL8YGpZ0:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=gXUry-hcjtY:PzlSL8YGpZ0:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=gXUry-hcjtY:PzlSL8YGpZ0:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Hint of COVID-19 immunity: 3 sailors with antibodies spared in outbreak at sea</title>
+      <link>https://arstechnica.com/?p=1700620</link>
+      <pubDate>Sat, 22 Aug 2020 14:00:22 +0000</pubDate>
+      <dc:creator><![CDATA[Beth Mole]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[antibodies]]></category>
+      <category><![CDATA[coronavirus]]></category>
+      <category><![CDATA[COVID-19]]></category>
+      <category><![CDATA[fishing]]></category>
+      <category><![CDATA[immunity]]></category>
+      <category><![CDATA[neutralizing antibodies]]></category>
+      <category><![CDATA[outbreak]]></category>
+      <category><![CDATA[public health]]></category>
+      <category><![CDATA[SARS-CoV-2]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700620</guid>
+      <description><![CDATA[The study is small and tricky to interpret, but it offers inklings of COVID-19 immunity.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-949018342-800x536.jpg" alt="Fishing vessels in Seattle. "><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-949018342.jpg" class="enlarge-link" data-height="2022" data-width="3020">Enlarge</a> <span class="sep">/</span> Fishing vessels in Seattle.  (credit: <a rel="nofollow" class="caption-link" href="https://www.gettyimages.com/detail/news-photo/alaskan-fishing-boats-japanes-cars-on-docks-news-photo/949018342?adppopup=true">Getty | Art Seitz</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Hints of protective immunity against the pandemic coronavirus have surfaced in the wake of a recent COVID-19 outbreak that flooded the crew of a fishing vessel.</p>
+<p>The coronavirus, SARS-CoV-2, infected 104 of the 122 people on board, about 85 percent, during a short voyage. But trawling through data collected before and after the ship set sail, researchers noted that the 18 spared from infection just happened to include the only three people on board that had potent, pre-existing immune responses against SARS-CoV-2. Specifically, the three sailors were the only ones found to have SARS-CoV-2 neutralizing antibodies, which are proteins that circulate in the blood and completely sink the infectious virus.</p>
+<p>The numbers are small, and the finding is not definitive. Additionally, <a href="https://www.medrxiv.org/content/10.1101/2020.08.13.20173161v1">the study appeared this month on a pre-print server</a>, meaning it has not been published by a scientific journal or gone through peer review. Still, experts say the study was well done and significant for netting data that hints that potent, pre-existing immune responses from a past infection can indeed protect someone from catching the virus again.</p></div><p><a href="https://arstechnica.com/?p=1700620#p3">Read 7 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700620&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JuZ7IELTWks:pi9irU--d1Q:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=JuZ7IELTWks:pi9irU--d1Q:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JuZ7IELTWks:pi9irU--d1Q:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=JuZ7IELTWks:pi9irU--d1Q:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JuZ7IELTWks:pi9irU--d1Q:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JuZ7IELTWks:pi9irU--d1Q:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>This plane flies itself—we went for a ride</title>
+      <link>https://arstechnica.com/?p=1700581</link>
+      <pubDate>Sat, 22 Aug 2020 13:30:11 +0000</pubDate>
+      <dc:creator><![CDATA[WIRED]]></dc:creator>
+      <category><![CDATA[Tech]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700581</guid>
+      <description><![CDATA[Xwing is testing a Cessna that's controlled from the ground, not the cockpit.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/Screen-Shot-2020-08-21-at-2.18.56-PM-800x425.png" alt="A Cessna Grand Caravan, flown by a pilot as photographed. But..."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/Screen-Shot-2020-08-21-at-2.18.56-PM.png" class="enlarge-link" data-height="666" data-width="1254">Enlarge</a> <span class="sep">/</span> A Cessna Grand Caravan, flown by a pilot as photographed. But... (credit: <a rel="nofollow" class="caption-link" href="https://cessna.txtav.com/-/media/cessna/files/caravan/grand-caravan-ex/grand_caravan_ex_productcard.ashx">Cessna</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>The conditions are not ideal for our landing. A hard wind is blowing over the low hills east of San Francisco, and at just the wrong angle—straight across the runway where we’re set to touch down. But as we ease into our final approach, our two-winged shadow clipping the suburban homes below, the veteran pilot sitting beside me makes a gentle suggestion. “I like to do it hands up. Like a roller coaster,” he says.</p>
+<p>He removes his hands from the wheel of our aircraft, a 27-year-old Cessna Caravan that once shuttled United Nations dignitaries in southern Africa. It’s nothing especially fancy, with aspects that feel more go-kart than airliner. The cockpit is filled with manual toggles and analog dials; pulleys connect the pedal directly to the rudder at the tail. But recently, this plane underwent some modifications. As we descend past 500 feet, the 15-knot gusts hitting our side and the pilot’s hands still hovering, the wheel and pedals begin to jostle, compensating for the wind with inhuman precision. The descent remains smooth—serene, even, as we touch down.</p>
+<p>“It will be very uneventful, almost boring,” Maxime Gariel, the chief technology officer of Xwing, had assured me shortly before our fully autonomous takeoff, flight, and landing. “That’s what we’re aiming for.” That hadn’t seemed to mean much coming from Gariel, an aerospace engineer whose interest in planes began by jumping out of them for recreation. But “almost boring” is an apt assessment. After all, the last thing anyone wants out of pilot-free air travel is excitement.</p></div><p><a href="https://arstechnica.com/?p=1700581#p3">Read 15 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700581&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=QRdF3cIGuYk:Ujoq9JeX0AQ:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=QRdF3cIGuYk:Ujoq9JeX0AQ:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=QRdF3cIGuYk:Ujoq9JeX0AQ:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=QRdF3cIGuYk:Ujoq9JeX0AQ:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=QRdF3cIGuYk:Ujoq9JeX0AQ:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=QRdF3cIGuYk:Ujoq9JeX0AQ:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>The race to collect the pandemic’s history—as it unfolds</title>
+      <link>https://arstechnica.com/?p=1700564</link>
+      <pubDate>Sat, 22 Aug 2020 12:00:25 +0000</pubDate>
+      <dc:creator><![CDATA[WIRED]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700564</guid>
+      <description><![CDATA[From protest signs to Purell, archivists try to preserve 2020 artifacts before they're lost.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1225049565-800x533.jpg" alt="Hand made face masks drying in Southeast France."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1225049565.jpg" class="enlarge-link" data-height="4000" data-width="6000">Enlarge</a> <span class="sep">/</span> Hand made face masks drying in Southeast France. (credit:  ICHAUVEL / Getty Images)</p>  </figure><div><a name="page-1"></a></div>
+<p>On March 13, the day the New-York Historical Society closed its doors to the public, Rebecca Klassen, an associate curator for material culture, was scrolling through Instagram when something caught her eye. A friend from the gym had posted an image to her story of a massive bottle of Purell. At the time, store shelves across the five boroughs were already bereft of disinfectants. The picture, Klassen says, was reminiscent of “some kind of night run in the frantic search for <a href="https://www.wired.com/story/how-to-make-hand-sanitizer/">sanitizer</a>.” It was captioned “liquid gold.”</p>
+<p>The post prompted Klassen to send two messages. The first was an email to Margaret K. Hofer, the Historical Society’s museum director and vice president, asking whether they ought to start collecting items from New Yorkers related to the <a href="https://www.wired.com/tag/coronavirus/">coronavirus pandemic</a>. The second was a DM in response to her friend’s story. “Hey, can I have that when you’re done?” she asked. “I want to add it to our museum collection.”</p><div class="image shortcode-img right full"><img src="https://cdn.arstechnica.net/wp-content/uploads/2019/02/wired-logo.png"></div>
+<p>People tend to think of archives as massive troves that are compiled long after an era has ended or someone has died. But when it comes to COVID-19, archivists, curators, and librarians nationwide are assembling the record of how the pandemic is impacting their communities in real time, collecting everything from makeshift masks to journal entries to protest signs. Their mandate is both urgent and sweeping: Gather items from a broad swath of residents that, viewed together, tell the story of a particular region’s collective experience of coronavirus. “A lot can be lost over time,” says Ayshea Khan, the Asian American community archivist at the Austin History Center. “Memories can shift, things can be thrown away. It’s important to archive present moments when they happen, as much as we can, to ensure an accurate representation of our city’s history.”</p></div><p><a href="https://arstechnica.com/?p=1700564#p3">Read 9 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700564&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ke2eqq4-OC8:-ytpEbmOLZY:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=ke2eqq4-OC8:-ytpEbmOLZY:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ke2eqq4-OC8:-ytpEbmOLZY:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=ke2eqq4-OC8:-ytpEbmOLZY:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ke2eqq4-OC8:-ytpEbmOLZY:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=ke2eqq4-OC8:-ytpEbmOLZY:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Former Uber security chief faces criminal charges for hiding 2016 breach</title>
+      <link>https://arstechnica.com/?p=1700528</link>
+      <pubDate>Fri, 21 Aug 2020 21:45:14 +0000</pubDate>
+      <dc:creator><![CDATA[Timothy B. Lee]]></dc:creator>
+      <category><![CDATA[Policy]]></category>
+      <category><![CDATA[Uber]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700528</guid>
+      <description><![CDATA[Joe Sullivan says it wasn't his decision to keep the FTC in the dark.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1228126176-800x560.jpg" alt="Former Uber security chief faces criminal charges for hiding 2016 breach"><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/GettyImages-1228126176.jpg" class="enlarge-link" data-height="3500" data-width="5000">Enlarge</a> (credit: Robyn Beck / AFP) (Photo by ROBYN BECK/AFP via Getty Images)</p>  </figure><div><a name="page-1"></a></div>
+<p>Federal prosecutors have <a href="https://www.justice.gov/usao-ndca/pr/former-chief-security-officer-uber-charged-obstruction-justice">charged</a> former Uber security chief Joe Sullivan with obstruction of justice for hiding a 2016 data breach from Federal Trade Commission investigators. Sullivan is now the chief security officer at Cloudflare.</p>
+<p>In an emailed statement, a spokesman for Sullivan said the government's charges have "no merit."</p>
+<p>"From the outset, Sullivan and his team collaborated closely with legal, communications and other relevant teams at Uber, in accordance with the company’s written policies," the spokesman wrote. "Those policies made clear that Uber’s legal department—and not Mr. Sullivan or his group—was responsible for deciding whether, and to whom, the matter should be disclosed."</p></div><p><a href="https://arstechnica.com/?p=1700528#p3">Read 17 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700528&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=H_1HZ-9gG8U:fRdgdhbybjE:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=H_1HZ-9gG8U:fRdgdhbybjE:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=H_1HZ-9gG8U:fRdgdhbybjE:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=H_1HZ-9gG8U:fRdgdhbybjE:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=H_1HZ-9gG8U:fRdgdhbybjE:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=H_1HZ-9gG8U:fRdgdhbybjE:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>July was a hot one, but here’s what NOAA sees ahead for the US</title>
+      <link>https://arstechnica.com/?p=1700536</link>
+      <pubDate>Fri, 21 Aug 2020 19:33:16 +0000</pubDate>
+      <dc:creator><![CDATA[Scott K. Johnson]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[noaa monthly]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700536</guid>
+      <description><![CDATA[Here’s the outlook for the next three months.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/noaa_globe_202007-800x618.png" alt="July was a hot one, but here’s what NOAA sees ahead for the US"><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/noaa_globe_202007.png" class="enlarge-link" data-height="765" data-width="990">Enlarge</a> (credit: <a rel="nofollow" class="caption-link" href="https://www.ncdc.noaa.gov/sotc/global/202007">NOAA</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Many of our American readers don’t need a news article to tell them it has been hot. California is going through a horrific stretch of heat, wildfires, and rolling blackouts. Hopefully, none of you were in Death Valley to see an unspeakable <a href="https://www.washingtonpost.com/weather/2020/08/16/death-valley-heat-record/">record 130°F mark</a> set last Sunday, so your eyebrows are merely raised and not singed. Beyond the West, portions of the Northeast just experienced weeks of unrelenting hot weather. Nevertheless, NOAA’s monthly summary and outlook could give you a bigger picture of what the weather's like outside your neck of the woods.</p>
+<p>Globally, July tied 2016 for the second warmest July on record (2019 being first). It was also the second warmest for North America, though it clocks in slightly lower at 11<sup>th</sup> warmest for the Contiguous US. Temperatures were near average in the Pacific Northwest and some Central Plains states but quite warm in the Southwest and extremely warm in the Northeast.</p>
+<p>Of 35 weather station sites with the longest records in the Northeast, July was the hottest month <em>period</em> at 11 of them. At seven sites, including Baltimore, DC, and Philadelphia, July also set a record for the most number of days hitting 90°F—that happened 28 times in DC, for example.</p></div><p><a href="https://arstechnica.com/?p=1700536#p3">Read 7 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700536&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=srxbuTZIFQ0:6c9S6Xgf9aY:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=srxbuTZIFQ0:6c9S6Xgf9aY:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=srxbuTZIFQ0:6c9S6Xgf9aY:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=srxbuTZIFQ0:6c9S6Xgf9aY:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=srxbuTZIFQ0:6c9S6Xgf9aY:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=srxbuTZIFQ0:6c9S6Xgf9aY:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>How do you do, fellow gamers?—Burger King exploits Twitch for cheap ads</title>
+      <link>https://arstechnica.com/?p=1700533</link>
+      <pubDate>Fri, 21 Aug 2020 18:33:53 +0000</pubDate>
+      <dc:creator><![CDATA[Sam Machkovech]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <category><![CDATA[FTC]]></category>
+      <category><![CDATA[online advertising]]></category>
+      <category><![CDATA[twitch]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700533</guid>
+      <description><![CDATA[Was a fast food chain's ad campaign merely scummy, or did it violate FTC rules?]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/burger-king-stream-800x450.jpg" alt="Ogilvy boasted about its ad campaign with the following claim. We have edited it slightly."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/burger-king-stream.jpg" class="enlarge-link" data-height="1440" data-width="2560">Enlarge</a> <span class="sep">/</span> Ogilvy boasted about its ad campaign with the following claim. We have edited it slightly. (credit: Ogilvy / Ars Technica)</p>  </figure><div><a name="page-1"></a></div>
+<p>Earlier this week, an advertising agency emerged with <a href="https://twitter.com/Ogilvy/status/1295707612315553799">a video bragging about an ad-campaign concept</a>: We'll invade gaming-filled Twitch chat rooms and post ads for your brand for cheap. The attached video was exactly the kind of cringe you might expect from "brand engages with video game culture," with edgy yet inoffensive quotes, footage of fake games, and digitally altered voices.</p>
+<p>But what looked like a fake ad concept has turned out to be very real—and after examining how Twitch works, the whole thing looks like a possible FTC violation.</p>
+<h2>More like “king of steaming-mad Twitch users”</h2>
+<p>The ad campaign, run by the Ogilvy agency on behalf of Burger King, relied on a common Twitch trope of donating to game-streaming hosts. "Affiliate" Twitch users are eligible to receive cash from viewers, either in the form of flat-rate subscriptions or variable one-time donations, and hosts often encourage this by adding text-to-voice automation to the process. So if you pay a certain amount, a voice will read your statement out loud—and hosts usually retroactively react to weird and offensive statements made by these systems instead of pre-screening them. (They're busy playing a game, after all.)</p></div><p><a href="https://arstechnica.com/?p=1700533#p3">Read 8 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700533&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=4wh2IXILsmU:Jfvro0FfXIE:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=4wh2IXILsmU:Jfvro0FfXIE:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=4wh2IXILsmU:Jfvro0FfXIE:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=4wh2IXILsmU:Jfvro0FfXIE:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=4wh2IXILsmU:Jfvro0FfXIE:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=4wh2IXILsmU:Jfvro0FfXIE:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Peer inside a mummified cat from ancient Egypt, courtesy of high-res 3D X-rays</title>
+      <link>https://arstechnica.com/?p=1700405</link>
+      <pubDate>Fri, 21 Aug 2020 16:54:48 +0000</pubDate>
+      <dc:creator><![CDATA[Jennifer Ouellette]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[anthropology]]></category>
+      <category><![CDATA[Archaeology]]></category>
+      <category><![CDATA[Micro CT scanning]]></category>
+      <category><![CDATA[Physics]]></category>
+      <category><![CDATA[science]]></category>
+      <category><![CDATA[X-Ray imaging]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700405</guid>
+      <description><![CDATA[Micro CT imaging enabled researchers to conduct a virtual postmortem on the remains.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/mummyTOP-800x534.jpg" alt="Scientists have digitally unwrapped three mummified animals from ancient Egypt using Micro CT scanning. Above: Digital unwrapping of a mummified cat's head, likely a strangled kitten."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/mummyTOP.jpg" class="enlarge-link" data-height="801" data-width="1200">Enlarge</a> <span class="sep">/</span> Scientists have digitally unwrapped three mummified animals from ancient Egypt using Micro CT scanning. Above: Digital unwrapping of a mummified cat's head, likely a strangled kitten. (credit: Swansea University)</p>  </figure><div><a name="page-1"></a></div>
+<p>The ancient Egyptians mummified animals as well as humans, most commonly as votive offerings to the gods available for purchase by visitors to temples. Many of those mummified remains have survived but are in such a fragile state that researchers are loath to disturb the remains to learn more about them. Now an inter-disciplinary team of scientists has managed to digitally "unwrap" three specimens—a mummified cat, bird, and snake—using a high-resolution 3D X-ray imaging technique, essentially enabling them to conduct a virtual postmortem, according to <a href="https://www.nature.com/articles/s41598-020-69726-0">a new paper</a> published in the journal Scientific Reports.</p>
+<p>Studying fragile ancient artifacts with cutting-edge imaging technology confers a powerful advantage on archaeological analysis. For instance, in 2016, an international team of scientists <a href="https://gizmodo.com/wondergadget-allows-researchers-to-read-a-charred-bibli-1786824739">developed a method</a> for "virtually unrolling" a badly damaged ancient scroll found on the western shore of the Dead Sea, revealing the first few verses from the book of Leviticus. The so-called <a href="https://en.wikipedia.org/wiki/En-Gedi_Scroll">En Gedi scroll</a> was recovered from the ark of an ancient synagogue destroyed by fire around 600 CE.</p>
+<p>In 2019, <a href="https://arstechnica.com/science/2019/08/physicists-discover-hidden-text-in-what-was-thought-to-be-blank-egyptian-papyri/">we reported</a> that German scientists used a combination of <a href="https://www.sciencedirect.com/science/article/pii/S1296207418307519?via%3Dihub">cutting-edge physics techniques</a> to <a href="https://www.sciencedirect.com/science/article/pii/S1296207419301670?via%3Dihub">virtually "unfold"</a> an ancient Egyptian papyrus, part of an extensive collection housed in the Berlin Egyptian Museum. Their analysis revealed that a seemingly blank patch on the papyrus actually contained characters written in what had become "invisible ink" after centuries of exposure to light. And earlier this year, <a href="https://arstechnica.com/science/2020/05/scientists-discover-that-four-blank-dead-sea-scrolls-actually-have-text/">we reported</a> that scientists had used multispectral imaging on four supposedly blank Dead Sea Scrolls and found the scrolls contained hidden text, most likely a passage from the book of Ezekiel.  </p></div><p><a href="https://arstechnica.com/?p=1700405#p3">Read 9 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700405&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=0dFXZFdAjkk:AN1d7WXpQEU:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=0dFXZFdAjkk:AN1d7WXpQEU:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=0dFXZFdAjkk:AN1d7WXpQEU:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=0dFXZFdAjkk:AN1d7WXpQEU:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=0dFXZFdAjkk:AN1d7WXpQEU:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=0dFXZFdAjkk:AN1d7WXpQEU:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Ancient lake sites suggest lots of precipitation on Mars</title>
+      <link>https://arstechnica.com/?p=1700511</link>
+      <pubDate>Fri, 21 Aug 2020 15:50:32 +0000</pubDate>
+      <dc:creator><![CDATA[John Timmer]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[Climate science]]></category>
+      <category><![CDATA[Mars]]></category>
+      <category><![CDATA[planetary science]]></category>
+      <category><![CDATA[precipitation]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700511</guid>
+      <description><![CDATA[How much water did it take to fill a lake bed on Mars?]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2016/12/pia19080_meyer2_vasavada-1_galelake-800x500.jpg" alt="A simulated view of Gale Crater Lake, measuring about 150km across, on Mars about 3 billion years ago. "><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2016/12/pia19080_meyer2_vasavada-1_galelake.jpg" class="enlarge-link" data-height="651" data-width="1041">Enlarge</a> <span class="sep">/</span> A simulated view of Gale Crater Lake, measuring about 150km across, on Mars about 3 billion years ago.  (credit: NASA/JPL-Caltech/ESA/DLR/FU Berlin/MSSS)</p>  </figure><div><a name="page-1"></a></div>
+<p>Mars clearly once had a lot of water—there are simply far too many features that clearly formed in a watery environment for that to be a matter of debate. What's less clear is how much of that water was liquid and for how long. While some features clearly indicate that <a href="https://arstechnica.com/science/2017/06/rover-finds-evidence-of-a-long-period-of-warm-watery-conditions-on-mars/">liquid water was present for a long time</a>, others <a href="https://arstechnica.com/science/2020/08/many-of-mars-stream-valleys-might-have-formed-under-an-ice-sheet/">likely formed under glacial ice</a>.</p>
+
+<p>It's not clear whether the differences are a matter of timing—a wet period followed by an icy one, for example—or due to regional differences in Mars' climate. It's difficult to tell in part because we can't get climate models of Mars to produce a climate that's wet enough for long enough to form a lot of watery features.</p>
+<p>To try to put some constraints on what the ancient Martian climate might have looked like, a team of planetary scientists decided to take a careful look at some of the once-watery features identified on the surface of the red planet. Timothy Goudge, Caleb Fassett, and Gaia Stucky de Quay (yes, that's a planetary scientist named Gaia) identified a series of lakes, and used the features of the lakes to put some constraints on the precipitation that fed them.</p></div><p><a href="https://arstechnica.com/?p=1700511#p3">Read 10 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700511&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=8GPi_o71b9g:Mw_8mFypR04:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=8GPi_o71b9g:Mw_8mFypR04:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=8GPi_o71b9g:Mw_8mFypR04:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=8GPi_o71b9g:Mw_8mFypR04:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=8GPi_o71b9g:Mw_8mFypR04:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=8GPi_o71b9g:Mw_8mFypR04:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Untested COVID-19 vaccine, Sputnik V, begins 40,000-person trial next week</title>
+      <link>https://arstechnica.com/?p=1700510</link>
+      <pubDate>Fri, 21 Aug 2020 15:38:14 +0000</pubDate>
+      <dc:creator><![CDATA[Beth Mole]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <category><![CDATA[COVID-19]]></category>
+      <category><![CDATA[Putin]]></category>
+      <category><![CDATA[russia]]></category>
+      <category><![CDATA[Sputnik V]]></category>
+      <category><![CDATA[vaccine]]></category>
+      <category><![CDATA[vaccine development]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700510</guid>
+      <description><![CDATA[Russia skipped trials to grant approval and claim breakthrough.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/Putin-Vaccine-Jets-800x450.jpg" alt="Untested COVID-19 vaccine, Sputnik V, begins 40,000-person trial next week"><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/Putin-Vaccine-Jets.jpg" class="enlarge-link" data-height="563" data-width="1000">Enlarge</a> (credit: Aurich Lawson / Getty Images)</p>  </figure><div><a name="page-1"></a></div>
+<p>After hastily granting approval last week for a COVID-19 vaccine that has yet to enter rigorous clinical trials, Russia has now announced plans to give the vaccine to more than 40,000 volunteers in a trial that starts next week.</p>
+<p>The “previously planned post-registration” injections are part of a “randomized, double-blind, placebo-controlled multicenter clinical study” of the vaccine, dubbed Sputnik V, <a href="https://rdif.ru/Eng_fullNews/5686/">according to an August 20 press release from the Russian Direct Investment Fund</a>, which has financially backed the development of the vaccine. The more than 40,000 people for the trial will be recruited from more than 45 medical centers, the press release added.</p>
+<p>On August 11, Russian President Vladimir Putin announced that Sputnik V had won regulatory approval, making it the first COVID-19 vaccine in the world to achieve domestic approval. Putin hailed Sputnik V as a breakthrough and even announced that one of his daughters had already received one dose of the two-dose vaccine.</p></div><p><a href="https://arstechnica.com/?p=1700510#p3">Read 7 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700510&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=L9VTDqBCOSA:jv08meQxPzI:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=L9VTDqBCOSA:jv08meQxPzI:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=L9VTDqBCOSA:jv08meQxPzI:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=L9VTDqBCOSA:jv08meQxPzI:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=L9VTDqBCOSA:jv08meQxPzI:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=L9VTDqBCOSA:jv08meQxPzI:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Pixel 5 renders show Google returning to rear fingerprint reader</title>
+      <link>https://arstechnica.com/?p=1700481</link>
+      <pubDate>Fri, 21 Aug 2020 14:46:38 +0000</pubDate>
+      <dc:creator><![CDATA[Ron Amadeo]]></dc:creator>
+      <category><![CDATA[Tech]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700481</guid>
+      <description><![CDATA[Google is scrapping the gimmicks of the Pixel 4 and copy/pasting the Pixel 4a design.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+
+
+
+
+
+<div><a name="page-1"></a></div>
+      <ul class="gallery shortcode-gallery gallery-wide"><li>
+        <div class="gallery-item-content">
+        <div class="gallery-image"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/61-980x696.jpg" alt=""></div>
+        <p>
+          OnLeak's Pixel 5 render.                   </p>
+        </div>
+      </li>
+      </ul><p>The Pixel 4a just <a href="https://arstechnica.com/gadgets/2020/08/google-finally-announces-the-pixel-4a-for-349/">started to ship</a> yesterday, but we're already getting leaks of the Pixel 5. Google made the odd move of confirming the Pixel 5 alongside the Pixel 4a launch, and now <a href="https://pricebaba.com/blog/google-pixel-5-renders-360-video-exclusive">thanks to OnLeaks</a>, we're getting an idea of what Google's new flagship will look like.</p>
+<p>OnLeaks <a href="https://arstechnica.com/gadgets/2020/01/early-pixel-4a-renders-show-off-slim-bezel-design-hole-punch-display/">previously nailed</a> the Pixel 4a design eight months before launch, so his Pixel 5 render is worth paying attention to. As usual, this is a render that is most likely based on CAD files that need to be sent out to accessory manufacturers ahead of launch. That means we're getting the general layout of the device components and display, but some of the finer details could be wrong.</p>
+<p>Anyway, the Pixel 5 render looks like a slightly upgraded 4a with a better camera, and that's about it. That means on the front you get a modern all-screen design with a hole-punch camera and slim bezels, and on the back, you get a Pixel 4-style camera block and the shocker inclusion of a rear fingerprint reader. The render shows three cameras, but the site describes the phone as having "dual cameras, an unknown sensor, and an LED flash." There's also no headphone jack.</p></div><p><a href="https://arstechnica.com/?p=1700481#p3">Read 4 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700481&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=jlRUED0DD8g:yJWFEqmGmt4:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=jlRUED0DD8g:yJWFEqmGmt4:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=jlRUED0DD8g:yJWFEqmGmt4:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=jlRUED0DD8g:yJWFEqmGmt4:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=jlRUED0DD8g:yJWFEqmGmt4:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=jlRUED0DD8g:yJWFEqmGmt4:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Respawn point: The inevitable reincarnation of the corporate office</title>
+      <link>https://arstechnica.com/?p=1700173</link>
+      <pubDate>Fri, 21 Aug 2020 13:00:04 +0000</pubDate>
+      <dc:creator><![CDATA[Sean Gallagher]]></dc:creator>
+      <category><![CDATA[Biz & IT]]></category>
+      <category><![CDATA[Features]]></category>
+      <category><![CDATA[back to work]]></category>
+      <category><![CDATA[feature]]></category>
+      <category><![CDATA[feature report]]></category>
+      <category><![CDATA[the future of business]]></category>
+      <category><![CDATA[work from home]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700173</guid>
+      <description><![CDATA[Forget the utopian visions—nothing ever happens neatly, or without struggle.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/pandemic-office-cubicles-800x450.jpg" alt="If you're back in the office, &lt;a href=https://www.youtube.com/watch?v=qyUnSuYYs18&gt;this helpful song&lt;/a&gt; will help you remember the cardinal rule of social distancing."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/pandemic-office-cubicles.jpg" class="enlarge-link" data-height="563" data-width="1000">Enlarge</a> <span class="sep">/</span> If you're back in the office, <a href="https://www.youtube.com/watch?v=qyUnSuYYs18">this helpful song</a> will help you remember the cardinal rule of social distancing. (credit: Aurich Lawson / Getty Images)</p>  </figure><div><a name="page-1"></a></div>
+<p>If you told any executive at a major corporation in mid-2019 that close to half of the US workforce would be working from home within the next year, they would have at least raised a skeptical eyebrow (and then probably called security to have you removed). Yet, here we are.</p>
+<p>Major technology companies, including Microsoft, Facebook, and Google, have closed their physical offices until well into 2021. <a href="https://blog.twitter.com/en_us/topics/company/2020/keeping-our-employees-and-partners-safe-during-coronavirus.html">Twitter has told many employees</a> that they can work from home permanently. And now that we have nearly six months of involuntary widespread work-from-home behind us, many other organizations are also reconsidering the value of office space.</p>
+<p>In April, a Gallup poll showed <a href="https://news.gallup.com/poll/306695/workers-discovering-affinity-remote-work.aspx">62 percent of the workforce</a> working from home, and 59 percent hoping they could continue to do so as much as possible once the pandemic is under control. While the numbers have since dropped to some degree—Stanford Institute for Economic Research figures in June showed only <a href="https://news.stanford.edu/2020/06/29/snapshot-new-working-home-economy/">42 percent of the US workforce</a> working from home full-time—the fact remains that people's relationship with their workplace has been dramatically restructured, perhaps permanently.</p></div><p><a href="https://arstechnica.com/?p=1700173#p3">Read 25 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700173&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=7wl_xDd0uys:RGKE_u1xiUk:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=7wl_xDd0uys:RGKE_u1xiUk:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=7wl_xDd0uys:RGKE_u1xiUk:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=7wl_xDd0uys:RGKE_u1xiUk:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=7wl_xDd0uys:RGKE_u1xiUk:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=7wl_xDd0uys:RGKE_u1xiUk:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Rocket Report: Raptor engine sets record, Northrop may say “Aloha!” to Omega</title>
+      <link>https://arstechnica.com/?p=1700333</link>
+      <pubDate>Fri, 21 Aug 2020 11:00:17 +0000</pubDate>
+      <dc:creator><![CDATA[Eric Berger]]></dc:creator>
+      <category><![CDATA[Science]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700333</guid>
+      <description><![CDATA["There have been some issues that have been uncovered just recently."]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/08/arian5-800x566.jpg" alt="A rocket lifts off at night amidst flame and smoke."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/08/arian5.jpg" class="enlarge-link" data-height="1414" data-width="2000">Enlarge</a> <span class="sep">/</span> An Ariane 5 rocket lifts off on August 15, 2020. (credit: <a rel="nofollow" class="caption-link" href="https://www.arianespace.com/">Arianespace</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Welcome to Edition 3.13 of the Rocket Report!</p>
+<p>This week's report is one of the longest ever, because there seems to be a lot of news in the world of heavy lift.</p>
+<p>We try to cover it all—from bad vibrations on the SLS rocket to the Raptor engine setting records.</p></div><p><a href="https://arstechnica.com/?p=1700333#p3">Read 33 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700333&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=s2yRsFnNVsc:O1szdPQlmVk:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=s2yRsFnNVsc:O1szdPQlmVk:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=s2yRsFnNVsc:O1szdPQlmVk:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=s2yRsFnNVsc:O1szdPQlmVk:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=s2yRsFnNVsc:O1szdPQlmVk:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=s2yRsFnNVsc:O1szdPQlmVk:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Tesla stock reaches $2,000 amid soaring interest in EV companies</title>
+      <link>https://arstechnica.com/?p=1700434</link>
+      <pubDate>Fri, 21 Aug 2020 01:37:41 +0000</pubDate>
+      <dc:creator><![CDATA[Timothy B. Lee]]></dc:creator>
+      <category><![CDATA[Cars]]></category>
+      <category><![CDATA[Tesla]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700434</guid>
+      <description><![CDATA[Tesla announced a five-for-one stock split last week.]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+<figure class="intro-image intro-left"><img src="https://cdn.arstechnica.net/wp-content/uploads/2020/07/GettyImages-1210929638-800x533.jpg" alt="Exterior photograph of a grass-ringed car dealership."><p class="caption" style="font-size:0.8em"><a href="https://cdn.arstechnica.net/wp-content/uploads/2020/07/GettyImages-1210929638.jpg" class="enlarge-link" data-height="3041" data-width="4561">Enlarge</a> <span class="sep">/</span> A Tesla facility in Lathrop, California. (credit: <a rel="nofollow" class="caption-link" href="https://www.gettyimages.com/">Andrei Stanescu / Getty Images</a>)</p>  </figure><div><a name="page-1"></a></div>
+<p>Tesla's stock closed at a record high of $2,000 on Thursday, pushing the company's market capitalization to $370 billion. Tesla has been on a weeklong rally since announcing a five-for-one stock split. The split will be distributed to anyone who holds the stock tomorrow—Friday, August 21.</p>
+<p><a href="https://arstechnica.com/cars/2020/06/tesla-stock-soars-above-1000-as-musk-vows-to-go-all-out-for-semi/">A little more than two months</a> have passed since Tesla's stock first reached $1,000 per share. Last month, Tesla announced a solid second-quarter profit of <a href="https://arstechnica.com/cars/2020/07/tesla-makes-a-profit-of-104-million-in-q2-2020/">$104 million</a>. It was the fourth straight quarter of profits.</p>
+<p>That could qualify Tesla for inclusion in the S&amp;P 500 stock index. If Tesla wins a slot in the S&amp;P 500, funds that track the index would need to buy Tesla shares. That could push the stock price up even further.</p></div><p><a href="https://arstechnica.com/?p=1700434#p3">Read 4 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700434&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JqDep8oGc5w:hpTbwX0kHa4:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=JqDep8oGc5w:hpTbwX0kHa4:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JqDep8oGc5w:hpTbwX0kHa4:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=JqDep8oGc5w:hpTbwX0kHa4:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JqDep8oGc5w:hpTbwX0kHa4:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=JqDep8oGc5w:hpTbwX0kHa4:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Blast off: Disney drops first trailer for The Right Stuff dramatic series</title>
+      <link>https://arstechnica.com/?p=1700270</link>
+      <pubDate>Thu, 20 Aug 2020 23:25:30 +0000</pubDate>
+      <dc:creator><![CDATA[Jennifer Ouellette]]></dc:creator>
+      <category><![CDATA[Gaming & Culture]]></category>
+      <category><![CDATA[disney plus]]></category>
+      <category><![CDATA[entertainment]]></category>
+      <category><![CDATA[history of science]]></category>
+      <category><![CDATA[NASA]]></category>
+      <category><![CDATA[space program]]></category>
+      <category><![CDATA[streaming television]]></category>
+      <category><![CDATA[The Right Stuff]]></category>
+      <category><![CDATA[Trailers]]></category>
+      <guid isPermaLink="false">https://arstechnica.com/?p=1700270</guid>
+      <description><![CDATA["Nobody has ever seen anything like you men—until now. You're heroes."]]></description>
+      <content:encoded><![CDATA[<div id="rss-wrap">
+
+
+
+
+
+<div><a name="page-1"></a></div>
+<div class="video"><div class="wrapper" style="display:block" type="text/html" width="980" height="550" src="https://www.youtube.com/embed/Og0htvEVqJQ?start=0&amp;wmode=transparent" frameborder="0" allowfullscreen></div><p class="caption" style="font-size:0.8em">In October, Disney+ will debut its new series, <em>The Right Stuff, </em>based on the 1979 book by Tom Wolfe. </p></div>
+<p>A team of elite military test pilots finds itself tapped to be astronauts for <a href="https://en.wikipedia.org/wiki/Project_Mercury">Project Mercury</a>, the first human spaceflight program in the United States, in <a href="https://en.wikipedia.org/wiki/The_Right_Stuff_(TV_series)"><em>The Right Stuff</em></a>, a new eight-episode dramatic series debuting in October on Disney+. Like Philip Kaufman's Oscar-winning 1983 film of the same name, the series is based on the <a href="https://en.wikipedia.org/wiki/The_Right_Stuff_(book)">bestselling 1979 book</a> by Tom Wolfe.</p>
+<p>Wolfe became interested in the US space program while on assignment by Rolling Stone to cover the launch of Apollo 17, NASA's last Moon mission. He spent the next seven years writing <em>The Right Stuff</em>, intent on capturing the drive and ethos of those early astronauts. (In a foreword to the 1983 edition, he pondered "What makes a man willing to sit up on top of an enormous Roman candle... and wait for someone to light the fuse.")  Wolfe spent a great deal of time consulting with General Chuck Yeager, who was shut out of the astronaut program and ended up as a contrasting character to the college-degreed Project Mercury team featured in the book. <em>The Right Stuff</em> won widespread critical praise, as well as the National Book Award for Nonfiction. </p>
+<p>When United Artists decided to finance <a href="https://en.wikipedia.org/wiki/The_Right_Stuff_(film)">a film adaptation</a>, the studio hired <a href="https://arstechnica.com/gaming/2018/11/rip-william-goldman-creator-of-beloved-film-the-princess-bride/">William Goldman</a> (<em>The Princess Bride</em>) to adapt the screenplay, but his vision was very different from that of director Philip Kaufman, and Goldman quit the project. Kaufman wrote his own draft script in eight weeks, making Yeager more of a central figure; Goldman's script ignored Yeager entirely. Goldman later wrote that "Phil [Kaufman]'s heart was with Yeager. And not only that, he felt the astronauts, rather than being heroic, were really minor leaguers, mechanical men of no particular quality, not great pilots at all, simply the product of hype."</p></div><p><a href="https://arstechnica.com/?p=1700270#p3">Read 7 remaining paragraphs</a> | <a href="https://arstechnica.com/?p=1700270&comments=1">Comments</a></p><div class="feedflare">
+<a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=oFeQuIcMsIY:JrDz4LgMuFQ:V_sGLiPBpWU"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=oFeQuIcMsIY:JrDz4LgMuFQ:V_sGLiPBpWU" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=oFeQuIcMsIY:JrDz4LgMuFQ:F7zBnMyn0Lo"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?i=oFeQuIcMsIY:JrDz4LgMuFQ:F7zBnMyn0Lo" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=oFeQuIcMsIY:JrDz4LgMuFQ:qj6IDK7rITs"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=qj6IDK7rITs" border="0"></img></a> <a href="http://feeds.arstechnica.com/~ff/arstechnica/index?a=oFeQuIcMsIY:JrDz4LgMuFQ:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/arstechnica/index?d=yIl2AUoC8zA" border="0"></img></a>
+</div>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

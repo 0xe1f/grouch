@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/">
+  <channel rdf:about="https://slashdot.org/">
+    <title>Slashdot</title>
+    <link>https://slashdot.org/</link>
+    <description>News for nerds, stuff that matters</description>
+    <dc:language>en-us</dc:language>
+    <dc:rights>Copyright 1997-2016, SlashdotMedia. All Rights Reserved.</dc:rights>
+    <dc:date>2020-08-24T06:47:08+00:00</dc:date>
+    <dc:publisher>Dice</dc:publisher>
+    <dc:creator>help@slashdot.org</dc:creator>
+    <dc:subject>Technology</dc:subject>
+    <syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+    <syn:updateFrequency>1</syn:updateFrequency>
+    <syn:updatePeriod>hourly</syn:updatePeriod>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="https://tech.slashdot.org/story/20/08/24/0321211/facebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://science.slashdot.org/story/20/08/24/0051256/new-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://tech.slashdot.org/story/20/08/23/2354235/tesla-fights-performance-hacks-for-its-electric-cars?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/23/2249212/pandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/23/2020230/ozone-increased-in-the-northern-hemisphere-over-the-last-two-decades?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://tech.slashdot.org/story/20/08/23/1810224/this-plane-flies-itself-we-went-for-a-ride?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://science.slashdot.org/story/20/08/23/1940220/new-zealand-cant-find-source-of-its-new-covid-19-cases?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://apple.slashdot.org/story/20/08/23/1846258/how-a-decision-by-apple-15-years-ago-hurts-intel-now?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://science.slashdot.org/story/20/08/23/1725236/spacex-now-valued-at-46-billion-making-it-americas-top-unicorn?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/23/0413221/america-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/22/2058210/23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://yro.slashdot.org/story/20/08/22/2351252/gamergate-proponent-kills-ex-girlfriend-commits-suicide?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/23/0235209/should-america-re-open-its-movie-theatres?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://slashdot.org/story/20/08/23/0148222/investors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+        <rdf:li rdf:resource="https://news.slashdot.org/story/20/08/23/0447224/open-source-sustainability-is-really-a-people-problem?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+      </rdf:Seq>
+    </items>
+    <image rdf:resource="https://a.fsdn.com/sd/topics/topicslashdot.gif" />
+    <textinput rdf:resource="https://slashdot.org/search.pl" />
+    <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rdf+xml" href="http://rss.slashdot.org/Slashdot/slashdot" />
+    <feedburner:info uri="slashdot/slashdot" />
+    <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" />
+  </channel>
+  <image rdf:about="https://a.fsdn.com/sd/topics/topicslashdot.gif">
+    <title>Slashdot</title>
+    <url>https://a.fsdn.com/sd/topics/topicslashdot.gif</url>
+    <link>https://slashdot.org/</link>
+  </image>
+  <item rdf:about="https://tech.slashdot.org/story/20/08/24/0321211/facebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Facebook's Mark Zuckerberg Stoked Washington's Fears About TikTok</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/8wt7XxicgR8/facebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok</link>
+    <description>Facebook spent more money on lobbying than any single company in the first half of 2020, That's according to figures cited by the Wall Street Journal from the Center for Responsive Politics.
+
+      But that's not all they did. Facebook CEO Mark Zuckerberg also began personally delivering a message last fall that TikTok "doesn't share Facebook's commitment to freedom of expression, and represents a risk to American values and technological supremacy."
+
+      That was a message Zuckerberg hammered behind the scenes in meetings with officials and lawmakers during the October trip and a separate visit to Washington weeks earlier, according to people familiar with the matter. In a private dinner at the White House in late October, Zuckerberg made the case to President Donald Trump that the rise of Chinese internet companies threatens American business, and should be a bigger concern than reining in Facebook, some of the people said.
+
+      Zuckerberg discussed TikTok specifically in meetings with several senators, according to people familiar with the meetings. In late October, Sen. Tom Cotton, R- Ark. &amp;mdash; who met with Zuckerberg in September &amp;mdash; and Sen. Charles Schumer, D-N.Y., wrote a letter to intelligence officials demanding an inquiry into TikTok. The government began a national-security review of the company soon after, and by the spring, Trump began threatening to ban the app entirely. This month he signed an executive order demanding that TikTok's Chinese owner, ByteDance Ltd., divest itself of its U.S. operations.
+      Few tech companies have as much to gain as Facebook from TikTok's travails, and the social-media giant has taken an active role in raising concerns about the popular app and its Chinese owners.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Facebook's+Mark+Zuckerberg+Stoked+Washington's+Fears+About+TikTok%3A+https%3A%2F%2Fbit.ly%2F31n7jsB"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Ftech.slashdot.org%2Fstory%2F20%2F08%2F24%2F0321211%2Ffacebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://tech.slashdot.org/story/20/08/24/0321211/facebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17031341&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/8wt7XxicgR8" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-24T03:34:00+00:00</dc:date>
+    <dc:subject>facebook</dc:subject>
+    <slash:department>Tik-Zuk</slash:department>
+    <slash:section>technology</slash:section>
+    <slash:comments>25</slash:comments>
+    <slash:hit_parade>25,23,19,13,3,1,1</slash:hit_parade>
+    <feedburner:origLink>https://tech.slashdot.org/story/20/08/24/0321211/facebooks-mark-zuckerberg-stoked-washingtons-fears-about-tiktok?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://science.slashdot.org/story/20/08/24/0051256/new-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>New Blender Add-On Accurately Models Subatomic Particles, Involves Community with Contest</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/HF9Ak0xzOvQ/new-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest</link>
+    <description>BlenderArtists.org writes:
+      To build and model the universe from the Planck scale to galactic scales requires an incredible number of mathematical computations to simulate particles and their interactions, yet the framework of nature and the physics of these interactions should be simple. Blender's physics engine provides a good base to begin this project, but it will take work from the community to accurately model subatomic particles.
+      That's where "Quantum Microscope" comes in. It's a newly open sourced add-on for Blender that simulates subatomic particles and the formation of matter using classical physics. "It provides a microscopic look at molecules, atoms, atomic nuclei, particles and spacetime, using the theoretical model from Energy Wave Theory," explains its web page, linking to a video summarizing some of its features.
+
+      And that's just the beginning, writes Slashdot reader atomicphysics:
+      A contest begins September 1, 2020 for developers to enhance the add-on, or create a new simulator meeting project requirements to use classical physics for the quantum realm, with at least $15,000 in prizes being awarded over the next year.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=New+Blender+Add-On+Accurately+Models+Subatomic+Particles%2C+Involves+Community+with+Contest%3A+https%3A%2F%2Fbit.ly%2F3howuk5"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fscience.slashdot.org%2Fstory%2F20%2F08%2F24%2F0051256%2Fnew-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://science.slashdot.org/story/20/08/24/0051256/new-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030989&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/HF9Ak0xzOvQ" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-24T01:50:00+00:00</dc:date>
+    <dc:subject>graphics</dc:subject>
+    <slash:department>quantum-leaps</slash:department>
+    <slash:section>science</slash:section>
+    <slash:comments>20</slash:comments>
+    <slash:hit_parade>20,19,14,10,1,0,0</slash:hit_parade>
+    <feedburner:origLink>https://science.slashdot.org/story/20/08/24/0051256/new-blender-add-on-accurately-models-subatomic-particles-involves-community-with-contest?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://tech.slashdot.org/story/20/08/23/2354235/tesla-fights-performance-hacks-for-its-electric-cars?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Tesla Fights Performance Hacks for Its Electric Cars</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/zrgY3jH0q3o/tesla-fights-performance-hacks-for-its-electric-cars</link>
+    <description>Engadget reports:
+      You might not want to rush into installing an unofficial performance boost for your Tesla. Users on Reddit (via Electrek) have discovered that the latest software for Tesla's Model 3 thwarts an Ingenext mod that unlocks features like an extra 50HP and Drive Mode...
+      These features typically cost thousands of dollars to unlock through Tesla (such as a $2,000 Acceleration Boost), so there's a strong incentive for buyers willing to take the risk... [T]his suggests would-be performance hackers could be in for a challenge if they want to maximize the potential of Tesla's EVs without the company's blessing &amp;mdash; they might not have more than a small window of time before Tesla clamps down again.
+
+      Electrek reports on the warnings their drivers receive:
+      Tesla says that it detected "incompatible vehicle modification" and that it could result in a "potential risk of damage or shutdown." The notification apparently stays stuck on the screen like that, but the vehicle remains drivable.... That was kind of expected. It is basically a cat and mouse game between hacking the inverter and Tesla patching the hack...
+      I get why some people would want to do the hack since the capacity is already in the cars that they bought and Tesla claiming that it could result in damages is weird since they are basically using the same code as their own acceleration boost. But at the same time, you are also running third-party software.
+
+      Again, at your risk.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Tesla+Fights+Performance+Hacks+for+Its+Electric+Cars%3A+https%3A%2F%2Fbit.ly%2F3grco7k"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Ftech.slashdot.org%2Fstory%2F20%2F08%2F23%2F2354235%2Ftesla-fights-performance-hacks-for-its-electric-cars%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://tech.slashdot.org/story/20/08/23/2354235/tesla-fights-performance-hacks-for-its-electric-cars?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030899&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/zrgY3jH0q3o" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T23:57:00+00:00</dc:date>
+    <dc:subject>transportation</dc:subject>
+    <slash:department>unpaid-upgrades</slash:department>
+    <slash:section>technology</slash:section>
+    <slash:comments>73</slash:comments>
+    <slash:hit_parade>73,70,63,60,25,10,7</slash:hit_parade>
+    <feedburner:origLink>https://tech.slashdot.org/story/20/08/23/2354235/tesla-fights-performance-hacks-for-its-electric-cars?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/23/2249212/pandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Pandemic-Weary CS Students Tempted With Gap Years By Recruiting Startups</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/NDQUpE6GpGM/pandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups</link>
+    <description>Long-time Slashdot reader theodp shared this report from Bloomberg News:
+
+      To many college students, the prospect of a year of school during a pandemic &amp;mdash; with virtual classes, restricted movements and no parties &amp;mdash; is a huge bummer. Some Silicon Valley startups, hungry for young talent, see it as an opportunity. Over the past few months, several companies have presented an alternative to school: a remote internship, aimed specifically at young people looking for alternatives to a dismal school year.
+
+      Dozens of Silicon Valley startups are looking to hire fall interns, according to a list assembled by startup accelerator Y Combinator. This month, venture firm Neo organized a virtual career fair for 120 students and a range of startups, hoping to match pairs for internships during the upcoming academic year. And venture firm Contrary Capital is offering to invest $100,000 in five teams of entrepreneurs if they take a gap year from school to build a company. Such arrangements allow interns to get paid and learn on the job, while avoiding paying tens of thousands of dollars for Zoom University. It also means that companies willing to improvise on hiring and gamble on younger workers may get new access to fresh talent.
+
+      Ali Partovi, Neo's chief executive officer, said the firm surveyed 120 students who are part of its mentorship programs and found that 46% of them are interested in taking a gap semester and 21% are interested in taking a gap year... Nimbler startups willing to experiment could gain access to star students who might otherwise have wound up in summer jobs at giants like Facebook, Alphabet or Apple, managers say. "Usually you would fight to get on the radar with people, and here people are reaching out," said Emmanuel Straschnov, the co-CEO of Bubble, an app design service. Compared with regular recruiting, he said, "It's like night and day."
+      The ultimate payoff isn't just the student labor. "With recruiting you always play the long game," said Nick Schrock, CEO of Elementl, a developer tools startup that's planning to hire three gap-year workers this fall. "A great intern who has a great network can often yield compounded returns later down the line."
+      Students are assessing the trade-offs critically, and trying to decide if what they're getting from schools is worth the cost, especially if classes happen virtually.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Pandemic-Weary+CS+Students+Tempted+With+Gap+Years+By+Recruiting+Startups%3A+https%3A%2F%2Fbit.ly%2F3j2CZt2"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F23%2F2249212%2Fpandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/23/2249212/pandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030815&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/NDQUpE6GpGM" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T22:51:00+00:00</dc:date>
+    <dc:subject>education</dc:subject>
+    <slash:department>graduation-can-wait</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>20</slash:comments>
+    <slash:hit_parade>20,18,17,15,1,0,0</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/23/2249212/pandemic-weary-cs-students-tempted-with-gap-years-by-recruiting-startups?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/23/2020230/ozone-increased-in-the-northern-hemisphere-over-the-last-two-decades?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Ozone Increased in the Northern Hemisphere Over the Last Two Decades</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/2eKeg-YuG1E/ozone-increased-in-the-northern-hemisphere-over-the-last-two-decades</link>
+    <description>Phys.org reports:
+      In a first-ever study using ozone data collected by commercial aircraft, researchers from the Cooperative Institute for Research in Environmental Sciences (CIRES) at the University of Colorado Boulder found that levels of the pollutant in the lowest part of Earth's atmosphere have increased across the Northern Hemisphere over the past 20 years. That's even as tighter controls on emissions of ozone precursors have lowered ground-level ozone in some places, including North America and Europe...
+
+      In a study published today in the journal Science Advances, the team found an overall increase in ozone levels above the Northern Hemisphere. "That's a big deal because it means that as we try to limit our pollution locally, it might not work as well as we thought," said Audrey Gaudel, a CIRES scientist working in the NOAA Chemical Sciences Laboratory and the study's lead author...
+
+      In the so-called "lower troposphere," which is closer to Earth's surface, ozone has decreased above some mid-latitude regions, including Europe and the United States, where ozone precursor emissions have decreased. The researchers found those reductions were offset by increases higher in the troposphere &amp;mdash; with the net result being an overall ozone increase from the surface to 12 km... The model showed that increased anthropogenic emissions in the tropics were likely driving the observed increase of ozone in the Northern Hemisphere.
+      &lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Ozone+Increased+in+the+Northern+Hemisphere+Over+the+Last+Two+Decades%3A+https%3A%2F%2Fbit.ly%2F2FRlrSA"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F23%2F2020230%2Fozone-increased-in-the-northern-hemisphere-over-the-last-two-decades%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/23/2020230/ozone-increased-in-the-northern-hemisphere-over-the-last-two-decades?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030565&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/2eKeg-YuG1E" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T21:50:00+00:00</dc:date>
+    <dc:subject>earth</dc:subject>
+    <slash:department>greenhouse-gases</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>26</slash:comments>
+    <slash:hit_parade>26,25,21,17,3,2,2</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/23/2020230/ozone-increased-in-the-northern-hemisphere-over-the-last-two-decades?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://tech.slashdot.org/story/20/08/23/1810224/this-plane-flies-itself-we-went-for-a-ride?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>'This Plane Flies Itself. We Went for a Ride'</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/MLw9zHs7lEI/this-plane-flies-itself-we-went-for-a-ride</link>
+    <description>Xwing envisions a fleet of retrofitted Cessna cargo planes flying without a human onboard, performing automated takeoffs and landing while being controlled by pilots on the ground (who might even be juggling a few aircraft at a time). They've logged "dozens" of hours of flight time &amp;mdash; though because of FAA guidelines the future "ground" pilot has always been esconced on-board the plane. Long-time Slashdot reader PuceBaboon shares this report from Wired (alternate URL here):
+
+      The conditions are not ideal for our landing. A hard wind is blowing over the low hills east of San Francisco, and at just the wrong angle &amp;mdash; straight across the runway where we're set to touch down. But as we ease into our final approach, our two-winged shadow clipping the suburban homes below, the veteran pilot sitting beside me makes a gentle suggestion. "I like to do it hands up. Like a roller coaster," he says.
+
+      He removes his hands from the wheel of our aircraft, a 27-year-old Cessna Caravan that once shuttled United Nations dignitaries in southern Africa. It's nothing especially fancy, with aspects that feel more go-kart than airliner. The cockpit is filled with manual toggles and analog dials; pulleys connect the pedal directly to the rudder at the tail. But recently, this plane underwent some modifications. As we descend past 500 feet, the 15-knot gusts hitting our side and the pilot's hands still hovering, the wheel and pedals begin to jostle, compensating for the wind with inhuman precision. The descent remains smooth &amp;mdash; serene, even, as we touch down.
+
+      "It will be very uneventful, almost boring," Maxime Gariel, the chief technology officer of Xwing, had assured me shortly before our fully autonomous takeoff, flight, and landing. "That's what we're aiming for."&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status='This+Plane+Flies+Itself.+We+Went+for+a+Ride'%3A+https%3A%2F%2Fbit.ly%2F34sDTeG"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Ftech.slashdot.org%2Fstory%2F20%2F08%2F23%2F1810224%2Fthis-plane-flies-itself-we-went-for-a-ride%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://tech.slashdot.org/story/20/08/23/1810224/this-plane-flies-itself-we-went-for-a-ride?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030243&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/MLw9zHs7lEI" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T20:50:00+00:00</dc:date>
+    <dc:subject>transportation</dc:subject>
+    <slash:department>high-in-the-sky</slash:department>
+    <slash:section>technology</slash:section>
+    <slash:comments>32</slash:comments>
+    <slash:hit_parade>32,32,32,25,5,1,0</slash:hit_parade>
+    <feedburner:origLink>https://tech.slashdot.org/story/20/08/23/1810224/this-plane-flies-itself-we-went-for-a-ride?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://science.slashdot.org/story/20/08/23/1940220/new-zealand-cant-find-source-of-its-new-covid-19-cases?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>New Zealand Can't Find Source of Its New Covid-19 Cases</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/MpK8WsQbW5I/new-zealand-cant-find-source-of-its-new-covid-19-cases</link>
+    <description>A new cluster of Covid-19 cases in New Zealand prompted a widespread investigation to identify where they're coming from. The New Zealand Herald reports:
+      Nearly 90 new cases of Covid-19 have now been linked back to the new cluster, which itself stemmed from an "index case" &amp;mdash; a 50-year-old man working at Mt Wellington's Americold coolstore, with no history or link to overseas travel. Contact tracers have been trying to work backwards from that index case, who tested positive on August 11, in hopes of finding the "primary case" &amp;mdash; or the person who brought the virus into the country in the first place.
+
+      Friday &amp;mdash; more than a week and 175,000 tests since the start of the outbreak &amp;mdash; Prime Minister Jacinda Ardern shared some details on how exhaustive that process had been. Virtually all of the country's border and managed isolation staff have been tested in the past 10 days, and so far there had been no additional cases, outside the mystery infection of a maintenance worker at Auckland's Rydges hotel...
+
+      University of Auckland microbiologist Associate Professor Siouxsie Wiles says it's quite possible we'll never get any further. "Is that a big deal? From the testing we've done so far, it looks like this is a pretty tight cluster &amp;mdash; so I would say, no," she said. "What we have lost is the opportunity to know how it happened, or what gaps need plugging. But at the same time, we have to remember that nothing is 100 per cent guaranteed to work all of the time."&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=New+Zealand+Can't+Find+Source+of+Its+New+Covid-19+Cases%3A+https%3A%2F%2Fbit.ly%2F3jbc2Un"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fscience.slashdot.org%2Fstory%2F20%2F08%2F23%2F1940220%2Fnew-zealand-cant-find-source-of-its-new-covid-19-cases%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://science.slashdot.org/story/20/08/23/1940220/new-zealand-cant-find-source-of-its-new-covid-19-cases?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030477&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/MpK8WsQbW5I" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T19:50:00+00:00</dc:date>
+    <dc:subject>government</dc:subject>
+    <slash:department>carrier-lost</slash:department>
+    <slash:section>science</slash:section>
+    <slash:comments>134</slash:comments>
+    <slash:hit_parade>134,126,103,88,20,12,9</slash:hit_parade>
+    <feedburner:origLink>https://science.slashdot.org/story/20/08/23/1940220/new-zealand-cant-find-source-of-its-new-covid-19-cases?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://apple.slashdot.org/story/20/08/23/1846258/how-a-decision-by-apple-15-years-ago-hurts-intel-now?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>How a Decision by Apple 15 Years Ago Hurts Intel Now</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/YMJN5XdMVLg/how-a-decision-by-apple-15-years-ago-hurts-intel-now</link>
+    <description>Last month Intel's stock lost $50 billion in valuation &amp;mdash; while the valuation for Taiwan-based TSMC jumped by over 50%.
+
+      The former chief of staff to Intel CEO Andrew Grove (and later general manager of Intel China) explains why this moment was 15 years in the making:
+
+      Learning curve theory says that the cost of manufacturing a product declines as the volume increases. Manufacturing chips for the whole computer industry gave Intel huge advantages of scale over any other semiconductor manufacturer and resulted in the company becoming the world's largest chip manufacturer with enviable profit margins.
+      Chaos theory says that a small change in one state of a system can cause a large change in a later stage. In Intel's case, this was not getting selected by Apple for its iPhones. Each successive era of computing was 10x the size of the previous era, so while Intel produced hundreds of millions of microprocessors per year, the mobile phone industry sells billions of units per year. Apple's decision in 2005 to use the ARM architecture instead of Intel's gave Taiwan-based TSMC, the foundry chosen to manufacture the processor chips for the iPhone, the learning curve advantage which over time enabled it to pull ahead of Intel in manufacturing process technology.
+
+      Intel's integrated model, its competitive advantage for decades, became its vulnerability. TSMC and ARM created a tectonic shift in the semiconductor industry by enabling a large number of "fabless" chip companies such as Apple, AMD, Nvidia and Qualcomm, to name a few. These fabless companies began to out-design Intel in the mobile phone industry and accelerated TSMC's lead over Intel in high volume manufacturing of the most advanced chips. Samsung, which also operates a foundry business, has been another beneficiary of this trend.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=How+a+Decision+by+Apple+15+Years+Ago+Hurts+Intel+Now%3A+https%3A%2F%2Fbit.ly%2F3aU7QVV"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fapple.slashdot.org%2Fstory%2F20%2F08%2F23%2F1846258%2Fhow-a-decision-by-apple-15-years-ago-hurts-intel-now%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://apple.slashdot.org/story/20/08/23/1846258/how-a-decision-by-apple-15-years-ago-hurts-intel-now?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030347&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/YMJN5XdMVLg" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T18:50:00+00:00</dc:date>
+    <dc:subject>intel</dc:subject>
+    <slash:department>butterfly-effects</slash:department>
+    <slash:section>apple</slash:section>
+    <slash:comments>83</slash:comments>
+    <slash:hit_parade>83,83,76,65,23,11,10</slash:hit_parade>
+    <feedburner:origLink>https://apple.slashdot.org/story/20/08/23/1846258/how-a-decision-by-apple-15-years-ago-hurts-intel-now?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://science.slashdot.org/story/20/08/23/1725236/spacex-now-valued-at-46-billion-making-it-americas-top-unicorn?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>SpaceX Now Valued at $46 Billion, Making It America's Top 'Unicorn'</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/YbCb0O6vxno/spacex-now-valued-at-46-billion-making-it-americas-top-unicorn</link>
+    <description>"SpaceX, the Elon Musk-led company that recently became the first business in history to send astronauts into Earth's orbit, is parlaying its successes into big money," reports CNN Business:
+
+      The company recently finished a $1.9 billion funding round, one of the largest single fundraising pushes by any privately held company, according to public filings and data aggregated by venture capital data firm Crunchbase. That brings SpaceX's overall valuation to $46 billion... SpaceX now ranks third on a list of so-called "unicorns," which are privately held startups with valuations topping $1 billion, according to data from the venture capital analysis firm CB Insights. The only two startups valued higher than SpaceX are two Chinese tech giants &amp;mdash; rideshare company Didi Chuxing and TikTok parent company ByteDance...
+
+      But even at SpaceX's eye-popping valuation, some Wall Street analysts and investors argue the company is still undervalued. Morgan Stanley analysts, for example, wrote in a report last month that SpaceX could be worth as much as $200 billion if its experimental satellite-internet project, Starlink, works as intended. Morgan Stanley said its low-end estimate for SpaceX's value is about $50 billion. And SpaceX's other ventures &amp;mdash; including launching astronauts and cargo for NASA, building massive prototypes for a would-be Mars rocket, and launching satellites for the US military &amp;mdash; all give investors plenty of reason to clamor for a chance to own a piece of SpaceX, according to Chad Anderson, a SpaceX investor and the CEO of investment firm Space Angels...
+
+      Anderson added that SpaceX still isn't turning a profit, but that's mostly because it's still spending large sums of money investing in new arms of its business, including the Starlink internet business and its Mars rocket prototypes, dubbed Starship. And that does leave some room for debate when it comes to the question of whether SpaceX's valuation is too high. "I think there would probably be an argument both ways," he said. "I think there's definitely a lot of SpaceX haters or naysayers."
+      &lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=SpaceX+Now+Valued+at+%2446+Billion%2C+Making+It+America's+Top+'Unicorn'%3A+https%3A%2F%2Fbit.ly%2F3l8UUAh"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fscience.slashdot.org%2Fstory%2F20%2F08%2F23%2F1725236%2Fspacex-now-valued-at-46-billion-making-it-americas-top-unicorn%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://science.slashdot.org/story/20/08/23/1725236/spacex-now-valued-at-46-billion-making-it-americas-top-unicorn?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17030109&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/YbCb0O6vxno" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T17:35:00+00:00</dc:date>
+    <dc:subject>space</dc:subject>
+    <slash:department>flying-high</slash:department>
+    <slash:section>science</slash:section>
+    <slash:comments>70</slash:comments>
+    <slash:hit_parade>70,68,61,49,12,6,5</slash:hit_parade>
+    <feedburner:origLink>https://science.slashdot.org/story/20/08/23/1725236/spacex-now-valued-at-46-billion-making-it-americas-top-unicorn?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/23/0413221/america-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>America Begins Airport Tests of Technology To Detect Drones and 'Mitigate Potential Safety Risks Posed'</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/SMOIvEyC5j4/america-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed</link>
+    <description>To address the possibility of drone-flying near airports, America's Federal Aviation Administration "will be testing at least 10 technologies and systems," reports Engadget, "developed not just to detect unmanned aerial systems, but also to mitigate the potential safety risks they pose."
+      The first tests will be conducted at FAA's William J. Hughes Technical Center, which is right next to the Atlantic City International Airport in New Jersey. After that, the agency expects to expand its tests to four additional airports in the U.S. It has yet to choose those airports, and it may also still be finalizing the list of technologies it's testing: The FAA is asking interested companies working on drone detection systems to respond to its announcement within 45 days.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=America+Begins+Airport+Tests+of+Technology+To+Detect+Drones+and+'Mitigate+Potential+Safety+Risks+Posed'%3A+https%3A%2F%2Fbit.ly%2F32hp9fV"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F23%2F0413221%2Famerica-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/23/0413221/america-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17028051&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/SMOIvEyC5j4" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T16:34:00+00:00</dc:date>
+    <dc:subject>usa</dc:subject>
+    <slash:department>knowing-before-you-fly</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>34</slash:comments>
+    <slash:hit_parade>34,32,27,20,6,1,0</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/23/0413221/america-begins-airport-tests-of-technology-to-detect-drones-and-mitigate-potential-safety-risks-posed?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/22/2058210/23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>23-Million-Year-Old Fossilized Leaves Offer New Insight Into Global Warming</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/7Yh5PLncXxE/23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming</link>
+    <description>UPI reports:
+      The links between rising carbon dioxide levels, global warming and greening trends have been confirmed by fossilized leaves from a 23 million-year-old forest... Scientists previously postulated that ancient increases in atmospheric CO2 during the early Miocene allowed plants to perform photosynthesis more efficiently. But the latest research, published Thursday in the journal Climate of the Past, is the first to confirm the link between CO2 and greening in the fossil record...
+
+
+      Lab experiments have shown increases in CO2 can boost photosynthesis, and recent satellite surveys suggest rising CO2 levels are responsible for greening patterns across the planet, including Arctic and drylands ecosystems. The latest research suggests that greening trends are likely to continue as CO2 levels approach those recorded during ancient period of warming... According to the new study, increases in photosynthesis rates won't be able to keep up with current rates of human-caused carbon emissions. In addition, previous studies suggest increases in rates of photosynthesis can prevent staple crops from absorbing calcium, iron, zinc and other minerals important for human health....
+
+      By comparing the fossilized leaf structures, including microscopic veins, stomata and pores, to those of modern leaves, researchers designed a model to more accurately predict CO2 levels... "It all fits together, it all makes sense," said study co-author William D'Andrea, a paleoclimate scientist at Lamont-Doherty. "This should give us more confidence about how temperatures will change with CO2 levels."&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=23-Million-Year-Old+Fossilized+Leaves+Offer+New+Insight+Into+Global+Warming%3A+https%3A%2F%2Fbit.ly%2F34p5YU3"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F22%2F2058210%2F23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/22/2058210/23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17027283&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/7Yh5PLncXxE" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T15:34:00+00:00</dc:date>
+    <dc:subject>earth</dc:subject>
+    <slash:department>branching-out</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>31</slash:comments>
+    <slash:hit_parade>31,31,28,22,2,0,0</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/22/2058210/23-million-year-old-fossilized-leaves-offer-new-insight-into-global-warming?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://yro.slashdot.org/story/20/08/22/2351252/gamergate-proponent-kills-ex-girlfriend-commits-suicide?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>'GamerGate' Proponent Kills Ex-Girlfriend, Commits Suicide</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/My5xgyY-KRk/gamergate-proponent-kills-ex-girlfriend-commits-suicide</link>
+    <description>41-year-old Rudy Ferretti "was known in the male-dominated retro gaming community as a champion gamer &amp;mdash; and as a raging misogynist who ferociously harassed women," writes blogger David Futrelle. "He once made a homebrew game in which the goal was to kill women.
+
+      "Last week, he allegedly gunned down his former girlfriend Amy Molter before turning his gun on himself."
+
+      Wired reports:
+      Longtime members of the retro and arcade gaming scene say they warned community leaders and even police about Ferretti's threatening behavior for years. For close to a decade, they say, Ferretti had harassed, stalked, and threatened gamers, particularly women, pushing some out of the niche gaming scene entirely... Arcade game collector and researcher Catherine DeSpira and video game historian and storage auction buyer Patrick Scott Patterson &amp;mdash; two of Ferretti's most public targets &amp;mdash; say they collectively contacted police in different states a half-dozen times to report Ferretti's threats against themselves and others. They say those attempts ultimately had no effect.
+
+      All the while, clusters of retro gamers across the country egged Ferretti on in private messages and on forums, leveraging his apparent instability and misogynist inclinations against women they didn't want in the scene... "They were emboldening it, pushing him, giving him a support system," says Patterson.... The rise of the GamerGate campaign in 2014 gave Ferretti new fodder to fuel his idea that women &amp;mdash; specifically "radical feminists," as he wrote in multiple blog posts and said in YouTube videos &amp;mdash; were out to destroy the purity of the arcade gaming scene... Ferretti believed that his gaming acumen justified his stewardship of the community. "I can be an asshole. You know why? Because I'm a world champion. I'm a gamer," he once said in a video. As recently as April 2020, Ferretti described himself in a YouTube video as "the savior of the community..."
+      [I]t was a network of institutional failures &amp;mdash; from forums to expos to law enforcement &amp;mdash; that allowed Ferretti to continue his campaigns for over a decade. "I was trying to tell people this guy Rudy was dangerous and capable of doing exactly what he ended up doing," says Patrick Scott Patterson.
+      &lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status='GamerGate'+Proponent+Kills+Ex-Girlfriend%2C+Commits+Suicide%3A+https%3A%2F%2Fbit.ly%2F3hnNmr1"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fyro.slashdot.org%2Fstory%2F20%2F08%2F22%2F2351252%2Fgamergate-proponent-kills-ex-girlfriend-commits-suicide%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://yro.slashdot.org/story/20/08/22/2351252/gamergate-proponent-kills-ex-girlfriend-commits-suicide?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17027551&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/My5xgyY-KRk" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T14:34:00+00:00</dc:date>
+    <dc:subject>crime</dc:subject>
+    <slash:department>game-over</slash:department>
+    <slash:section>yro</slash:section>
+    <slash:comments>220</slash:comments>
+    <slash:hit_parade>220,210,170,136,47,24,14</slash:hit_parade>
+    <feedburner:origLink>https://yro.slashdot.org/story/20/08/22/2351252/gamergate-proponent-kills-ex-girlfriend-commits-suicide?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/23/0235209/should-america-re-open-its-movie-theatres?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Should America Re-Open Its Movie Theatres?</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/IJ44y5J48UU/should-america-re-open-its-movie-theatres</link>
+    <description>70% of America's movie theatres have now re-opened for business, reports NPR:
+      "When our patrons come back, they'll see the safe environment we've provided for them," said John Fithian, president and CEO of the National Association of Theater Owners.
+      Fithian invited two medical experts and the heads of the country's biggest theater chains to launch a public awareness campaign dubbed "CinemaSafe," meant to ease moviegoer's fears. The campaign featured new industry-wide health and safety protocols, including mandatory face masks for moviegoers and employees, social distancing and regular sanitizing in theaters with better air ventilation, reduced theater capacity (most between 30% and 50%), and contact-less, electronic ticket sales.
+
+      Fithian says the protocols will be followed by more than 2,600 theater locations, including more than 30,000 screens in the U.S. The National Association of Theater Owners used guidelines from the Centers for Disease Control and Prevention, the World Health Organization, and the Occupational Safety and Health Administration.
+
+      "It's important to understand that going to the movies is not risk free," said David F. Goldsmith, an epidemiologist at George Washington University who consulted with the National Association of Theater Owners on the protocols. Still, during the announcement, he said he had not seen any medical literature evidence showing movie theaters around the world have been a venue for viral transmission of COVID-19. "Honestly, time will tell," he said.
+
+      The New York Times reports that six U.S. states say it's still too dangerous to open their movie theatres &amp;mdash; New York, California, New Jersey, North Carolina, Maryland and New Mexico.
+
+      But Megan Colligan, the president of Imax Entertainment, countered at a news conference Friday that "Some people go to the gym, some people go to church, some people need to go to the beach and surf, and some people really do need to go to the movies."&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Should+America+Re-Open+Its+Movie+Theatres%3F%3A+https%3A%2F%2Fbit.ly%2F3hogbnc"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F23%2F0235209%2Fshould-america-re-open-its-movie-theatres%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/23/0235209/should-america-re-open-its-movie-theatres?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17027851&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/IJ44y5J48UU" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T13:34:00+00:00</dc:date>
+    <dc:subject>movies</dc:subject>
+    <slash:department>now-playing:-Unhinged</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>180</slash:comments>
+    <slash:hit_parade>180,167,148,132,36,17,13</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/23/0235209/should-america-re-open-its-movie-theatres?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://slashdot.org/story/20/08/23/0148222/investors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Investors Argue This Stock Market Isn't Like the '90s Dot-Com Boom</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/W7lZpEvaV5c/investors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom</link>
+    <description>The stock market is setting new records, with some tech companies at "the steepest premium ever versus cheap shares," reports Bloomberg. (Even Tesla "is trading at more than 800-times earnings while an electric-truck peer, which made just $36,000 last quarter by installing solar panels for its founder, is valued at $16 billion.")
+
+      So is it like the great dot-com bubble of the late 1990s, they asked Ryan Jacob, founder of a tech-focused asset management firm. "The only people who say, 'Yes, it's like the 1990s' are hedge-fund managers who are net short and annoyed," he responds. "To say it's like the late 1990s &amp;mdash; they have no idea."
+
+      The global head of equities at JPMorgan Asset Management has been with the firm since 1992, and recalls the dot-com era as a period when investors bet on hoped-for earnings, in contrast to the current environment. "Today, at least for the big companies, the long-term profits have arrived," said New York-based Quinsee. "I would be surprised if there was a similarly spectacular decline. But the market's leadership could change."
+
+
+      The market of 2020 is a very different place than it was two decades ago. The number of domestic U.S. stocks has nearly halved from its 1998 peak to about 3,700 today, with much of the decline driven by disappearing micro-caps... At the height of the dot-com bubble, the median age of a firm going public was five years-old. It's been double that for most of the past decade, according to data compiled by Jay Ritter at the University of Florida. That suggests the kind of fledgling tech companies that imploded in the dot-com era now tend to stay private for longer, and the ones that do go public are usually more mature... As the modern equivalent of dot-coms learned to stay private, growth stocks in the market began to look very different. The Russell 3000 Growth Index currently has a net debt to earnings ratio of just slightly above 1. It was about 2.3 at the end of 1999. And back then, debt was a bigger burden. Around the time firms found themselves hurriedly removing "dot-com" from their names, the Federal Reserve was raising rates. Now, borrowing costs are nearly zero and look likely to stay there for a while...
+
+      Cheaper debt and less of it, healthy profits, and a virus-based boost to business. But not everything is different about technology shares in 2020. Predicting the outlook for companies when traditional valuation models do not necessarily apply was a huge challenge during the dot-com bubble, and remains so today... But Jacob can't help feeling his job has become just a little duller. "As a public company investor in today's environment, it's a bit frustrating," he said. "You're not going to replicate what happened in the late 1990s, it was basically the dawning of the Internet."&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Investors+Argue+This+Stock+Market+Isn't+Like+the+'90s+Dot-Com+Boom%3A+https%3A%2F%2Fbit.ly%2F3j74xh7"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fslashdot.org%2Fstory%2F20%2F08%2F23%2F0148222%2Finvestors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://slashdot.org/story/20/08/23/0148222/investors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17027779&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/W7lZpEvaV5c" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T11:04:00+00:00</dc:date>
+    <dc:subject>business</dc:subject>
+    <slash:department>boom-business</slash:department>
+    <slash:section>slashdot</slash:section>
+    <slash:comments>116</slash:comments>
+    <slash:hit_parade>116,114,103,92,27,11,11</slash:hit_parade>
+    <feedburner:origLink>https://slashdot.org/story/20/08/23/0148222/investors-argue-this-stock-market-isnt-like-the-90s-dot-com-boom?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <item rdf:about="https://news.slashdot.org/story/20/08/23/0447224/open-source-sustainability-is-really-a-people-problem?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+    <title>Open Source Sustainability is Really a People Problem</title>
+    <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/hgAIRyWpyd0/open-source-sustainability-is-really-a-people-problem</link>
+    <description>Matt Asay, a former COO of Canonical now working at AWS, argues that the question of open source sustainability "is really a people problem."
+
+      But to make the case, he cites comments by Tobie Langel, formerly W3C's testing lead (and a former member of Facebook's Open Source and Web Standards Team) who's now founded an open-source strategies consulting firm whose clients include Mozilla, Intell, Google, and Microsoft.
+      Much of the "open source sustainability" discussion has focused on the one thing that really needs no help being sustained: software. As Tobie Langel rightly points out, "Open source code isn't a scarce resource. It's the exact opposite, actually: It's infinitely reproducible at zero cost to the user and to the ecosystem." Nor is sustainability really a matter of funding, though this gets closer to the truth.
+
+      No, open source sustainability is really a people problem. Or, as Langel highlights, "In open source, the maintainers working on the source code are the scarce resource that needs to be protected and nurtured."
+
+      Over the past several weeks, I've interviewed a number of maintainers for popular open source projects. In every case, they talked about how they contribute because it's fun, but also acknowledged that some aspects of open source development can make it decidedly "un-fun" (e.g., demanding users who complain about missing features or existing bugs but don't contribute code or fixes). Most have found ways to turn their passion into financial independence, but Langel stresses that cash is critical to keeping open source humming along... "Without revenue, there is no maintenance, and without maintenance, the commons becomes toxic very quickly... As new security issues are discovered, open source code that isn't updated becomes a security risk..."
+
+      Langel is absolutely correct to argue, "In an ecosystem with infinite resources, the attention needs to be on the people taking care of and maintaining that resource, because that's where the bottleneck is." Again, that's partly a question of money, but it's even more a question of treating people with dignity and respect, while making open source communities a fun, welcoming place.&lt;p&gt;&lt;div class="share_submission" style="position:relative;"&gt;
+      &lt;a class="slashpop" href="http://twitter.com/home?status=Open+Source+Sustainability+is+Really+a+People+Problem%3A+https%3A%2F%2Fbit.ly%2F2EtPQFE"&gt;&lt;img src="https://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;
+      &lt;a class="slashpop" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fnews.slashdot.org%2Fstory%2F20%2F08%2F23%2F0447224%2Fopen-source-sustainability-is-really-a-people-problem%3Futm_source%3Dslashdot%26utm_medium%3Dfacebook"&gt;&lt;img src="https://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+
+
+
+      &lt;/div&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://news.slashdot.org/story/20/08/23/0447224/open-source-sustainability-is-really-a-people-problem?utm_source=rss1.0moreanon&amp;amp;utm_medium=feed"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="https://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=17028133&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/hgAIRyWpyd0" height="1" width="1" alt=""/&gt;</description>
+    <dc:creator>EditorDavid</dc:creator>
+    <dc:date>2020-08-23T07:59:00+00:00</dc:date>
+    <dc:subject>opensource</dc:subject>
+    <slash:department>see-XKCD-2347</slash:department>
+    <slash:section>news</slash:section>
+    <slash:comments>49</slash:comments>
+    <slash:hit_parade>49,49,43,36,13,6,3</slash:hit_parade>
+    <feedburner:origLink>https://news.slashdot.org/story/20/08/23/0447224/open-source-sustainability-is-really-a-people-problem?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</feedburner:origLink>
+  </item>
+  <textinput rdf:about="https://slashdot.org/search.pl">
+    <title>Search Slashdot</title>
+    <description>Search Slashdot stories</description>
+    <name>query</name>
+    <link>https://slashdot.org/search.pl</link>
+  </textinput>
+</rdf:RDF>

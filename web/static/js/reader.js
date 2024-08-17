@@ -845,11 +845,11 @@
             // FIXME: this call is missing
             $.ajax({
                 url: "articleExtras",
-                data: JSON.stringify({
+                data: {
                     "article": this.id,
                     "subscription": this.source,
                     "folder": this.getSubscription().parent,
-                }),
+                },
                 dataType: "json",
                 success: function(response) {
                     entry.extras = response;
