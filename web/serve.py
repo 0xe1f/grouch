@@ -17,7 +17,6 @@
 from common import first_or_none
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
-from config import read_config
 from datatype import Article
 from datatype import Folder
 from datatype import Subscription
@@ -62,8 +61,12 @@ import os.path
 import port
 import tasks
 import tempfile
+import tomllib
 
 app = Flask(__name__)
+app.config.from_file("../config_defaults.toml", load=tomllib.load, text=False)
+app.config.from_file("../config.toml", load=tomllib.load, text=False)
+
 executor = Executor(app)
 
 FEED_SYNC_TIMEOUT = 600 # 10 min
@@ -502,13 +505,11 @@ def _fetch_table_of_contents() -> TableOfContents:
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    config = read_config("config.yaml")
 
     conn = Connection()
-    conn.connect(config.database)
+    conn.connect(app.config)
 
     user_id = find_user_id(conn, "foo")
     user = fetch_user(conn, user_id)
 
-    app.config['EXECUTOR_PROPAGATE_EXCEPTIONS'] = True
     app.run(host='0.0.0.0', port='8080', debug=True)

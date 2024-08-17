@@ -14,6 +14,7 @@
 
 from lxml.html import clean
 import html
+import re
 
 _SANITIZER = clean.Cleaner(
     allow_tags=[
@@ -60,18 +61,26 @@ _SANITIZER = clean.Cleaner(
 _CLEANER = clean.Cleaner(
     allow_tags=[''],
 )
+REGEX_WHITESPACE = r"\s+"
 
 def sanitize_html(content: str) -> str:
     return _SANITIZER.clean_html(content)
 
 def extract_text(content: str, max_len: int=None) -> str:
+    # Strip out HTML
     content = _CLEANER.clean_html(content)
     content = _strip_bookend_tags(content)
 
+    # Trim to necessary length
     if max_len and len(content) > max_len:
         content = content[:max_len]
 
-    return html.unescape(content)
+    # Trim whitespace
+    content = re.sub(REGEX_WHITESPACE, " ", content).strip()
+
+    # Unescape HTML entities and trim.
+    # This might result in shorter text than expected, but that's OK
+    return html.unescape(content).strip()
 
 def _strip_bookend_tags(content: str) -> str:
     # Remove the div tags Cleaner inserts

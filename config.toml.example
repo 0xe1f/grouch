@@ -1,0 +1,7 @@
+# Database
+
+DATABASE_NAME = "<couchdb database name>"
+DATABASE_USERNAME = "<couchdb database username>"
+DATABASE_PASSWORD = "<couchdb database password>"
+DATABASE_HOST = "<couchdb database hostname>"
+DATABASE_PORT = "<couchdb database port - defaults to 5984>"

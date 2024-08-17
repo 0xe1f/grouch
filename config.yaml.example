@@ -1,6 +1,0 @@
-database:
-    name: [couchdb database name]
-    username: [username]
-    password: [password]
-    host: [couchdb instance hostname]
-    port: [port - default 5984]
