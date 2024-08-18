@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from web.ext_type.json_object import JsonObject
+from web.ext_type.objects import JsonObject
 
 class ArticlesRequest(JsonObject):
 
