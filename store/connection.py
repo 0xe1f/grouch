@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask.config import Config
 import couchdb
 import logging
 
@@ -26,9 +25,9 @@ class Connection:
     def __init__(self):
         pass
 
-    def connect(self, config: Config):
-        self.server = couchdb.Server(f"http://{config["DATABASE_USERNAME"]}:{config["DATABASE_PASSWORD"]}@{config["DATABASE_HOST"]}:{config["DATABASE_PORT"]}/")
-        self.initialize(config["DATABASE_NAME"])
+    def connect(self, database: str, username: str, password: str, host: str, port: int|None=None):
+        self.server = couchdb.Server(f"http://{username}:{password}@{host}:{port or 5984}/")
+        self.initialize(database)
 
     def initialize(self, database_name: str):
         # Create DB if necessary

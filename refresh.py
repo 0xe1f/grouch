@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 
 from argparse import ArgumentParser
-from config import read_config
 from tasks import refresh_feeds
 import logging
 import store
+import tomllib
 
 arg_parser = ArgumentParser()
 arg_parser.add_argument(
@@ -16,11 +16,19 @@ arg_parser.add_argument(
 )
 
 args = arg_parser.parse_args()
-config = read_config("config.yaml")
 logging.basicConfig(level=logging.DEBUG)
 
+with open("config.toml", "rb") as file:
+    config = tomllib.load(file)
+
 conn = store.Connection()
-conn.connect(config.database)
+conn.connect(
+    config["DATABASE_NAME"],
+    config["DATABASE_USERNAME"],
+    config["DATABASE_PASSWORD"],
+    config["DATABASE_HOST"],
+    config.get("DATABASE_PORT")
+)
 
 def main():
     freshness_seconds = args.fresh * 60

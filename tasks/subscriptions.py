@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from common import first_or_none
-from copy import copy
 from datatype import Article
 from datatype import Folder
 from datatype import Subscription
@@ -42,11 +41,60 @@ from time import time
 import logging
 import parser
 
-def sync_subs(conn: Connection, user_id: str):
-    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
-        _sync_subs(bulk_q, user_id)
+def sync_subs(bulk_q: BulkUpdateQueue, user_id: str, feed_ids: set[str]|None=None):
+    # Ensure nothing's left to write
+    bulk_q.flush()
 
-    logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written; {bulk_q.commit_count} commits")
+    # FIXME: migrate to iterview
+    for sub_id, feed_id, folder_id, synced in find_user_subs_synced(bulk_q.connection, user_id):
+        if feed_ids and feed_id not in feed_ids:
+            continue
+
+        max_synced = 0
+        read_batch_size = 40
+
+        # Fetch entries that have updated
+        marked_unread = 0
+        updated_article_count = 0
+        for entry_batch in batched(find_entries_fetched_since(bulk_q.connection, feed_id, synced), read_batch_size):
+            entry_map = {}
+            for entry in entry_batch:
+                entry_map[entry.id] = entry
+                max_synced = max(max_synced, entry.updated or "")
+
+            # Batch existing articles
+            for article in find_articles_by_entry(bulk_q.connection, user_id, *entry_map.keys()):
+                entry = entry_map.pop(article.entry_id)
+                if article.synced == entry.updated:
+                    # Nothing's changed
+                    continue
+                marked_unread += 1
+                updated_article_count += 1
+                article.toggle_prop(Article.PROP_UNREAD, True)
+                article.synced = entry.updated
+                article.published = entry.published
+                bulk_q.enqueue_flex(article)
+
+            # Batch new articles
+            for entry in entry_map.values():
+                marked_unread += 1
+                updated_article_count += 1
+                article = Article()
+                article.user_id = user_id
+                article.subscription_id = sub_id
+                article.folder_id = folder_id
+                article.entry_id = entry.id
+                article.toggle_prop(Article.PROP_UNREAD, True)
+                article.synced = entry.updated
+                article.published = entry.published
+                bulk_q.enqueue_flex(article)
+
+        # Update sub, if there were changes
+        if updated_article_count:
+            sub = first_or_none(find_subs_by_id(bulk_q.connection, sub_id))
+            sub.last_synced = max_synced
+            sub.unread_count += marked_unread
+            bulk_q.enqueue_flex(sub)
 
 def subscribe_user_unknown_url(conn: Connection, user_id: str, url: str):
     with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
@@ -109,25 +157,6 @@ def unsubscribe(conn: Connection, *sub_ids: int):
 
     logging.info(f"Unsub {len(sub_ids)} subs: {bulk_q.written_count}/{bulk_q.enqueued_count} objects written ({time() - start_time:.2}s)")
 
-def remove_subscriptions(bulk_q: BulkUpdateQueue, *sub_ids: int) -> bool:
-    pending_count = bulk_q.pending_count
-    written_count = bulk_q.written_count
-    enqueued_count = bulk_q.enqueued_count
-
-    for sub_id in sub_ids:
-        if remove_articles_by_sub(bulk_q, sub_id):
-            sub = first_or_none(find_subs_by_id(bulk_q.connection, sub_id))
-            sub.mark_deleted()
-            bulk_q.enqueue_flex(sub)
-
-    bulk_q.flush()
-    written_count = bulk_q.written_count - written_count - pending_count
-    enqueued_count = bulk_q.enqueued_count - enqueued_count
-
-    # If all_articles_removed, but enqueued_count != written_count,
-    # then at least one subscription failed to write
-    return enqueued_count == written_count
-
 def mark_subs_read_by_user(conn: Connection, user_id: str):
     start_time = time()
     logging.debug(f"Marking {user_id}'s subs as read")
@@ -152,7 +181,7 @@ def mark_subs_read_by_folder(conn: Connection, folder_id: str):
 
     logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
-def mark_sub_read(conn: Connection, sub_id: str) -> bool:
+def mark_sub_read(conn: Connection, sub_id: str):
     start_time = time()
     logging.debug(f"Marking {sub_id} as read")
 
@@ -163,6 +192,8 @@ def mark_sub_read(conn: Connection, sub_id: str) -> bool:
             bulk_q.enqueue_flex(sub)
 
     logging.info(f"Wrote {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
+
+# ---
 
 def _subscribe_user(bulk_q: BulkUpdateQueue, user_id: str, *sub_sources: Source):
     # Subscribe to all available feeds, get list of remaining
@@ -211,61 +242,25 @@ def _subscribe_local_feeds(bulk_q: BulkUpdateQueue, user_id: str, *sources: Sour
         subbed_feed_ids.add(feed_id)
         remaining_sources.remove(sub_source)
 
-    _sync_subs(bulk_q, user_id, subbed_feed_ids)
+    sync_subs(bulk_q, user_id, subbed_feed_ids)
 
     return remaining_sources
 
-def _sync_subs(bulk_q: BulkUpdateQueue, user_id: str, feed_ids: set[str]|None=None):
-    # Ensure nothing's left to write
-    bulk_q.flush()
+def remove_subscriptions(bulk_q: BulkUpdateQueue, *sub_ids: int) -> bool:
+    pending_count = bulk_q.pending_count
+    written_count = bulk_q.written_count
+    enqueued_count = bulk_q.enqueued_count
 
-    # FIXME: migrate to iterview
-    for sub_id, feed_id, folder_id, synced in find_user_subs_synced(bulk_q.connection, user_id):
-        if feed_ids and feed_id not in feed_ids:
-            continue
-
-        max_synced = 0
-        read_batch_size = 40
-
-        # Fetch entries that have updated
-        marked_unread = 0
-        updated_article_count = 0
-        for entry_batch in batched(find_entries_fetched_since(bulk_q.connection, feed_id, synced), read_batch_size):
-            entry_map = {}
-            for entry in entry_batch:
-                entry_map[entry.id] = entry
-                max_synced = max(max_synced, entry.updated or "")
-
-            # Batch existing articles
-            for article in find_articles_by_entry(bulk_q.connection, user_id, *entry_map.keys()):
-                entry = entry_map.pop(article.entry_id)
-                if article.synced == entry.updated:
-                    # Nothing's changed
-                    continue
-                marked_unread += 1
-                updated_article_count += 1
-                article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = entry.updated
-                article.published = entry.published
-                bulk_q.enqueue_flex(article)
-
-            # Batch new articles
-            for entry in entry_map.values():
-                marked_unread += 1
-                updated_article_count += 1
-                article = Article()
-                article.user_id = user_id
-                article.subscription_id = sub_id
-                article.folder_id = folder_id
-                article.entry_id = entry.id
-                article.toggle_prop(Article.PROP_UNREAD, True)
-                article.synced = entry.updated
-                article.published = entry.published
-                bulk_q.enqueue_flex(article)
-
-        # Update sub, if there were changes
-        if updated_article_count:
+    for sub_id in sub_ids:
+        if remove_articles_by_sub(bulk_q, sub_id):
             sub = first_or_none(find_subs_by_id(bulk_q.connection, sub_id))
-            sub.last_synced = max_synced
-            sub.unread_count += marked_unread
+            sub.mark_deleted()
             bulk_q.enqueue_flex(sub)
+
+    bulk_q.flush()
+    written_count = bulk_q.written_count - written_count - pending_count
+    enqueued_count = bulk_q.enqueued_count - enqueued_count
+
+    # If all_articles_removed, but enqueued_count != written_count,
+    # then at least one subscription failed to write
+    return enqueued_count == written_count

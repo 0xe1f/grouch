@@ -47,6 +47,8 @@ def remove_tag_from_articles(conn: Connection, user_id: str, tag: str):
 
     logging.info(f"Removed tag from {bulk_q.written_count} articles ({time() - start_time:.2}s)")
 
+# ---
+
 def remove_articles_by_sub(bulk_q: BulkUpdateQueue, sub_id: str) -> bool:
     pending_count = bulk_q.pending_count
     written_count = bulk_q.written_count

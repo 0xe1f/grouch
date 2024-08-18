@@ -20,8 +20,6 @@ from common.secret import obfuscate_json
 from datatype import Article
 from datatype import Folder
 from datatype import Subscription
-from datatype import FlexObject
-from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
 from flask import Flask
@@ -29,8 +27,8 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask_executor import Executor
+from flask_socketio import SocketIO
 from io import BytesIO
-from json import loads
 from store import BulkUpdateQueue
 from store import Connection
 from store import fetch_user
@@ -48,6 +46,8 @@ from store import find_tags_by_user
 from store import find_subs_by_id
 from store import find_user_id
 from store import find_subs_by_user
+from tasks.objects import TaskContext
+from tasks.objects import TaskException
 from web.ext_type import Article as PubArticle
 from web.ext_type import Error
 from web.ext_type import Folder as PubFolder
@@ -59,15 +59,18 @@ from web.ext_type import responses
 import logging
 import os.path
 import port
-import tasks
+import tasks.async_tasks as async_tasks
+import tasks.sync_tasks as sync_tasks
 import tempfile
 import tomllib
 
 app = Flask(__name__)
 app.config.from_file("../config_defaults.toml", load=tomllib.load, text=False)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
-
+socketio = SocketIO(app)
 executor = Executor(app)
+
+user_sessions = {}
 
 FEED_SYNC_TIMEOUT = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
@@ -133,8 +136,7 @@ def export_opml():
 
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
-    arg = requests.SubscribeRequest(request.json)
-    if not arg:
+    if not (arg := requests.SubscribeRequest(request.json)):
         app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
     elif not arg.url:
@@ -144,79 +146,45 @@ def subscribe():
     # FIXME: validate url
 
     # Kick off a task
-    executor.submit(tasks.subscribe_user_unknown_url, conn, user_id, arg.url)
+    executor.submit(async_tasks.subs_subscribe_url, _create_task_context(), arg.url)
 
     return responses.SubscribeResponse().as_dict()
 
 @app.route('/setProperty', methods=['POST'])
 def set_property():
-    arg = requests.SetPropertyRequest(request.json)
-    if not arg:
-        app.logger.error(f"Invalid setProperty request {request.json}")
-        return Error("FIXME!!").as_dict()
-    elif not arg.article_id:
-        app.logger.error(f"Missing article id for {request.json}")
+    if not (arg := requests.SetPropertyRequest(request.json)):
+        app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
-    owner_id = Article.extract_owner_id(arg.article_id)
-    if owner_id != user.id:
-        app.logger.error(f"Unauthorized article ({owner_id}!={user.id})")
+    try:
+        article = sync_tasks.articles_set_property(
+            _create_task_context(),
+            arg.article_id,
+            arg.prop_name,
+            arg.is_set,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
         return Error("FIXME!!").as_dict()
-
-    article = first_or_none(find_articles_by_id(conn, arg.article_id))
-    if not article:
-        return Error("FIXME!!").as_dict()
-
-    if arg.is_set != (arg.prop_name in article.props):
-        with BulkUpdateQueue(conn) as bulk_q:
-            if arg.prop_name == Article.PROP_UNREAD:
-                # Need to also update sub
-                sub = first_or_none(find_subs_by_id(conn, article.subscription_id))
-                if not sub:
-                    return Error("FIXME!!").as_dict()
-                sub.unread_count += 1 if arg.is_set else -1
-                bulk_q.enqueue_flex(sub)
-            article.toggle_prop(arg.prop_name, arg.is_set)
-            bulk_q.enqueue_flex(article)
 
     return article.props
 
 @app.route('/rename', methods=['POST'])
 def rename():
-    arg = requests.RenameRequest(request.json)
-    if not arg:
-        app.logger.error(f"Invalid setProperty request {request.json}")
+    if not (arg := requests.RenameRequest(request.json)):
+        app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
-    elif not arg.id:
-        app.logger.error(f"Missing object id for {request.json}")
-        return Error("FIXME!!").as_dict()
-    # FIXME!! validate title
 
-    doc_type = FlexObject.extract_doc_type(arg.id)
-    with BulkUpdateQueue(conn) as bulk_q:
-        if doc_type == Subscription.DOC_TYPE:
-            owner_id = Subscription.extract_owner_id(arg.id)
-            if owner_id != user.id:
-                app.logger.error(f"Unauthorized sub ({owner_id}!={user.id})")
-                return Error("FIXME!!").as_dict()
-            obj = first_or_none(find_subs_by_id(conn, arg.id))
-            if not obj:
-                return Error("FIXME!!").as_dict()
-            obj.title = arg.title
-            bulk_q.enqueue_flex(obj)
-        elif doc_type == Folder.DOC_TYPE:
-            owner_id = Folder.extract_owner_id(arg.id)
-            if owner_id != user.id:
-                app.logger.error(f"Unauthorized folder ({owner_id}!={user.id})")
-                return Error("FIXME!!").as_dict()
-            obj = first_or_none(find_folders_by_id(conn, arg.id))
-            if not obj:
-                return Error("FIXME!!").as_dict()
-            obj.title = arg.title
-            bulk_q.enqueue_flex(obj)
-        else:
-            app.logger.error(f"Unrecognized doc_type: {doc_type}")
-            return Error("FIXME!!").as_dict()
+    try:
+        sync_tasks.objects_rename(
+            _create_task_context(),
+            arg.article_id,
+            arg.prop_name,
+            arg.is_set,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
+        return Error("FIXME!!").as_dict()
 
     return responses.RenameResponse(
         toc=_fetch_table_of_contents(),
@@ -224,34 +192,19 @@ def rename():
 
 @app.route('/setTags', methods=['POST'])
 def set_tags():
-    arg = requests.SetTagsRequest(request.json)
-    if not arg:
-        app.logger.error(f"Invalid setTags request {request.json}")
-        return Error("FIXME!!").as_dict()
-    elif not arg.article_id:
-        app.logger.error(f"Missing article id for {request.json}")
+    if not (arg := requests.SetTagsRequest(request.json)):
+        app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
-    new_tags = []
-    if arg.tags:
-        # Extract unique tags, after trimming each for spaces
-        new_tags = list(set([tag.strip() for tag in arg.tags]))
-        if len(new_tags) > 5:
-            app.logger.error(f"Too many tags ({len(new_tags)})")
-            return Error("FIXME!!").as_dict()
-
-    owner_id = Article.extract_owner_id(arg.article_id)
-    if owner_id != user.id:
-        app.logger.error(f"Unauthorized article ({owner_id}!={user.id})")
+    try:
+        article = sync_tasks.articles_set_tags(
+            _create_task_context(),
+            arg.article_id,
+            arg.tags,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
         return Error("FIXME!!").as_dict()
-
-    article = first_or_none(find_articles_by_id(conn, arg.article_id))
-    if not article:
-        return Error("FIXME!!").as_dict()
-
-    with BulkUpdateQueue(conn) as bulk_q:
-        article.tags = new_tags
-        bulk_q.enqueue_flex(article)
 
     return responses.SetTagsResponse(
         toc=_fetch_table_of_contents(),
@@ -260,19 +213,18 @@ def set_tags():
 
 @app.route('/createFolder', methods=['POST'])
 def create_folder():
-    arg = requests.CreateFolderRequest(request.json)
-    if not arg:
-        app.logger.error(f"Invalid createFolder request {request.json}")
-        return Error("FIXME!!").as_dict()
-    elif not arg.title:
-        app.logger.error(f"Missing title for {request.json}")
+    if not (arg := requests.CreateFolderRequest(request.json)):
+        app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
-    with BulkUpdateQueue(conn) as bulk_q:
-        folder = Folder()
-        folder.title = arg.title
-        folder.user_id = user.id
-        bulk_q.enqueue_flex(folder)
+    try:
+        sync_tasks.folders_create(
+            _create_task_context(),
+            arg.title,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
+        return Error("FIXME!!").as_dict()
 
     return responses.CreateFolderResponse(
         toc=_fetch_table_of_contents(),
@@ -280,41 +232,15 @@ def create_folder():
 
 @app.route('/moveSub', methods=['POST'])
 def move_sub():
-    arg = requests.MoveSubRequest(request.json)
-    if not arg:
+    if not (arg := requests.MoveSubRequest(request.json)):
         app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
-    elif not arg.id:
-        app.logger.error(f"Missing id")
-        return Error("FIXME!!").as_dict()
 
-    source_owner_id = Subscription.extract_owner_id(arg.id)
-    if source_owner_id != user.id:
-        app.logger.error(f"Unauthorized source ({source_owner_id}!={user.id})")
-        return Error("FIXME!!").as_dict()
-
-    if arg.destination:
-        dest_owner_id = Folder.extract_owner_id(arg.destination)
-        if dest_owner_id != user.id:
-            app.logger.error(f"Unauthorized destination ({dest_owner_id}!={user.id})")
-            return Error("FIXME!!").as_dict()
-        folder = first_or_none(find_folders_by_id(conn, arg.destination))
-        if not folder:
-            app.logger.error(f"Destination ({arg.destination}) does not exist")
-            return Error("FIXME!!").as_dict()
-
-    # Move the subscription
-    with BulkUpdateQueue(conn) as bulk_q:
-        sub = first_or_none(find_subs_by_id(conn, arg.id))
-        if not sub:
-            app.logger.error(f"Sub ({arg.id}) does not exist")
-            return Error("FIXME!!").as_dict()
-        sub.folder_id = arg.destination
-        bulk_q.enqueue_flex(sub)
-
-    # Move the articles asynchronously
-    if bulk_q.written_count > 0:
-        executor.submit(tasks.move_articles, conn, arg.id, arg.destination)
+    sync_tasks.subs_move(
+        _create_task_context(),
+        arg.id,
+        arg.destination,
+    )
 
     return responses.MoveSubResponse(
         toc=_fetch_table_of_contents(),
@@ -331,7 +257,7 @@ def remove_tag():
         return Error("FIXME!!").as_dict()
 
     # Remove tags asynchronously
-    executor.submit(tasks.remove_tag_from_articles, conn, user.id, arg.tag)
+    executor.submit(async_tasks.articles_remove_tag, _create_task_context(), arg.tag)
 
     # Remove it from the list manually
     toc = _fetch_table_of_contents()
@@ -341,81 +267,65 @@ def remove_tag():
 
 @app.route('/unsubscribe', methods=['POST'])
 def unsubscribe():
-    arg = requests.UnsubscribeRequest(request.json)
-    if not arg:
+    if not (arg := requests.UnsubscribeRequest(request.json)):
         app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
-    if not arg.id:
-        app.logger.error(f"Missing id")
-        return Error("FIXME!!").as_dict()
+    sync_tasks.subs_unsubscribe(
+        _create_task_context(),
+        arg.id,
+    )
 
-    owner_id = Subscription.extract_owner_id(arg.id)
-    if owner_id != user.id:
-        app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
-        return Error("FIXME!!").as_dict()
-
-    executor.submit(tasks.unsubscribe, conn, arg.id)
-    toc = _fetch_table_of_contents()
     # Actual deletion will happen asynchronously
+    toc = _fetch_table_of_contents()
     toc.remove_subscription(arg.id)
 
     return responses.UnsubscribeResponse(toc).as_dict()
 
 @app.route('/deleteFolder', methods=['POST'])
 def delete_folder():
-    arg = requests.DeleteFolderRequest(request.json)
-    if not arg:
+    if not (arg := requests.DeleteFolderRequest(request.json)):
         app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
-    if not arg.id:
-        app.logger.error(f"Missing id")
-        return Error("FIXME!!").as_dict()
+    sync_tasks.folders_delete(
+        _create_task_context(),
+        arg.id,
+    )
 
-    owner_id = Folder.extract_owner_id(arg.id)
-    if owner_id != user.id:
-        app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
-        return Error("FIXME!!").as_dict()
-
-    executor.submit(tasks.delete_folder, conn, arg.id)
-    toc = _fetch_table_of_contents()
     # Actual deletion will happen asynchronously
+    toc = _fetch_table_of_contents()
     toc.remove_folder(arg.id)
 
     return responses.DeleteFolderResponse(toc).as_dict()
 
 @app.route('/markAllAsRead', methods=['POST'])
 def mark_all_as_read():
-    arg = requests.MarkAllAsReadRequest(request.json)
-    if not arg:
+    if not (arg := requests.MarkAllAsReadRequest(request.json)):
         app.logger.error(f"Empty request")
         return Error("FIXME!!").as_dict()
 
     match arg.scope:
         case requests.MarkAllAsReadRequest.SCOPE_ALL:
-            executor.submit(tasks.mark_subs_read_by_user, conn, user.id)
+            executor.submit(async_tasks.subs_mark_read_by_user, _create_task_context())
         case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
             if not arg.id:
                 app.logger.error(f"Missing id")
                 return Error("FIXME!!").as_dict()
-            owner_id = Folder.extract_owner_id(arg.id)
-            if owner_id != user.id:
+            elif (owner_id := Folder.extract_owner_id(arg.id)) != user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
 
-            executor.submit(tasks.mark_subs_read_by_folder, conn, arg.id)
+            executor.submit(async_tasks.subs_mark_read_by_folder, _create_task_context(), arg.id)
         case requests.MarkAllAsReadRequest.SCOPE_SUB:
             if not arg.id:
                 app.logger.error(f"Missing id")
                 return Error("FIXME!!").as_dict()
-
-            owner_id = Subscription.extract_owner_id(arg.id)
-            if owner_id != user.id:
+            elif (owner_id := Subscription.extract_owner_id(arg.id)) != user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
                 return Error("FIXME!!").as_dict()
 
-            executor.submit(tasks.mark_sub_read, conn, arg.id)
+            executor.submit(async_tasks.subs_mark_read_by_sub, _create_task_context(), arg.id)
 
     toc = _fetch_table_of_contents()
     match arg.scope:
@@ -446,7 +356,7 @@ def sync_feeds():
         with BulkUpdateQueue(conn) as bulk_q:
             bulk_q.enqueue_flex(user)
 
-    executor.submit(tasks.sync_subs, conn, user.id)
+    executor.submit(async_tasks.subs_sync, _create_task_context())
 
     return responses.SyncFeedsResponse(
         toc=_fetch_table_of_contents(),
@@ -479,9 +389,35 @@ def import_feeds():
         app.logger.error(f"Unable to import document")
         return Error("FIXME!!").as_dict()
 
-    executor.submit(tasks.import_user_subs, conn, user.id, doc)
+    executor.submit(async_tasks.subs_import, _create_task_context(), doc)
 
     return responses.ImportFeedsResponse().as_dict()
+
+@socketio.on("connect")
+def test_connect(auth):
+    sessions = user_sessions.setdefault(user.id, [])
+    sessions.append(request.sid)
+
+    socketio.emit("fef", { "wowie": "zowie" }, to=request.sid)
+    logging.info(f"connect: {user_sessions}")
+
+@socketio.on("disconnect")
+def disconnect():
+    logging.info(f"{user_sessions}")
+
+    # Not atomic
+    if request.sid in (sessions := user_sessions.setdefault(user.id, [])):
+        sessions.remove(request.sid)
+
+    logging.info(f"connect: {user_sessions}")
+
+def _create_task_context() -> TaskContext:
+    return TaskContext(
+        conn,
+        user.id,
+        None,
+        executor.submit,
+    )
 
 def _fetch_table_of_contents() -> TableOfContents:
     subs = find_subs_by_user(conn, user.id)
@@ -500,9 +436,16 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     conn = Connection()
-    conn.connect(app.config)
+    conn.connect(
+        app.config["DATABASE_NAME"],
+        app.config["DATABASE_USERNAME"],
+        app.config["DATABASE_PASSWORD"],
+        app.config["DATABASE_HOST"],
+        app.config.get("DATABASE_PORT")
+    )
 
     user_id = find_user_id(conn, "foo")
     user = fetch_user(conn, user_id)
 
-    app.run(host='0.0.0.0', port='8080', debug=True)
+    # app.run(host='0.0.0.0', port='8080', debug=True)
+    socketio.run(app, host='0.0.0.0', port='8080', debug=True)
