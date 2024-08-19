@@ -6,6 +6,7 @@ CouchDB==1.2
 feedparser==6.0.11
 Flask==3.0.3
 Flask-Executor==1.0.0
+Flask-Login==0.6.3
 Flask-SocketIO==5.3.6
 h11==0.14.0
 itsdangerous==2.2.0

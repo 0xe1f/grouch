@@ -21,10 +21,6 @@ from datatype import Folder
 from datatype import Subscription
 from datetime import datetime
 from datetime import timedelta
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import send_file
 from flask_executor import Executor
 from flask_socketio import SocketIO
 from io import BytesIO
@@ -44,47 +40,92 @@ from store import find_user_id
 from store import find_subs_by_user
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
-from web.ext_type.objects import Article as PubArticle
-from web.ext_type.objects import Error
-from web.ext_type.objects import Folder as PubFolder
-from web.ext_type.objects import Subscription as PubSub
-from web.ext_type.objects import TableOfContents
-from web.ext_type.objects import Tag as PubTag
 from web.ext_type import requests
 from web.ext_type import responses
+import flask
+import flask_login
 import logging
 import os.path
 import port
+import re
 import tasks.async_tasks as async_tasks
 import tasks.sync_tasks as sync_tasks
 import tempfile
 import tomllib
+import web.ext_type.objects as ext_objs
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config.from_file("../config_defaults.toml", load=tomllib.load, text=False)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
 socketio = SocketIO(app)
 executor = Executor(app)
 
+login_manager = flask_login.LoginManager()
+login_manager.login_view = "/login"
+login_manager.init_app(app)
+
 user_sessions = {}
 
 FEED_SYNC_TIMEOUT = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
+REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
 
-@app.route('/')
+@login_manager.user_loader
+def load_user(user_id):
+    return ext_objs.User(user=fetch_user(conn, user_id))
+
+@app.get("/login")
+def login_get():
+    return flask.render_template(
+        "login.html",
+    )
+
+@app.post("/login")
+def login_post():
+    arg = requests.LoginRequest(flask.request.form)
+
+    try:
+        arg.validate()
+    except requests.ValidationException as e:
+        app.logger.error(e.message)
+        return ext_objs.Error("FIXME!!").as_dict()
+
+    try:
+        user = sync_tasks.users_authenticate(
+            _create_task_context(),
+            arg.username,
+            arg.password
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
+        return ext_objs.Error("FIXME!!").as_dict()
+
+    flask_login.utils.login_user(ext_objs.User(user))
+
+    if next := flask.request.args.get("next"):
+        if not REGEX_REDIRECT_URL.fullmatch(next):
+            logging.warn(f"{next} is not a valid redirection URL")
+            next = None
+
+    return flask.redirect(next or flask.url_for("/"))
+
+@app.route("/")
+@flask_login.login_required
 def index():
-    return render_template(
+    return flask.render_template(
         "index.html",
         user=user,
     )
 
-@app.route('/subscriptions')
+@app.route("/subscriptions")
+@flask_login.login_required
 def subscriptions():
     return _fetch_table_of_contents().as_dict()
 
-@app.route('/articles')
+@app.route("/articles")
+@flask_login.login_required
 def articles():
-    arg = requests.ArticlesRequest(request.args)
+    arg = requests.ArticlesRequest(flask.request.args)
 
     start = None
     if arg.start:
@@ -107,11 +148,12 @@ def articles():
     entry_map = { entry.id:entry for entry in entries }
 
     return responses.ArticlesResponse(
-        articles=[PubArticle(article=article, entry=entry_map[article.entry_id]) for article in articles],
+        articles=[ext_objs.Article(article=article, entry=entry_map[article.entry_id]) for article in articles],
         next_start=obfuscate_json(next_start) if next_start else None,
     ).as_dict()
 
-@app.route('/exportOpml')
+@app.route("/exportOpml")
+@flask_login.login_required
 def export_opml():
     subs = find_subs_by_user(conn, user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
@@ -123,21 +165,22 @@ def export_opml():
         folders=find_folders_by_user(conn, user.id),
     )
 
-    return send_file(
+    return flask.send_file(
         BytesIO(output.encode()),
         as_attachment=True,
         download_name="subscriptions.xml",
         mimetype="application/xml",
     )
 
-@app.route('/subscribe', methods=['POST'])
+@app.route("/subscribe", methods=["POST"])
+@flask_login.login_required
 def subscribe():
-    if not (arg := requests.SubscribeRequest(request.json)):
+    if not (arg := requests.SubscribeRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
     elif not arg.url:
         app.logger.error(f"Missing URL")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     # FIXME: validate url
 
@@ -146,11 +189,12 @@ def subscribe():
 
     return responses.SubscribeResponse().as_dict()
 
-@app.route('/setProperty', methods=['POST'])
+@app.route("/setProperty", methods=["POST"])
+@flask_login.login_required
 def set_property():
-    if not (arg := requests.SetPropertyRequest(request.json)):
+    if not (arg := requests.SetPropertyRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     try:
         article = sync_tasks.articles_set_property(
@@ -161,15 +205,16 @@ def set_property():
         )
     except TaskException as e:
         app.logger.error(e.message)
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     return article.props
 
-@app.route('/rename', methods=['POST'])
+@app.route("/rename", methods=["POST"])
+@flask_login.login_required
 def rename():
-    if not (arg := requests.RenameRequest(request.json)):
+    if not (arg := requests.RenameRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     try:
         sync_tasks.objects_rename(
@@ -180,17 +225,18 @@ def rename():
         )
     except TaskException as e:
         app.logger.error(e.message)
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     return responses.RenameResponse(
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route('/setTags', methods=['POST'])
+@app.route("/setTags", methods=["POST"])
+@flask_login.login_required
 def set_tags():
-    if not (arg := requests.SetTagsRequest(request.json)):
+    if not (arg := requests.SetTagsRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     try:
         article = sync_tasks.articles_set_tags(
@@ -200,18 +246,19 @@ def set_tags():
         )
     except TaskException as e:
         app.logger.error(e.message)
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     return responses.SetTagsResponse(
         toc=_fetch_table_of_contents(),
         tags=article.tags,
     ).as_dict()
 
-@app.route('/createFolder', methods=['POST'])
+@app.route("/createFolder", methods=["POST"])
+@flask_login.login_required
 def create_folder():
-    if not (arg := requests.CreateFolderRequest(request.json)):
+    if not (arg := requests.CreateFolderRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     try:
         sync_tasks.folders_create(
@@ -220,17 +267,18 @@ def create_folder():
         )
     except TaskException as e:
         app.logger.error(e.message)
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     return responses.CreateFolderResponse(
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route('/moveSub', methods=['POST'])
+@app.route("/moveSub", methods=["POST"])
+@flask_login.login_required
 def move_sub():
-    if not (arg := requests.MoveSubRequest(request.json)):
+    if not (arg := requests.MoveSubRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     sync_tasks.subs_move(
         _create_task_context(),
@@ -242,15 +290,16 @@ def move_sub():
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route('/removeTag', methods=['POST'])
+@app.route("/removeTag", methods=["POST"])
+@flask_login.login_required
 def remove_tag():
-    arg = requests.RemoveTagRequest(request.json)
+    arg = requests.RemoveTagRequest(flask.request.json)
     if not arg:
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
     elif not arg.tag:
         app.logger.error(f"Missing tag")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     # Remove tags asynchronously
     executor.submit(async_tasks.articles_remove_tag, _create_task_context(), arg.tag)
@@ -261,11 +310,12 @@ def remove_tag():
 
     return responses.MoveSubResponse(toc).as_dict()
 
-@app.route('/unsubscribe', methods=['POST'])
+@app.route("/unsubscribe", methods=["POST"])
+@flask_login.login_required
 def unsubscribe():
-    if not (arg := requests.UnsubscribeRequest(request.json)):
+    if not (arg := requests.UnsubscribeRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     sync_tasks.subs_unsubscribe(
         _create_task_context(),
@@ -278,11 +328,12 @@ def unsubscribe():
 
     return responses.UnsubscribeResponse(toc).as_dict()
 
-@app.route('/deleteFolder', methods=['POST'])
+@app.route("/deleteFolder", methods=["POST"])
+@flask_login.login_required
 def delete_folder():
-    if not (arg := requests.DeleteFolderRequest(request.json)):
+    if not (arg := requests.DeleteFolderRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     sync_tasks.folders_delete(
         _create_task_context(),
@@ -295,11 +346,12 @@ def delete_folder():
 
     return responses.DeleteFolderResponse(toc).as_dict()
 
-@app.route('/markAllAsRead', methods=['POST'])
+@app.route("/markAllAsRead", methods=["POST"])
+@flask_login.login_required
 def mark_all_as_read():
-    if not (arg := requests.MarkAllAsReadRequest(request.json)):
+    if not (arg := requests.MarkAllAsReadRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     match arg.scope:
         case requests.MarkAllAsReadRequest.SCOPE_ALL:
@@ -307,19 +359,19 @@ def mark_all_as_read():
         case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
             if not arg.id:
                 app.logger.error(f"Missing id")
-                return Error("FIXME!!").as_dict()
+                return ext_objs.Error("FIXME!!").as_dict()
             elif (owner_id := Folder.extract_owner_id(arg.id)) != user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
-                return Error("FIXME!!").as_dict()
+                return ext_objs.Error("FIXME!!").as_dict()
 
             executor.submit(async_tasks.subs_mark_read_by_folder, _create_task_context(), arg.id)
         case requests.MarkAllAsReadRequest.SCOPE_SUB:
             if not arg.id:
                 app.logger.error(f"Missing id")
-                return Error("FIXME!!").as_dict()
+                return ext_objs.Error("FIXME!!").as_dict()
             elif (owner_id := Subscription.extract_owner_id(arg.id)) != user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
-                return Error("FIXME!!").as_dict()
+                return ext_objs.Error("FIXME!!").as_dict()
 
             executor.submit(async_tasks.subs_mark_read_by_sub, _create_task_context(), arg.id)
 
@@ -334,7 +386,8 @@ def mark_all_as_read():
 
     return responses.MarkAllAsReadResponse(toc).as_dict()
 
-@app.route('/syncFeeds', methods=['POST'])
+@app.route("/syncFeeds", methods=["POST"])
+@flask_login.login_required
 def sync_feeds():
     now = datetime.now()
     if last_sync := user.last_sync:
@@ -359,21 +412,22 @@ def sync_feeds():
         next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).timestamp(),
     ).as_dict()
 
-@app.route('/importFeeds', methods=['POST'])
+@app.route("/importFeeds", methods=["POST"])
+@flask_login.login_required
 def import_feeds():
     # Check individual files
-    if "file" not in request.files:
+    if "file" not in flask.request.files:
         app.logger.error(f"No file in request")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
-    if not (file := request.files["file"]) or file.filename == "":
+    if not (file := flask.request.files["file"]) or file.filename == "":
         app.logger.error(f"No filename in file")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     _, ext = os.path.splitext(file.filename)
     if ext not in UPLOAD_ALLOWED_TYPES:
         app.logger.error(f"Unsupported file type: '{ext}'")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     with tempfile.TemporaryFile() as tmp:
         file.save(tmp)
@@ -383,7 +437,7 @@ def import_feeds():
 
     if not doc:
         app.logger.error(f"Unable to import document")
-        return Error("FIXME!!").as_dict()
+        return ext_objs.Error("FIXME!!").as_dict()
 
     executor.submit(async_tasks.subs_import, _create_task_context(), doc)
 
@@ -392,9 +446,9 @@ def import_feeds():
 @socketio.on("connect")
 def test_connect(auth):
     sessions = user_sessions.setdefault(user.id, [])
-    sessions.append(request.sid)
+    sessions.append(flask.request.sid)
 
-    socketio.emit("fef", { "wowie": "zowie" }, to=request.sid)
+    socketio.emit("fef", { "wowie": "zowie" }, to=flask.request.sid)
     logging.info(f"connect: {user_sessions}")
 
 @socketio.on("disconnect")
@@ -402,8 +456,8 @@ def disconnect():
     logging.info(f"{user_sessions}")
 
     # Not atomic
-    if request.sid in (sessions := user_sessions.setdefault(user.id, [])):
-        sessions.remove(request.sid)
+    if flask.request.sid in (sessions := user_sessions.setdefault(user.id, [])):
+        sessions.remove(flask.request.sid)
 
     logging.info(f"connect: {user_sessions}")
 
@@ -415,17 +469,17 @@ def _create_task_context() -> TaskContext:
         executor.submit,
     )
 
-def _fetch_table_of_contents() -> TableOfContents:
+def _fetch_table_of_contents() -> ext_objs.TableOfContents:
     subs = find_subs_by_user(conn, user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
     folders = find_folders_by_user(conn, user.id)
     feed_map = { feed.id:feed for feed in feeds }
     tags = find_tags_by_user(conn, user.id)
 
-    return TableOfContents(
-        subs=[PubSub(sub, feed_map[sub.feed_id]) for sub in subs],
-        folders=[PubFolder(folder) for folder in folders],
-        tags=[PubTag(tag) for tag in tags],
+    return ext_objs.TableOfContents(
+        subs=[ext_objs.Subscription(sub, feed_map[sub.feed_id]) for sub in subs],
+        folders=[ext_objs.Folder(folder) for folder in folders],
+        tags=[ext_objs.Tag(tag) for tag in tags],
     )
 
 if __name__ == '__main__':

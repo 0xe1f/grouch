@@ -42,14 +42,6 @@ class User(FlexObject):
         self.set_prop("hashed_password", val)
 
     @property
-    def salt(self) -> str:
-        return self.get_prop("salt")
-
-    @salt.setter
-    def salt(self, val: str):
-        self.set_prop("salt", val)
-
-    @property
     def email_address(self) -> str:
         return self.get_prop("email_address")
 
@@ -75,7 +67,9 @@ class User(FlexObject):
 
     def set_hashed_password(self, plaintext: str, salt: bytes):
         self.hashed_password = bcrypt.hashpw(plaintext.encode(), salt).hex()
-        self.salt = salt.hex()
+
+    def plaintext_matching_stored(self, plaintext: str) -> bool:
+        return bcrypt.checkpw(plaintext.encode(), bytes.fromhex(self.hashed_password))
 
     def new_key(self) -> str|None:
         if not self.username:

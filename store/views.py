@@ -35,3 +35,4 @@ SUBS_BY_USER_BY_SYNC = "maint/subs_by_user"
 TAGS_BY_USER = "maint/tags_by_user"
 
 USERS_BY_EMAIL = "maint/users_by_email"
+USERS_BY_USERNAME = "maint/users_by_username"

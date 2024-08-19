@@ -45,4 +45,5 @@ from store.subscriptions import generate_subscriptions_by_user
 from store.tags import find_tags_by_user
 from store.users import create_user
 from store.users import fetch_user
+from store.users import find_user_by_username
 from store.users import find_user_id

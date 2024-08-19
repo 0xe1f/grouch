@@ -13,8 +13,17 @@
 # limitations under the License.
 
 from web.ext_type.objects import JsonObject
+from web.ext_type.objects import ValidationException
 
-class ArticlesRequest(JsonObject):
+class RequestObject(JsonObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    def validate(self):
+        pass
+
+class ArticlesRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -39,7 +48,7 @@ class ArticlesRequest(JsonObject):
     def tag(self) -> str:
         return self.get_prop("tag")
 
-class CreateFolderRequest(JsonObject):
+class CreateFolderRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -48,7 +57,7 @@ class CreateFolderRequest(JsonObject):
     def title(self) -> str:
         return self.get_prop("title")
 
-class DeleteFolderRequest(JsonObject):
+class DeleteFolderRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -57,7 +66,7 @@ class DeleteFolderRequest(JsonObject):
     def id(self) -> str:
         return self.get_prop("id")
 
-class MarkAllAsReadRequest(JsonObject):
+class MarkAllAsReadRequest(RequestObject):
 
     SCOPE_ALL = "all"
     SCOPE_SUB = "subscription"
@@ -74,7 +83,7 @@ class MarkAllAsReadRequest(JsonObject):
     def scope(self) -> str:
         return self.get_prop("scope")
 
-class MoveSubRequest(JsonObject):
+class MoveSubRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -87,7 +96,7 @@ class MoveSubRequest(JsonObject):
     def destination(self) -> str:
         return self.get_prop("destination")
 
-class RemoveTagRequest(JsonObject):
+class RemoveTagRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -96,7 +105,7 @@ class RemoveTagRequest(JsonObject):
     def tag(self) -> str:
         return self.get_prop("tag")
 
-class RenameRequest(JsonObject):
+class RenameRequest(RequestObject):
 
     def __init__(self, source: dict={}):
         super().__init__(source)
@@ -109,7 +118,7 @@ class RenameRequest(JsonObject):
     def title(self) -> str:
         return self.get_prop("title")
 
-class SetPropertyRequest(JsonObject):
+class SetPropertyRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -126,7 +135,7 @@ class SetPropertyRequest(JsonObject):
     def is_set(self) -> bool:
         return self.get_prop("set")
 
-class SetTagsRequest(JsonObject):
+class SetTagsRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -139,7 +148,7 @@ class SetTagsRequest(JsonObject):
     def tags(self) -> list[str]:
         return self.get_prop("tags")
 
-class SubscribeRequest(JsonObject):
+class SubscribeRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -152,7 +161,7 @@ class SubscribeRequest(JsonObject):
     def folder_id(self) -> str:
         return self.get_prop("folderId")
 
-class UnsubscribeRequest(JsonObject):
+class UnsubscribeRequest(RequestObject):
 
     def __init__(self, source: dict[str, str]={}):
         super().__init__(source)
@@ -160,3 +169,22 @@ class UnsubscribeRequest(JsonObject):
     @property
     def id(self) -> str:
         return self.get_prop("id")
+
+class LoginRequest(RequestObject):
+
+    def __init__(self, source: dict[str, str]={}):
+        super().__init__(source)
+
+    @property
+    def username(self) -> str:
+        return self.get_prop("username")
+
+    @property
+    def password(self) -> str:
+        return self.get_prop("password")
+
+    def validate(self):
+        if not self.username:
+            raise ValidationException("Missing username")
+        if not self.password:
+            raise ValidationException("Missing password")

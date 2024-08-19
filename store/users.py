@@ -20,6 +20,12 @@ from store.connection import Connection
 from store import views
 import logging
 
+def find_user_by_username(conn: Connection, username: str) -> User:
+    for item in conn.db.view(views.USERS_BY_USERNAME, key=username, include_docs=True):
+        return User(item.doc)
+
+    return None
+
 def find_user_id(conn: Connection, username: str) -> str:
     item_id = build_key("user", username)
     if conn.db.get(item_id):

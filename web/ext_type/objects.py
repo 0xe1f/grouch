@@ -230,3 +230,39 @@ class TableOfContents(JsonObject):
             sub.unread_count = 0
             subs.append(sub.as_dict())
         self.set_prop("subscriptions", subs)
+
+class User(JsonObject):
+
+    def __init__(self, user: datatype.User|None=None, source: dict={}):
+        super().__init__(source)
+        if user:
+            self.set_prop("id", user.id)
+
+    @property
+    def id(self) -> str:
+        return self._doc.get("id")
+
+    @property
+    def is_authenticated(self) -> str:
+        return not not self.id
+
+    @property
+    def is_active(self) -> str:
+        return self.is_authenticated
+
+    @property
+    def is_anonymous(self) -> str:
+        return not self.is_authenticated
+
+    def get_id(self):
+        return self._doc.get("id")
+
+class ValidationException(BaseException):
+
+    def __init__(self, message: str, *args: object) -> None:
+        super().__init__(*args)
+        self._message = message
+
+    @property
+    def message(self) -> str|None:
+        return self._message

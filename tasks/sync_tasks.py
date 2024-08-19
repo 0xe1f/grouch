@@ -17,11 +17,12 @@ from datatype import Article
 from datatype import FlexObject
 from datatype import Folder
 from datatype import Subscription
-from datetime import datetime
+from datatype import User
 from store import BulkUpdateQueue
 from store import find_articles_by_id
 from store import find_folders_by_id
 from store import find_subs_by_id
+from store import find_user_by_username
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
 import tasks.async_tasks as async_tasks
@@ -197,3 +198,17 @@ def subs_unsubscribe(
 
     # Clean up asynchronously
     task_context.queue_async(async_tasks.subs_unsubscribe, task_context, sub_id)
+
+# User
+
+def users_authenticate(
+    task_context: TaskContext,
+    username: str,
+    password: str,
+) -> User:
+    if not (user := find_user_by_username(task_context.connection, username)):
+        raise TaskException("User not found")
+    elif not user.plaintext_matching_stored(password):
+        raise TaskException("Password mismatch")
+
+    return user

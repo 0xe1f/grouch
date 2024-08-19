@@ -8,4 +8,4 @@ DATABASE_PORT = "<couchdb database port - defaults to 5984>"
 
 # Security
 
-SECRET_KEY = "secret!"
+SECRET_KEY = "<CHANGE THIS VALUE!>"

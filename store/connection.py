@@ -18,7 +18,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 1
+_SCHEMA_VERSION_CURRENT = 2
 
 class Connection:
 
@@ -53,159 +53,175 @@ class Connection:
 
     def update_schema(self, from_ver: int):
         design_doc = self.get_design_doc("maint")
-        self.add_views(
-            design_doc,
-            updated_feeds={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'feed') {
-                            emit(doc.updated);
+        if from_ver < 1:
+            self.add_views(
+                design_doc,
+                updated_feeds={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.updated);
+                            }
                         }
-                    }
-                """
-            },
-            users_by_email={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'user') {
-                            emit(doc.email_address);
+                    """
+                },
+                users_by_email={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'user') {
+                                emit(doc.email_address);
+                            }
                         }
-                    }
-                """,
-                "reduce": "_count"
-            },
-            feeds_by_url={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'feed') {
-                            emit(doc.feed_url, doc.title);
+                    """,
+                    "reduce": "_count"
+                },
+                feeds_by_url={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.feed_url, doc.title);
+                            }
                         }
-                    }
-                """
-            },
-            folders_by_user={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'folder') {
-                            emit(doc.user_id);
+                    """
+                },
+                folders_by_user={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'folder') {
+                                emit(doc.user_id);
+                            }
                         }
-                    }
-                """
-            },
-            entries_by_feed={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'entry') {
-                            emit([doc.feed_id, doc.entry_uid]);
+                    """
+                },
+                entries_by_feed={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'entry') {
+                                emit([doc.feed_id, doc.entry_uid]);
+                            }
                         }
-                    }
-                """
-            },
-            entries_by_feed_updated={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'entry') {
-                            emit([doc.feed_id, doc.updated]);
+                    """
+                },
+                entries_by_feed_updated={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'entry') {
+                                emit([doc.feed_id, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            subs_by_user={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'sub') {
-                            emit([ doc.user_id, doc.last_synced ], { "feed_id": doc.feed_id, "folder_id": doc.folder_id, "last_sync": doc.last_synced });
+                    """
+                },
+                subs_by_user={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub') {
+                                emit([ doc.user_id, doc.last_synced ], { "feed_id": doc.feed_id, "folder_id": doc.folder_id, "last_sync": doc.last_synced });
+                            }
                         }
-                    }
-                """
-            },
-            subs_by_folder={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'sub' && doc.folder_id) {
-                            emit(doc.folder_id);
+                    """
+                },
+                subs_by_folder={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub' && doc.folder_id) {
+                                emit(doc.folder_id);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_user={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article') {
-                            emit([doc.user_id, doc.published, doc.updated]);
+                    """
+                },
+                articles_by_user={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.user_id, doc.published, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_sub={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article') {
-                            emit([doc.subscription_id, doc.published, doc.updated]);
+                    """
+                },
+                articles_by_sub={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                emit([doc.subscription_id, doc.published, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_sub_unread={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article' && doc.props.includes('unread')) {
-                            emit([doc.subscription_id, doc.published, doc.updated]);
+                    """
+                },
+                articles_by_sub_unread={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article' && doc.props.includes('unread')) {
+                                emit([doc.subscription_id, doc.published, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_folder={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article' && doc.folder_id) {
-                            emit([doc.folder_id, doc.published, doc.updated]);
+                    """
+                },
+                articles_by_folder={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article' && doc.folder_id) {
+                                emit([doc.folder_id, doc.published, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_folder_unread={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article' && doc.folder_id && doc.props.includes('unread')) {
-                            emit([doc.folder_id, doc.published, doc.updated]);
+                    """
+                },
+                articles_by_folder_unread={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article' && doc.folder_id && doc.props.includes('unread')) {
+                                emit([doc.folder_id, doc.published, doc.updated]);
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_prop={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article') {
-                            doc.props.forEach((prop) => {
-                                emit([doc.user_id, prop, doc.published, doc.updated])
-                            });
+                    """
+                },
+                articles_by_prop={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                doc.props.forEach((prop) => {
+                                    emit([doc.user_id, prop, doc.published, doc.updated])
+                                });
+                            }
                         }
-                    }
-                """
-            },
-            articles_by_tag={
-                "map": """
-                    function (doc) {
-                        if (doc.doc_type == 'article') {
+                    """
+                },
+                articles_by_tag={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article') {
+                                doc.tags.forEach((tag) => {
+                                    emit([doc.user_id, tag, doc.published, doc.updated])
+                                });
+                            }
+                        }
+                    """
+                },
+                tags_by_user={
+                    "map": """
+                        function (doc) {
                             doc.tags.forEach((tag) => {
-                                emit([doc.user_id, tag, doc.published, doc.updated])
+                                emit([doc.user_id, tag])
                             });
                         }
-                    }
-                """
-            },
-            tags_by_user={
-                "map": """
-                    function (doc) {
-                        doc.tags.forEach((tag) => {
-                            emit([doc.user_id, tag])
-                        });
-                    }
-                """,
-                "reduce": "_count"
-            },
-        )
+                    """,
+                    "reduce": "_count"
+                },
+            )
+        if from_ver < 2:
+            self.add_views(
+                design_doc,
+                users_by_username={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'user') {
+                                emit(doc.username);
+                            }
+                        }
+                    """,
+                    "reduce": "_count"
+                },
+            )
+
         self.save_design_doc(design_doc)
 
     def get_design_doc(self, design_doc_name: str):
