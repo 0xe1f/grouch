@@ -1922,8 +1922,9 @@
             var delta = now - lastRefresh;
 
             if (delta < 60000) {
-                if (console && console.debug)
-                    console.debug("Ignoring sync request (last sync " + (delta / 1000) + "s ago)");
+                if (console && console.debug) {
+                    console.debug(`Ignoring sync request (last sync ${delta / 1000}s ago)`);
+                }
 
                 return; // No need to sync yet
             }
@@ -1933,8 +1934,9 @@
                 timeoutId = -1;
             }
 
-            if (console && console.debug)
-                console.debug("Synchronizing feeds (last sync " + (delta / 1000) + "s ago)");
+            if (console && console.debug) {
+                console.debug(`Synchronizing feeds (last sync ${delta / 1000}s ago)`);
+            }
 
             lastRefresh = now;
 
@@ -1945,11 +1947,8 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response.subscriptions) {
-                        resetSubscriptionDom(response.subscriptions, false);
-                    }
                     if (console && console.debug) {
-                        console.debug("Refresh succeeded");
+                        console.debug(`Next sync: ${response.nextSync}`);
                     }
                 }
             });
@@ -1959,7 +1958,7 @@
     const socket = io();
     socket
         .on("connect", function() {
-            socket.emit('my event', {data: 'I\'m connected!'});
+            console.debug("Connected");
         });
 
     ui.init();

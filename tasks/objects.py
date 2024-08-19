@@ -21,21 +21,17 @@ class TaskContext:
             self,
             conn: Connection,
             user_id: str|None=None,
-            session_id: str|None=None,
             async_q: Callable|None=None,
+            message_sender: Callable|None=None,
         ):
         self._conn = conn
         self._user_id = user_id
-        self._session_id = session_id
         self._async_q = async_q
+        self._message_sender = message_sender
 
     @property
     def connection(self) -> str|None:
         return self._conn
-
-    @property
-    def session_id(self) -> str|None:
-        return self._session_id
 
     @property
     def user_id(self) -> str|None:
@@ -45,6 +41,11 @@ class TaskContext:
         if not self._async_q:
             raise TaskException("No task enqueuer defined")
         self._async_q(fn, *args, **kwargs)
+
+    def send_message(self, name: str, payload):
+        if not self._message_sender:
+            raise TaskException("No message sender defined")
+        self._message_sender(name, payload)
 
 class TaskException(BaseException):
     def __init__(self, message: str, *args: object) -> None:

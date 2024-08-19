@@ -102,10 +102,9 @@ class SubscribeResponse(JsonObject):
 
 class SyncFeedsResponse(JsonObject):
 
-    def __init__(self, toc: TableOfContents|None=None, next_sync: str|None=None):
+    def __init__(self, next_sync: str|None=None):
         super().__init__(
             {
-                "subscriptions": toc.as_dict() if toc else None,
                 "nextSync": next_sync,
             },
         )

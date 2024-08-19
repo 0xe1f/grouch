@@ -237,10 +237,20 @@ class User(JsonObject):
         super().__init__(source)
         if user:
             self.set_prop("id", user.id)
+            self.set_prop("username", user.username)
+            self.set_prop("email_address", user.email_address)
 
     @property
     def id(self) -> str:
         return self._doc.get("id")
+
+    @property
+    def username(self) -> str:
+        return self._doc.get("username")
+
+    @property
+    def email_address(self) -> str:
+        return self._doc.get("email_address")
 
     @property
     def is_authenticated(self) -> str:

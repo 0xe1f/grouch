@@ -20,11 +20,9 @@ from datatype import Article
 from datatype import Folder
 from datatype import Subscription
 from datetime import datetime
-from datetime import timedelta
 from flask_executor import Executor
-from flask_socketio import SocketIO
+from flask_login import current_user
 from io import BytesIO
-from store import BulkUpdateQueue
 from store import Connection
 from store import fetch_user
 from store import find_articles_by_folder
@@ -36,7 +34,6 @@ from store import find_entries_by_id
 from store import find_feeds_by_id
 from store import find_folders_by_user
 from store import find_tags_by_user
-from store import find_user_id
 from store import find_subs_by_user
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
@@ -44,6 +41,7 @@ from web.ext_type import requests
 from web.ext_type import responses
 import flask
 import flask_login
+import flask_socketio
 import logging
 import os.path
 import port
@@ -57,16 +55,14 @@ import web.ext_type.objects as ext_objs
 app = flask.Flask(__name__)
 app.config.from_file("../config_defaults.toml", load=tomllib.load, text=False)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
-socketio = SocketIO(app)
+socketio = flask_socketio.SocketIO(app)
 executor = Executor(app)
 
 login_manager = flask_login.LoginManager()
 login_manager.login_view = "/login"
 login_manager.init_app(app)
 
-user_sessions = {}
-
-FEED_SYNC_TIMEOUT = 600 # 10 min
+FEED_SYNC_TIMEOUT_SECS = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
 REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
 
@@ -109,20 +105,19 @@ def login_post():
 
     return flask.redirect(next or flask.url_for("/"))
 
-@app.route("/")
+@app.get("/")
 @flask_login.login_required
 def index():
     return flask.render_template(
         "index.html",
-        user=user,
     )
 
-@app.route("/subscriptions")
+@app.get("/subscriptions")
 @flask_login.login_required
 def subscriptions():
     return _fetch_table_of_contents().as_dict()
 
-@app.route("/articles")
+@app.get("/articles")
 @flask_login.login_required
 def articles():
     arg = requests.ArticlesRequest(flask.request.args)
@@ -138,11 +133,11 @@ def articles():
         unread_only = arg.prop == Article.PROP_UNREAD
         articles, next_start = find_articles_by_sub(conn, arg.sub, start, unread_only=unread_only)
     elif arg.prop:
-        articles, next_start = find_articles_by_prop(conn, user.id, arg.prop, start)
+        articles, next_start = find_articles_by_prop(conn, current_user.id, arg.prop, start)
     elif arg.tag:
-        articles, next_start = find_articles_by_tag(conn, user.id, arg.tag, start)
+        articles, next_start = find_articles_by_tag(conn, current_user.id, arg.tag, start)
     else:
-        articles, next_start = find_articles_by_user(conn, user.id, start)
+        articles, next_start = find_articles_by_user(conn, current_user.id, start)
 
     entries = find_entries_by_id(conn, *[article.entry_id for article in articles])
     entry_map = { entry.id:entry for entry in entries }
@@ -152,17 +147,17 @@ def articles():
         next_start=obfuscate_json(next_start) if next_start else None,
     ).as_dict()
 
-@app.route("/exportOpml")
+@app.get("/exportOpml")
 @flask_login.login_required
 def export_opml():
-    subs = find_subs_by_user(conn, user.id)
+    subs = find_subs_by_user(conn, current_user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
     feed_map = { feed.id:feed for feed in feeds }
 
     output = port.export_opml(
-        title=f"{user.username} subscriptions in grouch",
+        title=f"{current_user.username} subscriptions in grouch",
         subs=[(sub, feed_map[sub.feed_id]) for sub in subs],
-        folders=find_folders_by_user(conn, user.id),
+        folders=find_folders_by_user(conn, current_user.id),
     )
 
     return flask.send_file(
@@ -172,7 +167,7 @@ def export_opml():
         mimetype="application/xml",
     )
 
-@app.route("/subscribe", methods=["POST"])
+@app.post("/subscribe")
 @flask_login.login_required
 def subscribe():
     if not (arg := requests.SubscribeRequest(flask.request.json)):
@@ -189,7 +184,7 @@ def subscribe():
 
     return responses.SubscribeResponse().as_dict()
 
-@app.route("/setProperty", methods=["POST"])
+@app.post("/setProperty")
 @flask_login.login_required
 def set_property():
     if not (arg := requests.SetPropertyRequest(flask.request.json)):
@@ -209,7 +204,7 @@ def set_property():
 
     return article.props
 
-@app.route("/rename", methods=["POST"])
+@app.post("/rename")
 @flask_login.login_required
 def rename():
     if not (arg := requests.RenameRequest(flask.request.json)):
@@ -231,7 +226,7 @@ def rename():
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route("/setTags", methods=["POST"])
+@app.post("/setTags")
 @flask_login.login_required
 def set_tags():
     if not (arg := requests.SetTagsRequest(flask.request.json)):
@@ -253,7 +248,7 @@ def set_tags():
         tags=article.tags,
     ).as_dict()
 
-@app.route("/createFolder", methods=["POST"])
+@app.post("/createFolder")
 @flask_login.login_required
 def create_folder():
     if not (arg := requests.CreateFolderRequest(flask.request.json)):
@@ -273,7 +268,7 @@ def create_folder():
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route("/moveSub", methods=["POST"])
+@app.post("/moveSub")
 @flask_login.login_required
 def move_sub():
     if not (arg := requests.MoveSubRequest(flask.request.json)):
@@ -290,7 +285,7 @@ def move_sub():
         toc=_fetch_table_of_contents(),
     ).as_dict()
 
-@app.route("/removeTag", methods=["POST"])
+@app.post("/removeTag")
 @flask_login.login_required
 def remove_tag():
     arg = requests.RemoveTagRequest(flask.request.json)
@@ -310,7 +305,7 @@ def remove_tag():
 
     return responses.MoveSubResponse(toc).as_dict()
 
-@app.route("/unsubscribe", methods=["POST"])
+@app.post("/unsubscribe")
 @flask_login.login_required
 def unsubscribe():
     if not (arg := requests.UnsubscribeRequest(flask.request.json)):
@@ -328,7 +323,7 @@ def unsubscribe():
 
     return responses.UnsubscribeResponse(toc).as_dict()
 
-@app.route("/deleteFolder", methods=["POST"])
+@app.post("/deleteFolder")
 @flask_login.login_required
 def delete_folder():
     if not (arg := requests.DeleteFolderRequest(flask.request.json)):
@@ -346,7 +341,7 @@ def delete_folder():
 
     return responses.DeleteFolderResponse(toc).as_dict()
 
-@app.route("/markAllAsRead", methods=["POST"])
+@app.post("/markAllAsRead")
 @flask_login.login_required
 def mark_all_as_read():
     if not (arg := requests.MarkAllAsReadRequest(flask.request.json)):
@@ -360,8 +355,8 @@ def mark_all_as_read():
             if not arg.id:
                 app.logger.error(f"Missing id")
                 return ext_objs.Error("FIXME!!").as_dict()
-            elif (owner_id := Folder.extract_owner_id(arg.id)) != user.id:
-                app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+            elif (owner_id := Folder.extract_owner_id(arg.id)) != current_user.id:
+                app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
             executor.submit(async_tasks.subs_mark_read_by_folder, _create_task_context(), arg.id)
@@ -369,8 +364,8 @@ def mark_all_as_read():
             if not arg.id:
                 app.logger.error(f"Missing id")
                 return ext_objs.Error("FIXME!!").as_dict()
-            elif (owner_id := Subscription.extract_owner_id(arg.id)) != user.id:
-                app.logger.error(f"Unauthorized object ({owner_id}!={user.id})")
+            elif (owner_id := Subscription.extract_owner_id(arg.id)) != current_user.id:
+                app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
             executor.submit(async_tasks.subs_mark_read_by_sub, _create_task_context(), arg.id)
@@ -386,33 +381,24 @@ def mark_all_as_read():
 
     return responses.MarkAllAsReadResponse(toc).as_dict()
 
-@app.route("/syncFeeds", methods=["POST"])
+@app.post("/syncFeeds")
 @flask_login.login_required
 def sync_feeds():
-    now = datetime.now()
-    if last_sync := user.last_sync:
-        last_sync_dt = datetime.fromtimestamp(last_sync)
-        delta = now - last_sync_dt
-        if delta.total_seconds() < FEED_SYNC_TIMEOUT:
-            return responses.SyncFeedsResponse(
-                next_sync=(now + delta).timestamp(),
-            ).as_dict()
-        else:
-           last_sync = None
-
-    if not last_sync:
-        user.last_sync = now.timestamp()
-        with BulkUpdateQueue(conn) as bulk_q:
-            bulk_q.enqueue_flex(user)
-
-    executor.submit(async_tasks.subs_sync, _create_task_context())
+    try:
+        next_sync = sync_tasks.subs_sync(
+            _create_task_context(),
+            datetime.now(),
+            FEED_SYNC_TIMEOUT_SECS,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
+        return ext_objs.Error("FIXME!!").as_dict()
 
     return responses.SyncFeedsResponse(
-        toc=_fetch_table_of_contents(),
-        next_sync=(now + timedelta(seconds=FEED_SYNC_TIMEOUT)).timestamp(),
+        next_sync=next_sync.isoformat(),
     ).as_dict()
 
-@app.route("/importFeeds", methods=["POST"])
+@app.post("/importFeeds")
 @flask_login.login_required
 def import_feeds():
     # Check individual files
@@ -444,43 +430,46 @@ def import_feeds():
     return responses.ImportFeedsResponse().as_dict()
 
 @socketio.on("connect")
-def test_connect(auth):
-    sessions = user_sessions.setdefault(user.id, [])
-    sessions.append(flask.request.sid)
+def socketio_connect():
+    if not current_user.is_authenticated:
+        logging.warning("Unauthenticated user; disconnecting")
+        socketio.disconnect()
+        return False
 
-    socketio.emit("fef", { "wowie": "zowie" }, to=flask.request.sid)
-    logging.info(f"connect: {user_sessions}")
+    flask_socketio.join_room(current_user.id)
+    app.logger.debug(f"Connected; joined {current_user.id}")
 
 @socketio.on("disconnect")
-def disconnect():
-    logging.info(f"{user_sessions}")
-
-    # Not atomic
-    if flask.request.sid in (sessions := user_sessions.setdefault(user.id, [])):
-        sessions.remove(flask.request.sid)
-
-    logging.info(f"connect: {user_sessions}")
+def socketio_disconnect():
+    flask_socketio.leave_room(current_user.id)
+    app.logger.debug("Disconnected")
 
 def _create_task_context() -> TaskContext:
     return TaskContext(
         conn,
-        user.id,
-        None,
+        current_user.id,
         executor.submit,
+        _send_message,
     )
 
 def _fetch_table_of_contents() -> ext_objs.TableOfContents:
-    subs = find_subs_by_user(conn, user.id)
+    subs = find_subs_by_user(conn, current_user.id)
     feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
-    folders = find_folders_by_user(conn, user.id)
+    folders = find_folders_by_user(conn, current_user.id)
     feed_map = { feed.id:feed for feed in feeds }
-    tags = find_tags_by_user(conn, user.id)
+    tags = find_tags_by_user(conn, current_user.id)
 
     return ext_objs.TableOfContents(
         subs=[ext_objs.Subscription(sub, feed_map[sub.feed_id]) for sub in subs],
         folders=[ext_objs.Folder(folder) for folder in folders],
         tags=[ext_objs.Tag(tag) for tag in tags],
     )
+
+def _send_message(message_name: str, payload):
+    if current_user.is_authenticated:
+        socketio.emit(message_name, payload, to=current_user.id)
+    else:
+        app.logger.warning(f"Cannot send {message_name}; user not authenticated")
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -493,9 +482,6 @@ if __name__ == '__main__':
         app.config["DATABASE_HOST"],
         app.config.get("DATABASE_PORT")
     )
-
-    user_id = find_user_id(conn, "foo")
-    user = fetch_user(conn, user_id)
 
     # app.run(host='0.0.0.0', port='8080', debug=True)
     socketio.run(app, host='0.0.0.0', port='8080', debug=True)

@@ -23,8 +23,10 @@ from store import find_articles_by_id
 from store import find_folders_by_id
 from store import find_subs_by_id
 from store import find_user_by_username
+from store import fetch_user
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
+import datetime
 import tasks.async_tasks as async_tasks
 
 # General/multiple
@@ -94,6 +96,8 @@ def articles_set_property(
                 bulk_q.enqueue_flex(sub)
             article.toggle_prop(prop_name, is_set)
             bulk_q.enqueue_flex(article)
+
+    return article
 
 def articles_set_tags(
     task_context: TaskContext,
@@ -198,6 +202,31 @@ def subs_unsubscribe(
 
     # Clean up asynchronously
     task_context.queue_async(async_tasks.subs_unsubscribe, task_context, sub_id)
+
+def subs_sync(
+    task_context: TaskContext,
+    ref_time: datetime.datetime,
+    timeout_secs: int,
+) -> datetime.datetime:
+    if not (user := fetch_user(task_context.connection, task_context.user_id)):
+        raise TaskException("User not found")
+
+    if last_sync := user.last_sync:
+        last_sync_dt = datetime.datetime.fromtimestamp(last_sync)
+        delta = ref_time - last_sync_dt
+        if delta.total_seconds() < timeout_secs:
+            return ref_time + delta
+        else:
+           last_sync = None
+
+    if not last_sync:
+        user.last_sync = ref_time.timestamp()
+        with BulkUpdateQueue(task_context.connection) as bulk_q:
+            bulk_q.enqueue_flex(user)
+
+    task_context.queue_async(async_tasks.subs_sync, task_context)
+
+    return ref_time + datetime.timedelta(seconds=timeout_secs)
 
 # User
 
