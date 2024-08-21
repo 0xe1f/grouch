@@ -14,6 +14,7 @@
 
 from .entity import Entity
 import bcrypt
+import secrets
 
 class User(Entity):
 
@@ -22,7 +23,16 @@ class User(Entity):
     def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
-            self.doc_type = User.DOC_TYPE
+            self.doc_type = self.__class__.DOC_TYPE
+            self.uid = secrets.token_urlsafe(12)
+
+    @property
+    def uid(self) -> str:
+        return self._doc.get("uid")
+
+    @uid.setter
+    def uid(self, val: str):
+        self._doc["uid"] = val
 
     @property
     def username(self) -> str:
@@ -71,7 +81,4 @@ class User(Entity):
         return bcrypt.checkpw(plaintext.encode(), bytes.fromhex(self.hashed_password))
 
     def new_key(self) -> str|None:
-        if not self.username:
-            raise ValueError("Missing username")
-
-        return self.build_key(self.doc_type, self.username)
+        return self.build_key(self.doc_type, self.uid)

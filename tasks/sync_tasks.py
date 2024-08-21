@@ -48,7 +48,7 @@ def objects_rename(
             if not obj:
                 raise TaskException(f"No subscription with id {object_id}")
             obj.title = title
-            bulk_q.enqueue_flex(obj)
+            bulk_q.enqueue(obj)
         elif doc_type == Folder.DOC_TYPE:
             owner_id = Folder.extract_owner_id(object_id)
             if owner_id != tc.user_id:
@@ -57,7 +57,7 @@ def objects_rename(
             if not obj:
                 raise TaskException(f"No folder with id {object_id}")
             obj.title = title
-            bulk_q.enqueue_flex(obj)
+            bulk_q.enqueue(obj)
         else:
             raise TaskException(f"Unrecognized doc_type: {doc_type}")
 
@@ -87,9 +87,9 @@ def articles_set_property(
                 if not (sub := first_or_none(tc.dao.subs.find_by_id(article.subscription_id))):
                     raise TaskException(f"No sub with id {article.subscription_id}")
                 sub.unread_count += 1 if is_set else -1
-                bulk_q.enqueue_flex(sub)
+                bulk_q.enqueue(sub)
             article.toggle_prop(prop_name, is_set)
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
     return article
 
@@ -120,7 +120,7 @@ def articles_set_tags(
 
     with tc.dao.new_q() as bulk_q:
         article.tags = new_tags
-        bulk_q.enqueue_flex(article)
+        bulk_q.enqueue(article)
 
     return article
 
@@ -139,7 +139,7 @@ def folders_create(
         folder = Folder()
         folder.title = title
         folder.user_id = tc.user_id
-        bulk_q.enqueue_flex(folder)
+        bulk_q.enqueue(folder)
 
 def folders_delete(
     tc: TaskContext,
@@ -178,7 +178,7 @@ def subs_move(
     # Move the subscription
     with tc.dao.new_q() as bulk_q:
         sub.folder_id = dest_id or None
-        bulk_q.enqueue_flex(sub)
+        bulk_q.enqueue(sub)
 
     # Move the articles asynchronously
     if bulk_q.written_count > 0:
@@ -216,7 +216,7 @@ def subs_sync(
     if not last_sync:
         user.last_sync = ref_time.timestamp()
         with tc.dao.new_q() as bulk_q:
-            bulk_q.enqueue_flex(user)
+            bulk_q.enqueue(user)
 
     tc.queue_async(async_tasks.subs_sync, tc)
 

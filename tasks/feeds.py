@@ -46,14 +46,14 @@ def import_feed_results(
         feed = result.feed
         feed_count += 1
         feed.digest = feed.computed_digest()
-        bulk_q.enqueue_flex(feed)
+        bulk_q.enqueue(feed)
 
         entry_count += len(result.entries)
         for entry in result.entries:
             entry.feed_id = result.feed.id
             entry.digest = entry.computed_digest()
 
-            bulk_q.enqueue_flex(entry)
+            bulk_q.enqueue(entry)
 
 def refresh_feeds(
     tc: TaskContext,
@@ -97,7 +97,7 @@ def _freshen_stale_feed(
             remote_feed.id = local_feed.id
             remote_feed.digest = remote_feed.computed_digest()
 
-            bulk_q.enqueue_flex(remote_feed)
+            bulk_q.enqueue(remote_feed)
 
         remote_entry_map = { entry.entry_uid:entry for entry in result.entries }
         for local_entry in tc.dao.entries.iter_by_uid(local_feed.id, *remote_entry_map.keys()):
@@ -108,7 +108,7 @@ def _freshen_stale_feed(
                 remote_entry.id = local_entry.id
                 remote_entry.digest = remote_entry.computed_digest()
 
-                bulk_q.enqueue_flex(remote_entry)
+                bulk_q.enqueue(remote_entry)
                 entries_changed += 1
                 del remote_entry_map[local_entry.entry_uid]
             else:
@@ -117,7 +117,7 @@ def _freshen_stale_feed(
         for remote_entry in remote_entry_map.values():
             remote_entry.feed_id = local_feed.id
             remote_entry.digest = remote_entry.computed_digest()
-            bulk_q.enqueue_flex(remote_entry)
+            bulk_q.enqueue(remote_entry)
             entries_changed += 1
 
     logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated")

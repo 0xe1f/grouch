@@ -66,7 +66,7 @@ def sync_subs(
                 article.toggle_prop(Article.PROP_UNREAD, True)
                 article.synced = entry.updated
                 article.published = entry.published
-                bulk_q.enqueue_flex(article)
+                bulk_q.enqueue(article)
 
             # Batch new articles
             for entry in entry_map.values():
@@ -80,14 +80,14 @@ def sync_subs(
                 article.toggle_prop(Article.PROP_UNREAD, True)
                 article.synced = entry.updated
                 article.published = entry.published
-                bulk_q.enqueue_flex(article)
+                bulk_q.enqueue(article)
 
         # Update sub, if there were changes
         if updated_article_count:
             sub = first_or_none(tc.dao.subs.find_by_id(sub_id))
             sub.last_synced = max_synced
             sub.unread_count += marked_unread
-            bulk_q.enqueue_flex(sub)
+            bulk_q.enqueue(sub)
 
 def subscribe_user_unknown_url(
     tc: TaskContext,
@@ -130,7 +130,7 @@ def import_user_subs(
                 folder = Folder()
                 folder.title = group.title
                 folder.user_id = user_id
-                bulk_q.enqueue_flex(folder)
+                bulk_q.enqueue(folder)
                 folder_group_id_map[group.id] = folder.new_key()
             else:
                 folder_group_id_map[group.id] = folder_name_map[group.title]
@@ -219,7 +219,7 @@ def _subscribe_local_feeds(
         sub.title = sub_source.title or title
         sub.subscribed = datetime.now().timestamp()
 
-        bulk_q.enqueue_flex(sub)
+        bulk_q.enqueue(sub)
         subbed_feed_ids.add(feed_id)
         remaining_sources.remove(sub_source)
 
@@ -250,7 +250,7 @@ def remove_subscriptions(
         if written_count == enqueued_count:
             sub = first_or_none(tc.dao.subs.find_by_id(sub_id))
             sub.mark_deleted()
-            bulk_q.enqueue_flex(sub)
+            bulk_q.enqueue(sub)
 
     bulk_q.flush()
 

@@ -35,7 +35,7 @@ def delete_folder(
             # Don't remove folder if one or more subs were left
             if folder := first_or_none(tc.dao.folders.find_by_id(folder_id)):
                 folder.mark_deleted()
-                bulk_q.enqueue_flex(folder)
+                bulk_q.enqueue(folder)
             else:
                 logging.warning(f"No folder with id {folder_id}")
 

@@ -18,7 +18,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 2
+_SCHEMA_VERSION_CURRENT = 1
 
 class Connection:
 
@@ -74,6 +74,16 @@ class Connection:
                         }
                     """,
                     "reduce": "_count"
+                },
+                users_by_username={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'user') {
+                                emit(doc.username);
+                            }
+                        }
+                    """,
+                    "reduce": "_count",
                 },
                 feeds_by_url={
                     "map": """
@@ -205,19 +215,6 @@ class Connection:
                         }
                     """,
                     "reduce": "_count"
-                },
-            )
-        if from_ver < 2:
-            self.add_views(
-                design_doc,
-                users_by_username={
-                    "map": """
-                        function (doc) {
-                            if (doc.doc_type == 'user') {
-                                emit(doc.username);
-                            }
-                        }
-                    """,
                 },
             )
 

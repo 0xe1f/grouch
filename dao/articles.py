@@ -39,7 +39,7 @@ class ArticleDao(Dao):
         matches = []
         for item in self.db.view(self.__class__.ALL_DOCS, keys=article_ids, include_docs=True):
             if "doc" in item:
-                matches.append(Article(item["doc"]))
+                matches.append(Article(item.doc))
 
         return matches
 
@@ -159,7 +159,7 @@ class ArticleDao(Dao):
 
         next_start = None
         matches = []
-        view_name = __class__.BY_SUB_UNREAD if unread_only else __class__.BY_SUB
+        view_name = self.__class__.BY_SUB_UNREAD if unread_only else self.__class__.BY_SUB
 
         for item in self.db.view(view_name, **options):
             if len(matches) < limit:
@@ -187,7 +187,7 @@ class ArticleDao(Dao):
 
         next_start = None
         matches = []
-        view_name = __class__.BY_FOLDER_UNREAD if unread_only else __class__.BY_FOLDER
+        view_name = self.__class__.BY_FOLDER_UNREAD if unread_only else self.__class__.BY_FOLDER
 
         for item in self.db.view(view_name, **options):
             if len(matches) < limit:
@@ -225,9 +225,9 @@ class ArticleDao(Dao):
             "include_docs": True,
         }
         if unread_only:
-            view = __class__.BY_SUB_UNREAD
+            view = self.__class__.BY_SUB_UNREAD
         else:
-            view = __class__.BY_SUB
+            view = self.__class__.BY_SUB
         for item in self.db.iterview(view, batch_size, **options):
             yield Article(item.doc)
 
@@ -244,9 +244,9 @@ class ArticleDao(Dao):
             "include_docs": True,
         }
         if unread_only:
-            view = __class__.BY_FOLDER_UNREAD
+            view = self.__class__.BY_FOLDER_UNREAD
         else:
-            view = __class__.BY_FOLDER
+            view = self.__class__.BY_FOLDER
         for item in self.db.iterview(view, batch_size, **options):
             yield Article(item.doc)
 
@@ -261,13 +261,13 @@ class ArticleDao(Dao):
             "include_docs": True,
         }
         if unread_only:
-            view = __class__.BY_PROP
+            view = self.__class__.BY_PROP
             options = options | {
                 "end_key": [user_id, Article.PROP_UNREAD],
                 "start_key":[user_id, Article.PROP_UNREAD, {}],
             }
         else:
-            view = __class__.BY_USER
+            view = self.__class__.BY_USER
             options = options | {
                 "end_key": [user_id],
                 "start_key":[user_id, {}],
@@ -299,7 +299,7 @@ class ArticleDao(Dao):
 
         for article in self.iter_by_sub(sub_id):
             article.folder_id = dest_folder_id
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count
 
@@ -315,7 +315,7 @@ class ArticleDao(Dao):
             index = first_index(article.tags, tag)
             if index > -1:
                 del article.tags[index]
-                bulk_q.enqueue_flex(article)
+                bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count
 
@@ -327,7 +327,7 @@ class ArticleDao(Dao):
         enqueued_count = bulk_q.enqueued_count
         for article in self.iter_by_sub(sub_id, unread_only=True):
             article.toggle_prop(Article.PROP_UNREAD, False)
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count
 
@@ -340,7 +340,7 @@ class ArticleDao(Dao):
 
         for article in self.iter_by_folder(folder_id, unread_only=True):
             article.toggle_prop(Article.PROP_UNREAD, False)
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count
 
@@ -353,7 +353,7 @@ class ArticleDao(Dao):
 
         for article in self.iter_by_user(user_id, unread_only=True):
             article.toggle_prop(Article.PROP_UNREAD, False)
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count
 
@@ -366,6 +366,6 @@ class ArticleDao(Dao):
 
         for article in self.iter_by_sub(sub_id):
             article.mark_deleted()
-            bulk_q.enqueue_flex(article)
+            bulk_q.enqueue(article)
 
         return bulk_q.enqueued_count - enqueued_count

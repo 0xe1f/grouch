@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dao.bulk_update_queue import BulkUpdateQueue
-from dao.connection import Connection
-from dao.database import Database
+from .bulk_update_queue import BulkUpdateQueue
+from .connection import Connection
+from .database import Database

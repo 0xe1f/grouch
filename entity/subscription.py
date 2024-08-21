@@ -22,7 +22,7 @@ class Subscription(Entity):
     def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
-            self.doc_type = __class__.DOC_TYPE
+            self.doc_type = self.__class__.DOC_TYPE
             self.unread_count = 0
 
     @property
@@ -91,9 +91,9 @@ class Subscription(Entity):
 
     @classmethod
     def extract_owner_id(cls, obj_id: str) -> str|None:
-        doc_type, parts = __class__.decompose_key(obj_id)
-        if doc_type != __class__.DOC_TYPE:
+        doc_type, parts = cls.decompose_key(obj_id)
+        if doc_type != cls.DOC_TYPE:
             return None
         if len(parts) != 2:
             return None
-        return __class__.build_key(User.DOC_TYPE, parts[0])
+        return cls.build_key(User.DOC_TYPE, parts[0])

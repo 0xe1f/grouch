@@ -37,7 +37,7 @@ class BulkUpdateQueue:
     def __exit__(self, *_):
         self.flush()
 
-    def enqueue_flex(self, *objs: Entity):
+    def enqueue(self, *objs: Entity):
         # Update update time & attach an id
         for obj in objs:
             if not obj.id:

@@ -41,7 +41,7 @@ class EntryDao(Dao):
             "include_docs": True,
         }
         for item in self.db.view("maint/entries_by_feed_updated", **options):
-            yield Entry(item["doc"])
+            yield Entry(item.doc)
 
     def iter_by_uid(
         self,
@@ -53,4 +53,4 @@ class EntryDao(Dao):
             "keys": [[feed_id, entry_uid] for entry_uid in entry_uids],
         }
         for item in self.db.view(self.__class__.BY_FEED, **options):
-            yield Entry(item["doc"])
+            yield Entry(item.doc)

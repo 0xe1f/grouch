@@ -26,7 +26,7 @@ class FolderDao(Dao):
         matches = []
         for item in self.db.view(self.__class__.ALL_DOCS, keys=ids, include_docs=True):
             if "doc" in item:
-                matches.append(Folder(item["doc"]))
+                matches.append(Folder(item.doc))
 
         return matches
 

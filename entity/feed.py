@@ -23,7 +23,7 @@ class Feed(Entity):
     def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
-            self.doc_type = __class__.DOC_TYPE
+            self.doc_type = self.__class__.DOC_TYPE
         self._computed_digest = None
 
     @property

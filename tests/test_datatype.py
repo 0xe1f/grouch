@@ -41,7 +41,7 @@ class TestFeedContent(unittest.TestCase):
         obj = Feed()
         self.assertEqual(Feed.DOC_TYPE, obj.doc_type)
 
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             self.assertTrue(hasattr(obj, k))
             setattr(obj, k, v)
             self.assertEqual(getattr(obj, k), v)
@@ -52,7 +52,7 @@ class TestFeedContent(unittest.TestCase):
 
     def test_feed_digest_computation(self):
         obj = Feed()
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             setattr(obj, k, v)
 
         m = hashlib.md5()
@@ -64,7 +64,7 @@ class TestFeedContent(unittest.TestCase):
     def test_feed_digest_recomputed(self):
         obj = Feed()
         previous_digest = obj.computed_digest()
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             setattr(obj, k, v)
             digest = obj.computed_digest()
             self.assertTrue(digest)
@@ -98,7 +98,7 @@ class TestEntryContent(unittest.TestCase):
         obj = Entry()
         self.assertEqual(Entry.DOC_TYPE, obj.doc_type)
 
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             self.assertTrue(hasattr(obj, k))
             setattr(obj, k, v)
             self.assertEqual(getattr(obj, k), v)
@@ -109,7 +109,7 @@ class TestEntryContent(unittest.TestCase):
 
     def test_entry_digest_computation(self):
         obj = Entry()
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             setattr(obj, k, v)
 
         m = hashlib.md5()
@@ -121,7 +121,7 @@ class TestEntryContent(unittest.TestCase):
     def test_entry_digest_recomputed(self):
         obj = Entry()
         previous_digest = obj.computed_digest()
-        for k, v in __class__.DIGEST_DICT.items():
+        for k, v in self.__class__.DIGEST_DICT.items():
             setattr(obj, k, v)
             digest = obj.computed_digest()
             self.assertTrue(digest)

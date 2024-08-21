@@ -23,7 +23,7 @@ class TestAtomParsing(unittest.TestCase):
     ENTRY_COUNT = 25
 
     def test_atom_parsing_feed(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -45,7 +45,7 @@ class TestAtomParsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_atom_parsing_entries(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -76,7 +76,7 @@ class TestRss1Parsing(unittest.TestCase):
     ENTRY_COUNT = 15
 
     def test_rss1_parsing_feed(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -98,7 +98,7 @@ class TestRss1Parsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_rss1_parsing_entries(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -129,7 +129,7 @@ class TestRss2Parsing(unittest.TestCase):
     ENTRY_COUNT = 20
 
     def test_rss2_parsing_feed(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -151,7 +151,7 @@ class TestRss2Parsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_rss2_parsing_entries(self):
-        feed_url = __class__.XML_PATH
+        feed_url = self.__class__.XML_PATH
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)

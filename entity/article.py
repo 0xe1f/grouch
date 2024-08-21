@@ -26,7 +26,7 @@ class Article(Entity):
     def __init__(self, source: dict={}):
         super().__init__(source)
         if not source:
-            self.doc_type = Article.DOC_TYPE
+            self.doc_type = self.__class__.DOC_TYPE
         if self.tags == None:
             self.tags = []
         if self.props == None:
@@ -117,9 +117,9 @@ class Article(Entity):
 
     @classmethod
     def extract_owner_id(cls, obj_id: str) -> str|None:
-        doc_type, parts = __class__.decompose_key(obj_id)
-        if doc_type != __class__.DOC_TYPE:
+        doc_type, parts = cls.decompose_key(obj_id)
+        if doc_type != cls.DOC_TYPE:
             return None
         if len(parts) != 3:
             return None
-        return __class__.build_key(User.DOC_TYPE, parts[0])
+        return cls.build_key(User.DOC_TYPE, parts[0])

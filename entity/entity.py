@@ -84,7 +84,7 @@ class Entity:
 
     @classmethod
     def extract_doc_type(cls, entity_id: str) -> str|None:
-        doc_type, _ = __class__.decompose_key(entity_id)
+        doc_type, _ = cls.decompose_key(entity_id)
         return doc_type
 
     @classmethod
