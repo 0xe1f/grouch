@@ -25,16 +25,20 @@ class Connection:
     def __init__(self):
         pass
 
-    def connect(self, database: str, username: str, password: str, host: str, port: int|None=None):
-        self.server = couchdb.Server(f"http://{username}:{password}@{host}:{port or 5984}/")
-        self.initialize(database)
+    def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None):
+        self._db_name = db_name
+        self._server = couchdb.Server(f"http://{username}:{password}@{host}:{port or 5984}/")
+        self.initialize()
 
-    def initialize(self, database_name: str):
+    def destroy(self):
+        del self._server[self._db_name]
+
+    def initialize(self):
         # Create DB if necessary
-        if database_name not in self.server:
-            self.db = self.server.create(database_name)
+        if self._db_name not in self._server:
+            self.db = self._server.create(self._db_name)
         else:
-            self.db = self.server[database_name]
+            self.db = self._server[self._db_name]
 
         if _METADATA_KEY in self.db:
             metadata = self.db[_METADATA_KEY]

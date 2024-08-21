@@ -17,7 +17,6 @@ from common import first_or_none
 from couchdb.http import ResourceConflict
 from entity import User
 from datetime import datetime
-import logging
 
 class UserDao(Dao):
 
@@ -43,6 +42,16 @@ class UserDao(Dao):
 
         return None
 
+    def find_by_email_address(
+        self,
+        email_address: str,
+    ) -> User:
+        for item in self.db.view(self.__class__.BY_EMAIL, key=email_address, include_docs=True, reduce=False):
+            if item.doc:
+                return User(item.doc)
+
+        return None
+
     def create(
         self,
         user: User,
@@ -50,13 +59,10 @@ class UserDao(Dao):
         if not user.id:
             user.id = user.new_key()
         if user.id in self.db:
-            logging.error(f"User with id {user.id} already exists")
             return False
         elif self._entity_count(self.__class__.BY_USERNAME, user.email_address) > 0:
-            logging.error(f"User with email address {user.email_address} already exists")
             return False
         elif self._entity_count(self.__class__.BY_EMAIL, user.email_address) > 0:
-            logging.error(f"User with email address {user.email_address} already exists")
             return False
 
         user.created = datetime.now().timestamp()
@@ -65,7 +71,6 @@ class UserDao(Dao):
         try:
             new_id, _ = self.db.save(user.as_dict())
         except ResourceConflict as e:
-            logging.exception(f"Error writing user {user.id}", e)
             return False
 
         # Ensure we didn't end up writing multiple addresses
@@ -73,10 +78,6 @@ class UserDao(Dao):
         is_username_dupe = self._entity_count(self.__class__.BY_USERNAME, user.username) > 1
 
         if is_email_dupe or is_username_dupe:
-            if is_email_dupe:
-                logging.warning(f"Existing user with email ({user.email_address})")
-            elif is_username_dupe:
-                logging.warning(f"Existing user with username ({user.username})")
             # Delete dupe account
             del self.db[new_id]
             return False

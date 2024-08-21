@@ -19,6 +19,9 @@ class Entity:
     def __init__(self, source: dict={}):
         self._doc = source.copy()
 
+    def __eq__(self, value: object) -> bool:
+        return self._doc == value._doc
+
     @property
     def id(self) -> str:
         return self.get_prop("_id")

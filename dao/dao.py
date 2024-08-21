@@ -26,5 +26,8 @@ class Dao:
     def db(self) -> couchdb.Database:
         return self._db
 
+    def delete_by_id(self, id: str):
+        del self._db[id]
+
     def new_q(self, track_ids: bool=False) -> BulkUpdateQueue:
         return BulkUpdateQueue(self._db, track_ids=track_ids)

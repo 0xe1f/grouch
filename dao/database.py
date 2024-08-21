@@ -24,7 +24,6 @@ import couchdb.client as couchdb
 class Database:
 
     def __init__(self, db: couchdb.Database):
-        self._db = db
         self._articles = ArticleDao(db)
         self._entries = EntryDao(db)
         self._feeds = FeedDao(db)

@@ -33,6 +33,7 @@ class Folder(Entity):
     @uid.setter
     def uid(self, val: str):
         self._doc["uid"] = val
+        self.id = None
 
     @property
     def title(self) -> str:
