@@ -23,18 +23,8 @@ from datetime import datetime
 from flask_executor import Executor
 from flask_login import current_user
 from io import BytesIO
-from store import Connection
-from store import fetch_user
-from store import find_articles_by_folder
-from store import find_articles_by_prop
-from store import find_articles_by_tag
-from store import find_articles_by_sub
-from store import find_articles_by_user
-from store import find_entries_by_id
-from store import find_feeds_by_id
-from store import find_folders_by_user
-from store import find_tags_by_user
-from store import find_subs_by_user
+from dao import Connection
+from dao import Database
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
 from web.ext_type import requests
@@ -68,7 +58,7 @@ REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
 
 @login_manager.user_loader
 def load_user(user_id):
-    return ext_objs.User(user=fetch_user(conn, user_id))
+    return ext_objs.User(user=stores.users.find_by_id(user_id))
 
 @app.get("/login")
 def login_get():
@@ -128,18 +118,18 @@ def articles():
 
     if arg.folder:
         unread_only = arg.prop == Article.PROP_UNREAD
-        articles, next_start = find_articles_by_folder(conn, arg.folder, start, unread_only=unread_only)
+        articles, next_start = stores.articles.get_page_by_folder(arg.folder, start, unread_only=unread_only)
     elif arg.sub:
         unread_only = arg.prop == Article.PROP_UNREAD
-        articles, next_start = find_articles_by_sub(conn, arg.sub, start, unread_only=unread_only)
+        articles, next_start = stores.articles.get_page_by_sub(arg.sub, start, unread_only=unread_only)
     elif arg.prop:
-        articles, next_start = find_articles_by_prop(conn, current_user.id, arg.prop, start)
+        articles, next_start = stores.articles.get_page_by_prop(current_user.id, arg.prop, start)
     elif arg.tag:
-        articles, next_start = find_articles_by_tag(conn, current_user.id, arg.tag, start)
+        articles, next_start = stores.articles.get_page_by_tag(current_user.id, arg.tag, start)
     else:
-        articles, next_start = find_articles_by_user(conn, current_user.id, start)
+        articles, next_start = stores.articles.get_page_by_user(current_user.id, start)
 
-    entries = find_entries_by_id(conn, *[article.entry_id for article in articles])
+    entries = stores.entries.find_by_id(*[article.entry_id for article in articles])
     entry_map = { entry.id:entry for entry in entries }
 
     return responses.ArticlesResponse(
@@ -150,14 +140,14 @@ def articles():
 @app.get("/exportOpml")
 @flask_login.login_required
 def export_opml():
-    subs = find_subs_by_user(conn, current_user.id)
-    feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
+    subs = stores.subs.find_by_user(current_user.id)
+    feeds = stores.feeds.find_by_id(*[sub.feed_id for sub in subs])
     feed_map = { feed.id:feed for feed in feeds }
 
     output = port.export_opml(
         title=f"{current_user.username} subscriptions in grouch",
         subs=[(sub, feed_map[sub.feed_id]) for sub in subs],
-        folders=find_folders_by_user(conn, current_user.id),
+        folders=stores.folders.find_by_user(current_user.id),
     )
 
     return flask.send_file(
@@ -214,9 +204,8 @@ def rename():
     try:
         sync_tasks.objects_rename(
             _create_task_context(),
-            arg.article_id,
-            arg.prop_name,
-            arg.is_set,
+            arg.id,
+            arg.title,
         )
     except TaskException as e:
         app.logger.error(e.message)
@@ -446,18 +435,18 @@ def socketio_disconnect():
 
 def _create_task_context() -> TaskContext:
     return TaskContext(
-        conn,
+        stores,
         current_user.id,
         executor.submit,
         _send_message,
     )
 
 def _fetch_table_of_contents() -> ext_objs.TableOfContents:
-    subs = find_subs_by_user(conn, current_user.id)
-    feeds = find_feeds_by_id(conn, *[sub.feed_id for sub in subs])
-    folders = find_folders_by_user(conn, current_user.id)
+    subs = stores.subs.find_by_user(current_user.id)
+    feeds = stores.feeds.find_by_id(*[sub.feed_id for sub in subs])
+    folders = stores.folders.find_by_user(current_user.id)
     feed_map = { feed.id:feed for feed in feeds }
-    tags = find_tags_by_user(conn, current_user.id)
+    tags = stores.articles.find_tags_by_user(current_user.id)
 
     return ext_objs.TableOfContents(
         subs=[ext_objs.Subscription(sub, feed_map[sub.feed_id]) for sub in subs],
@@ -480,8 +469,9 @@ if __name__ == '__main__':
         app.config["DATABASE_USERNAME"],
         app.config["DATABASE_PASSWORD"],
         app.config["DATABASE_HOST"],
-        app.config.get("DATABASE_PORT")
+        app.config["DATABASE_PORT"],
     )
+    stores = Database(conn.db)
 
     # app.run(host='0.0.0.0', port='8080', debug=True)
     socketio.run(app, host='0.0.0.0', port='8080', debug=True)

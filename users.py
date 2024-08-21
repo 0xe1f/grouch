@@ -16,8 +16,8 @@
 
 from argparse import ArgumentParser
 from datatype import User
-from store import create_user
-from store import Connection
+from dao import Connection
+from dao import Database
 import bcrypt
 import logging
 import tomllib
@@ -43,6 +43,7 @@ conn.connect(
     config["DATABASE_HOST"],
     config.get("DATABASE_PORT")
 )
+repo = Database(conn.db)
 
 salt = bcrypt.gensalt()
 
@@ -51,7 +52,7 @@ user.username = args.username
 user.set_hashed_password(args.password, salt)
 user.email_address = args.email
 
-if not (success := create_user(conn, user)):
+if not (success := repo.users.create(user)):
     logging.warning("Cannot create user")
 else:
     logging.info("User created successfully")

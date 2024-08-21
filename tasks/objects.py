@@ -12,26 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from store import Connection
+from dao import Database
 from typing import Callable
 
 class TaskContext:
 
     def __init__(
             self,
-            conn: Connection,
+            dao: Database,
             user_id: str|None=None,
             async_q: Callable|None=None,
             message_sender: Callable|None=None,
         ):
-        self._conn = conn
+        self._dao = dao
         self._user_id = user_id
         self._async_q = async_q
         self._message_sender = message_sender
 
+
     @property
-    def connection(self) -> str|None:
-        return self._conn
+    def dao(self) -> Database:
+        return self._dao
 
     @property
     def user_id(self) -> str|None:

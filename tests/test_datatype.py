@@ -56,7 +56,7 @@ class TestFeedContent(unittest.TestCase):
             setattr(obj, k, v)
 
         m = hashlib.md5()
-        m.update(json.dumps(__class__.DIGEST_DICT).encode())
+        m.update(json.dumps(self.__class__.DIGEST_DICT).encode())
         computed_digest = m.hexdigest()
 
         self.assertEqual(computed_digest, obj.computed_digest())
@@ -113,7 +113,7 @@ class TestEntryContent(unittest.TestCase):
             setattr(obj, k, v)
 
         m = hashlib.md5()
-        m.update(json.dumps(__class__.DIGEST_DICT).encode())
+        m.update(json.dumps(self.__class__.DIGEST_DICT).encode())
         computed_digest = m.hexdigest()
 
         self.assertEqual(computed_digest, obj.computed_digest())

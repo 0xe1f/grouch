@@ -31,7 +31,7 @@ class TestAtomParsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
 
@@ -53,12 +53,12 @@ class TestAtomParsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         entries_proto = proto["entries"]
 
         # Verify total count
-        self.assertEqual(__class__.ENTRY_COUNT, len(entries))
+        self.assertEqual(self.__class__.ENTRY_COUNT, len(entries))
 
         # Verify each item
         for ix, entry in enumerate(entries):
@@ -84,7 +84,7 @@ class TestRss1Parsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
 
@@ -106,12 +106,12 @@ class TestRss1Parsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         entries_proto = proto["entries"]
 
         # Verify total count
-        self.assertEqual(__class__.ENTRY_COUNT, len(entries))
+        self.assertEqual(self.__class__.ENTRY_COUNT, len(entries))
 
         # Verify each item
         for ix, entry in enumerate(entries):
@@ -137,7 +137,7 @@ class TestRss2Parsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
 
@@ -159,12 +159,12 @@ class TestRss2Parsing(unittest.TestCase):
 
         # Load proto - we'll use this to verify content obtained
         # from parser
-        with open(__class__.JSON_PATH) as file:
+        with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         entries_proto = proto["entries"]
 
         # Verify total count
-        self.assertEqual(__class__.ENTRY_COUNT, len(entries))
+        self.assertEqual(self.__class__.ENTRY_COUNT, len(entries))
 
         # Verify each item
         for ix, entry in enumerate(entries):

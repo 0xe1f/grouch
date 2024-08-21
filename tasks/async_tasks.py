@@ -12,49 +12,104 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from store import BulkUpdateQueue
+from common import first_or_none
+from dao import BulkUpdateQueue
 from port import PortDoc
 from tasks.objects import TaskContext
+from time import time
 import logging
-import tasks.articles as tasks_articles
 import tasks.folders as tasks_folders
 import tasks.subscriptions as tasks_sub
 
 # Subs
 
-def subs_sync(task_context: TaskContext):
-    with BulkUpdateQueue(task_context.connection, track_ids=False) as bulk_q:
-        tasks_sub.sync_subs(bulk_q, task_context.user_id)
+def subs_sync(
+    tc: TaskContext,
+):
+    with tc.dao.new_q() as bulk_q:
+        tasks_sub.sync_subs(tc, bulk_q, tc.user_id)
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written; {bulk_q.commit_count} commits")
 
-def subs_subscribe_url(task_context: TaskContext, url: str):
-    tasks_sub.subscribe_user_unknown_url(task_context.connection, task_context.user_id, url)
+def subs_subscribe_url(
+    tc: TaskContext,
+    url: str,
+):
+    tasks_sub.subscribe_user_unknown_url(tc, tc.user_id, url)
 
-def subs_import(task_context: TaskContext, doc: PortDoc):
-    tasks_sub.import_user_subs(task_context.connection, task_context.user_id, doc)
+def subs_import(
+    tc: TaskContext,
+    doc: PortDoc,
+):
+    tasks_sub.import_user_subs(tc, tc.user_id, doc)
 
-def subs_unsubscribe(task_context: TaskContext, *sub_ids: int):
-    tasks_sub.unsubscribe(task_context.connection, *sub_ids)
+def subs_unsubscribe(
+    tc: TaskContext,
+    *sub_ids: int,
+):
+    tasks_sub.unsubscribe(tc, *sub_ids)
 
-def subs_mark_read_by_user(task_context: TaskContext):
-    tasks_sub.mark_subs_read_by_user(task_context.connection, task_context.user_id)
+def subs_mark_read_by_user(
+    tc: TaskContext,
+):
+    start_time = time()
+    with tc.dao.new_q() as bulk_q:
+        tc.dao.articles.mark_as_read_by_user(bulk_q, tc.user_id)
+        for sub in tc.dao.subs.iter_by_user(tc.user_id):
+            sub.unread_count = 0
+            bulk_q.enqueue_flex(sub)
 
-def subs_mark_read_by_folder(task_context: TaskContext, folder_id: str):
-    tasks_sub.mark_subs_read_by_folder(task_context.connection, folder_id)
+    logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
-def subs_mark_read_by_sub(task_context: TaskContext, sub_id: str):
-    tasks_sub.mark_sub_read(task_context.connection, sub_id)
+def subs_mark_read_by_folder(
+    tc: TaskContext,
+    folder_id: str,
+):
+    start_time = time()
+    with tc.dao.new_q() as bulk_q:
+        tc.dao.articles.mark_as_read_by_folder(bulk_q, folder_id)
+        for sub in tc.dao.subs.iter_by_folder(folder_id):
+            # TODO: this is potentially inacurate
+            sub.unread_count = 0
+            bulk_q.enqueue_flex(sub)
+
+    logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
+
+def subs_mark_read_by_sub(
+    tc: TaskContext,
+    sub_id: str,
+):
+    start_time = time()
+    with tc.dao.new_q() as bulk_q:
+        changed = tc.dao.articles.mark_as_read_by_sub(bulk_q, sub_id)
+        if sub := first_or_none(tc.dao.subs.find_by_id(sub_id)):
+            sub.unread_count -= changed
+            bulk_q.enqueue_flex(sub)
+
+    logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
 # Articles
 
-def articles_move(task_context: TaskContext, sub_id: str, dest_folder_id: str|None):
-    tasks_articles.move_articles(task_context.connection, sub_id, dest_folder_id)
+def articles_move(
+    tc: TaskContext,
+    sub_id: str,
+    dest_folder_id: str|None,
+):
+    start_time = time()
+    with tc.dao.new_q() as bulk_q:
+        tc.dao.articles.move_by_sub(bulk_q, sub_id, dest_folder_id)
+    logging.info(f"Moved {bulk_q.written_count}/{bulk_q.enqueued_count} articles ({time() - start_time:.2}s)")
 
-def articles_remove_tag(task_context: TaskContext, tag: str):
-    tasks_articles.remove_tag_from_articles(task_context.connection, tag)
+def articles_remove_tag(
+    tc: TaskContext,
+    tag: str,
+):
+    start_time = time()
+    with tc.dao.new_q() as bulk_q:
+        tc.dao.articles.remove_all_tags_by_user_by_name(bulk_q, tag)
+    logging.info(f"Updated {bulk_q.written_count}/{bulk_q.enqueued_count} articles ({time() - start_time:.2}s)")
 
 # Folders
 
-def folders_delete(task_context: TaskContext, folder_id: str):
-    tasks_folders.delete_folder(task_context.connection, folder_id)
+def folders_delete(tc: TaskContext, folder_id: str):
+    tasks_folders.delete_folder(tc, folder_id)

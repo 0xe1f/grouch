@@ -12,28 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .objects import TaskContext
+from .subscriptions import remove_subscriptions
 from common import first_or_none
-from store import find_folders_by_id
-from store import find_sub_ids_by_folder
-from store import BulkUpdateQueue
-from store import Connection
-from tasks.subscriptions import remove_subscriptions
 from time import time
 import logging
 
-def delete_folder(conn: Connection, folder_id: str):
+def delete_folder(
+    tc: TaskContext,
+    folder_id: str,
+):
     start_time = time()
     all_subscriptions_removed = True
 
-    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
-        if sub_ids := find_sub_ids_by_folder(conn, folder_id):
-            if not remove_subscriptions(bulk_q, *sub_ids):
+    with tc.dao.new_q() as bulk_q:
+        if sub_ids := tc.dao.subs.find_ids_by_folder(folder_id):
+            if not remove_subscriptions(tc, bulk_q, *sub_ids):
                 all_subscriptions_removed = False
                 logging.warning(f"Not all subscriptions were removed")
 
         if all_subscriptions_removed:
             # Don't remove folder if one or more subs were left
-            if folder := first_or_none(find_folders_by_id(conn, folder_id)):
+            if folder := first_or_none(tc.dao.folders.find_by_id(folder_id)):
                 folder.mark_deleted()
                 bulk_q.enqueue_flex(folder)
             else:

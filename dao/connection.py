@@ -218,7 +218,6 @@ class Connection:
                             }
                         }
                     """,
-                    "reduce": "_count"
                 },
             )
 

@@ -12,19 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from couchdb.client import Database
+from couchdb.http import ResourceConflict
 from datatype import FlexObject
 from datetime import datetime
-from couchdb.http import ResourceConflict
-from store.connection import Connection
-import logging
 
 # Not thread-safe
 class BulkUpdateQueue:
 
-    def __init__(self, conn: Connection, max_size: int=40, track_ids: bool=True):
+    def __init__(self, db: Database, max_size: int=40, track_ids: bool=True):
         self._max_size = max_size
         self._docs = []
-        self._conn = conn
+        self._db = db
         self._enqueued_count = 0
         self._success_count = 0
         self._conflict_count = 0
@@ -32,14 +31,10 @@ class BulkUpdateQueue:
         self._success_ids = []
         self._track_ids = track_ids
 
-    @property
-    def connection(self) -> Connection:
-        return self._conn
-
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, *_):
         self.flush()
 
     def enqueue_flex(self, *objs: FlexObject):
@@ -97,7 +92,7 @@ class BulkUpdateQueue:
             return
 
         self._commit_count += 1
-        for result in self._conn.db.update(docs):
+        for result in self._db.update(docs):
             success, id, status = result
             if success:
                 self._success_count += 1

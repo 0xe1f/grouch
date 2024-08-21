@@ -17,7 +17,7 @@
 from argparse import ArgumentParser
 from tasks import refresh_feeds
 import logging
-import store
+import dao
 import tomllib
 
 arg_parser = ArgumentParser()
@@ -35,7 +35,7 @@ logging.basicConfig(level=logging.DEBUG)
 with open("config.toml", "rb") as file:
     config = tomllib.load(file)
 
-conn = store.Connection()
+conn = dao.Connection()
 conn.connect(
     config["DATABASE_NAME"],
     config["DATABASE_USERNAME"],

@@ -12,26 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .objects import TaskContext
 from concurrent.futures import as_completed
 from concurrent.futures import ThreadPoolExecutor
 from datatype import FeedContent
 from parser import ParseResult
 from parser import parse_feed
-from store import BulkUpdateQueue
-from store import Connection
-from store import find_entries_by_uid
-from store import stale_feeds
+from dao import BulkUpdateQueue
 import datetime
 import logging
 import time
 
-def import_feeds(bulk_q: BulkUpdateQueue, *feed_urls: str) -> set[str]:
+def import_feeds(
+    bulk_q: BulkUpdateQueue,
+    *feed_urls: str,
+) -> set[str]:
     successful, _ = _fetch_feeds(*feed_urls)
     import_feed_results(bulk_q, *successful)
 
     return [result.url for result in successful]
 
-def import_feed_results(bulk_q: BulkUpdateQueue, *results: ParseResult):
+def import_feed_results(
+    bulk_q: BulkUpdateQueue,
+    *results: ParseResult,
+):
     if not results:
         return set()
 
@@ -51,26 +55,33 @@ def import_feed_results(bulk_q: BulkUpdateQueue, *results: ParseResult):
 
             bulk_q.enqueue_flex(entry)
 
-def refresh_feeds(conn: Connection, freshness_seconds: int):
+def refresh_feeds(
+    tc: TaskContext,
+    freshness_seconds: int,
+):
     now = datetime.datetime.now()
     stale_start = now - datetime.timedelta(seconds=freshness_seconds)
 
     pending_fetch = []
     fetch_batch_max = 40
 
-    with BulkUpdateQueue(conn, track_ids=False) as bulk_q:
+    with tc.dao.new_q() as bulk_q:
         # TODO: probably good to set some sort of max limit
-        for feed in stale_feeds(conn, stale_start=stale_start.timestamp()):
+        for feed in tc.dao.feeds.iter_updated_before(stale_start=stale_start.timestamp()):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
-                _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
+                _freshen_stale_feed_content(tc, bulk_q, *pending_fetch)
                 pending_fetch.clear()
 
         if pending_fetch:
-            _freshen_stale_feed_content(conn, bulk_q, *pending_fetch)
+            _freshen_stale_feed_content(tc, bulk_q, *pending_fetch)
             pending_fetch.clear()
 
-def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feeds: FeedContent):
+def _freshen_stale_feed_content(
+    tc: TaskContext,
+    bulk_q: BulkUpdateQueue,
+    *feeds: FeedContent,
+):
     local_feed_map = { feed.feed_url:feed for feed in feeds }
 
     feeds_changed = 0
@@ -89,7 +100,7 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
             bulk_q.enqueue_flex(remote_feed)
 
         remote_entry_map = { entry.entry_uid:entry for entry in result.entries }
-        for local_entry in find_entries_by_uid(conn, local_feed.id, *remote_entry_map.keys()):
+        for local_entry in tc.dao.entries.iter_by_uid(local_feed.id, *remote_entry_map.keys()):
             remote_entry = remote_entry_map[local_entry.entry_uid]
             if remote_entry.digest != local_entry.digest:
                 remote_entry.feed_id = local_feed.id
@@ -111,7 +122,9 @@ def _freshen_stale_feed_content(conn: Connection, bulk_q: BulkUpdateQueue, *feed
 
     logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated")
 
-def _fetch_feeds(*feed_urls: str) -> tuple[list[ParseResult], list[ParseResult]]:
+def _fetch_feeds(
+    *feed_urls: str,
+) -> tuple[list[ParseResult], list[ParseResult]]:
     start = time.time()
 
     successful = []
