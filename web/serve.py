@@ -436,7 +436,7 @@ def socketio_disconnect():
 def _create_task_context() -> TaskContext:
     return TaskContext(
         stores,
-        current_user.id,
+        current_user.id if current_user.is_authenticated else None,
         executor.submit,
         _send_message,
     )

@@ -209,7 +209,7 @@ def subs_sync(
         last_sync_dt = datetime.datetime.fromtimestamp(last_sync)
         delta = ref_time - last_sync_dt
         if delta.total_seconds() < timeout_secs:
-            return ref_time + delta
+            return last_sync_dt + datetime.timedelta(seconds=timeout_secs)
         else:
            last_sync = None
 
