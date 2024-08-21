@@ -14,9 +14,9 @@
 
 from .bulk_update_queue import BulkUpdateQueue
 from .dao import Dao
-from common import build_key
 from common import first_index
-from datatype import Article
+from entity import Article
+from entity import Entity
 
 type ArticlePageMarker = tuple
 type ArticlePage = tuple[list[Article], ArticlePageMarker|None]
@@ -205,7 +205,7 @@ class ArticleDao(Dao):
     ):
         options = {
             "include_docs": True,
-            "keys": [build_key("article", user_id, entry_id) for entry_id in entry_ids],
+            "keys": [Entity.build_key("article", user_id, entry_id) for entry_id in entry_ids],
         }
         for item in self.db.view(self.__class__.ALL_DOCS, **options):
             doc = item.get("doc")

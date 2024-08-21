@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .dao import Dao
-from datatype import Folder
+from entity import Folder
 
 class FolderDao(Dao):
 

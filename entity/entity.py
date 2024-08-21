@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import decompose_key
+import re
 
-class FlexObject:
+class Entity:
 
     def __init__(self, source: dict={}):
         self._doc = source.copy()
@@ -74,7 +74,22 @@ class FlexObject:
             "_deleted": True,
         }
 
-    @staticmethod
-    def extract_doc_type(obj_id: str) -> str|None:
-        doc_type, _ = decompose_key(obj_id)
+    @classmethod
+    def build_key(cls, prefix: str, *entity_ids: str) -> str:
+        # TODO: should also strip out :+ in individual ids
+        # Remove entity prefix from each key
+        stripped = [re.sub(r"^[a-z]+::", "", id) for id in entity_ids]
+        # Join them together and tack on a prefix
+        return f"{prefix}::{"::".join(stripped)}"
+
+    @classmethod
+    def extract_doc_type(cls, entity_id: str) -> str|None:
+        doc_type, _ = __class__.decompose_key(entity_id)
         return doc_type
+
+    @classmethod
+    def decompose_key(cls, key: str) -> tuple[str|None, list[str]|None]:
+        parts = key.split("::")
+        if not parts:
+            return None, None
+        return parts[0], parts[1:]

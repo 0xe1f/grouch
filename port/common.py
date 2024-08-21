@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datatype.folder import Folder
-from datatype.feed_content import FeedContent
-from datatype.subscription import Subscription
+from entity.folder import Folder
+from entity.feed import Feed
+from entity.subscription import Subscription
 from port.objects import PortDoc
 from port.objects import Group
 from port.objects import Source
 from port.opml import write_opml
 from port.opml import read_opml
 
-SubMeta = tuple[Subscription, FeedContent]
+SubMeta = tuple[Subscription, Feed]
 
 def export_opml(title: str, subs: list[SubMeta], folders: list[Folder]) -> str:
     doc = _to_doc(subs, folders)

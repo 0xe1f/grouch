@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datatype import EntryContent
-from datatype import FeedContent
+from entity import Entry
+from entity import Feed
 import hashlib
 import json
 import unittest
@@ -37,9 +37,9 @@ class TestFeedContent(unittest.TestCase):
         "published": uuid.uuid4().hex,
     }   
 
-    def test_feed_content_properties(self):
-        obj = FeedContent()
-        self.assertEqual(FeedContent.DOC_TYPE, obj.doc_type)
+    def test_feed_properties(self):
+        obj = Feed()
+        self.assertEqual(Feed.DOC_TYPE, obj.doc_type)
 
         for k, v in __class__.DIGEST_DICT.items():
             self.assertTrue(hasattr(obj, k))
@@ -51,7 +51,7 @@ class TestFeedContent(unittest.TestCase):
             self.assertEqual(getattr(obj, k), v)
 
     def test_feed_digest_computation(self):
-        obj = FeedContent()
+        obj = Feed()
         for k, v in __class__.DIGEST_DICT.items():
             setattr(obj, k, v)
 
@@ -62,7 +62,7 @@ class TestFeedContent(unittest.TestCase):
         self.assertEqual(computed_digest, obj.computed_digest())
 
     def test_feed_digest_recomputed(self):
-        obj = FeedContent()
+        obj = Feed()
         previous_digest = obj.computed_digest()
         for k, v in __class__.DIGEST_DICT.items():
             setattr(obj, k, v)
@@ -72,7 +72,7 @@ class TestFeedContent(unittest.TestCase):
             previous_digest = digest
 
     def test_feed_digest_unchaged(self):
-        obj = FeedContent()
+        obj = Feed()
 
         previous_digest = obj.computed_digest()
         for k, v in FLEX_DICT.items():
@@ -94,9 +94,9 @@ class TestEntryContent(unittest.TestCase):
         "published": uuid.uuid4().hex,
     }   
 
-    def test_entry_content_properties(self):
-        obj = EntryContent()
-        self.assertEqual(EntryContent.DOC_TYPE, obj.doc_type)
+    def test_entry_properties(self):
+        obj = Entry()
+        self.assertEqual(Entry.DOC_TYPE, obj.doc_type)
 
         for k, v in __class__.DIGEST_DICT.items():
             self.assertTrue(hasattr(obj, k))
@@ -108,7 +108,7 @@ class TestEntryContent(unittest.TestCase):
             self.assertEqual(getattr(obj, k), v)
 
     def test_entry_digest_computation(self):
-        obj = EntryContent()
+        obj = Entry()
         for k, v in __class__.DIGEST_DICT.items():
             setattr(obj, k, v)
 
@@ -119,7 +119,7 @@ class TestEntryContent(unittest.TestCase):
         self.assertEqual(computed_digest, obj.computed_digest())
 
     def test_entry_digest_recomputed(self):
-        obj = EntryContent()
+        obj = Entry()
         previous_digest = obj.computed_digest()
         for k, v in __class__.DIGEST_DICT.items():
             setattr(obj, k, v)
@@ -129,7 +129,7 @@ class TestEntryContent(unittest.TestCase):
             previous_digest = digest
 
     def test_entry_digest_unchaged(self):
-        obj = EntryContent()
+        obj = Entry()
 
         previous_digest = obj.computed_digest()
         for k, v in FLEX_DICT.items():

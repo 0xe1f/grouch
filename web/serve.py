@@ -16,9 +16,9 @@
 
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
-from datatype import Article
-from datatype import Folder
-from datatype import Subscription
+from entity import Article
+from entity import Folder
+from entity import Subscription
 from datetime import datetime
 from flask_executor import Executor
 from flask_login import current_user

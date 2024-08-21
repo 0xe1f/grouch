@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from common import first_or_none
-from datatype import Article
-from datatype import FlexObject
-from datatype import Folder
-from datatype import Subscription
-from datatype import User
+from entity import Article
+from entity import Entity
+from entity import Folder
+from entity import Subscription
+from entity import User
 from dao import BulkUpdateQueue
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
@@ -38,7 +38,7 @@ def objects_rename(
 
     # FIXME!! validate title
 
-    doc_type = FlexObject.extract_doc_type(object_id)
+    doc_type = Entity.extract_doc_type(object_id)
     with tc.dao.new_q() as bulk_q:
         if doc_type == Subscription.DOC_TYPE:
             owner_id = Subscription.extract_owner_id(object_id)

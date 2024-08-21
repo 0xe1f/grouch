@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from argparse import ArgumentParser
-from datatype import User
+from entity import User
 from dao import Connection
 from dao import Database
 import bcrypt

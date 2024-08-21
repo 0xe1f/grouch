@@ -16,9 +16,9 @@ from .feeds import import_feeds
 from .feeds import import_feed_results
 from .objects import TaskContext
 from common import first_or_none
-from datatype import Article
-from datatype import Folder
-from datatype import Subscription
+from entity import Article
+from entity import Folder
+from entity import Subscription
 from datetime import datetime
 from itertools import batched
 from parser import ParseResult

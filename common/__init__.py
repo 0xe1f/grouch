@@ -12,8 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common.keys import build_key
-from common.keys import decompose_key
-from common.keys import decompose_key
 from common.lists import first_index
 from common.lists import first_or_none

@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import build_key
-from datatype.flex_object import FlexObject
+from .entity import Entity
 import bcrypt
 
-class User(FlexObject):
+class User(Entity):
 
     DOC_TYPE = "user"
 
@@ -75,4 +74,4 @@ class User(FlexObject):
         if not self.username:
             raise ValueError("Missing username")
 
-        return build_key(self.doc_type, self.username)
+        return self.build_key(self.doc_type, self.username)

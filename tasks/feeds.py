@@ -15,7 +15,7 @@
 from .objects import TaskContext
 from concurrent.futures import as_completed
 from concurrent.futures import ThreadPoolExecutor
-from datatype import FeedContent
+from entity import Feed
 from parser import ParseResult
 from parser import parse_feed
 from dao import BulkUpdateQueue
@@ -70,17 +70,17 @@ def refresh_feeds(
         for feed in tc.dao.feeds.iter_updated_before(stale_start=stale_start.timestamp()):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
-                _freshen_stale_feed_content(tc, bulk_q, *pending_fetch)
+                _freshen_stale_feed(tc, bulk_q, *pending_fetch)
                 pending_fetch.clear()
 
         if pending_fetch:
-            _freshen_stale_feed_content(tc, bulk_q, *pending_fetch)
+            _freshen_stale_feed(tc, bulk_q, *pending_fetch)
             pending_fetch.clear()
 
-def _freshen_stale_feed_content(
+def _freshen_stale_feed(
     tc: TaskContext,
     bulk_q: BulkUpdateQueue,
-    *feeds: FeedContent,
+    *feeds: Feed,
 ):
     local_feed_map = { feed.feed_url:feed for feed in feeds }
 

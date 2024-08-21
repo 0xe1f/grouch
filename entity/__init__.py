@@ -12,16 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-
-def build_key(prefix: str, *entity_ids: str) -> str:
-    # Remove entity prefix from each key
-    stripped = [re.sub(r"^[a-z]+::", "", id) for id in entity_ids]
-    # Join them together and tack on a prefix
-    return f"{prefix}::{"::".join(stripped)}"
-
-def decompose_key(key: str) -> tuple[str|None, list[str]|None]:
-    parts = key.split("::")
-    if not parts:
-        return None, None
-    return parts[0], parts[1:]
+from entity.article import Article
+from entity.entry import Entry
+from entity.feed import Feed
+from entity.entity import Entity
+from entity.folder import Folder
+from entity.subscription import Subscription
+from entity.user import User

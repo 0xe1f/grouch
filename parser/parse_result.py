@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datatype import EntryContent
-from datatype import FeedContent
+from entity import Entry
+from entity import Feed
 
 class ParseResult:
 
-    def __init__(self, url: str, feed: FeedContent|None=None, entries: list[EntryContent]|None=None, alts: list[str]|None=None):
+    def __init__(self, url: str, feed: Feed|None=None, entries: list[Entry]|None=None, alts: list[str]|None=None):
         self._url = url
         self._feed = feed
         self._entries = entries
@@ -28,11 +28,11 @@ class ParseResult:
         return self._url
 
     @property
-    def feed(self) -> FeedContent|None:
+    def feed(self) -> Feed|None:
         return self._feed
 
     @property
-    def entries(self) -> list[EntryContent]|None:
+    def entries(self) -> list[Entry]|None:
         return self._entries
 
     @property

@@ -14,7 +14,7 @@
 
 from couchdb.client import Database
 from couchdb.http import ResourceConflict
-from datatype import FlexObject
+from entity import Entity
 from datetime import datetime
 
 # Not thread-safe
@@ -37,7 +37,7 @@ class BulkUpdateQueue:
     def __exit__(self, *_):
         self.flush()
 
-    def enqueue_flex(self, *objs: FlexObject):
+    def enqueue_flex(self, *objs: Entity):
         # Update update time & attach an id
         for obj in objs:
             if not obj.id:

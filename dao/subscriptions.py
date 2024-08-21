@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .dao import Dao
-from datatype import Subscription
+from entity import Subscription
 
 class SubscriptionDao(Dao):
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .dao import Dao
-from datatype import FeedContent
+from entity import Feed
 
 FeedMeta = tuple[str, str]
 
@@ -24,10 +24,10 @@ class FeedDao(Dao):
     def find_by_id(
         self,
         *feed_ids: str,
-    ) -> list[FeedContent]:
+    ) -> list[Feed]:
         matches = []
         for item in self.db.view(self.__class__.ALL_DOCS, keys=feed_ids, include_docs=True):
-            matches.append(FeedContent(item.doc))
+            matches.append(Feed(item.doc))
 
         return matches
 
@@ -55,4 +55,4 @@ class FeedDao(Dao):
 
         iterable = self.db.iterview("maint/updated_feeds", batch_limit, **options)
         for item in iterable:
-            yield FeedContent(item.doc)
+            yield Feed(item.doc)

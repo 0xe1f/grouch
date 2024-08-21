@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .dao import Dao
-from datatype import EntryContent
+from entity import Entry
 
 class EntryDao(Dao):
 
@@ -22,11 +22,11 @@ class EntryDao(Dao):
     def find_by_id(
         self,
         *entry_ids: str,
-    ) -> list[EntryContent]:
+    ) -> list[Entry]:
         matches = []
         for item in self.db.view(self.__class__.ALL_DOCS, keys=entry_ids, include_docs=True):
             if doc := item.get("doc"):
-                matches.append(EntryContent(doc))
+                matches.append(Entry(doc))
 
         return matches
 
@@ -41,7 +41,7 @@ class EntryDao(Dao):
             "include_docs": True,
         }
         for item in self.db.view("maint/entries_by_feed_updated", **options):
-            yield EntryContent(item["doc"])
+            yield Entry(item["doc"])
 
     def iter_by_uid(
         self,
@@ -53,4 +53,4 @@ class EntryDao(Dao):
             "keys": [[feed_id, entry_uid] for entry_uid in entry_uids],
         }
         for item in self.db.view(self.__class__.BY_FEED, **options):
-            yield EntryContent(item["doc"])
+            yield Entry(item["doc"])

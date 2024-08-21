@@ -14,7 +14,7 @@
 
 from .dao import Dao
 from couchdb.http import ResourceConflict
-from datatype import User
+from entity import User
 from datetime import datetime
 import logging
 

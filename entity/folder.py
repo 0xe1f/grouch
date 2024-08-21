@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import build_key
-from common import decompose_key
-from datatype.flex_object import FlexObject
-from datatype.user import User
+from .entity import Entity
+from .user import User
 from uuid import uuid4
 
-class Folder(FlexObject):
+class Folder(Entity):
 
     DOC_TYPE = "folder"
 
@@ -53,13 +51,13 @@ class Folder(FlexObject):
         self._doc["user_id"] = val
 
     def new_key(self) -> str|None:
-        return build_key(self.doc_type, self.user_id, self.uid)
+        return self.build_key(self.doc_type, self.user_id, self.uid)
 
-    @staticmethod
-    def extract_owner_id(obj_id: str) -> str|None:
-        doc_type, parts = decompose_key(obj_id)
+    @classmethod
+    def extract_owner_id(cls, obj_id: str) -> str|None:
+        doc_type, parts = __class__.decompose_key(obj_id)
         if doc_type != __class__.DOC_TYPE:
             return None
         if len(parts) != 2:
             return None
-        return build_key(User.DOC_TYPE, parts[0])
+        return __class__.build_key(User.DOC_TYPE, parts[0])

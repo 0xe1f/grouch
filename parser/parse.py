@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datatype import EntryContent
-from datatype import FeedContent
+from entity import Entry
+from entity import Feed
 from parser import ParseResult
 from parser import sanitizer
 import datetime
@@ -85,12 +85,12 @@ def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
 
     return ParseResult(
         url,
-        feed=_create_feed_content(url, doc.feed),
-        entries=[_create_entry_content(entry) for entry in doc.entries],
+        feed=_create_feed(url, doc.feed),
+        entries=[_create_entry(entry) for entry in doc.entries],
     )
 
-def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedContent:
-    content = FeedContent()
+def _create_feed(url: str, feed: feedparser.FeedParserDict) -> Feed:
+    content = Feed()
     content.feed_url = url
     content.title = feed.title
     if "subtitle" in feed:
@@ -107,12 +107,12 @@ def _create_feed_content(url: str, feed: feedparser.FeedParserDict) -> FeedConte
 
     return content
 
-def _create_entry_content(entry: feedparser.FeedParserDict) -> EntryContent:
+def _create_entry(entry: feedparser.FeedParserDict) -> Entry:
     body = _entry_body(entry)
     html_content = sanitizer.sanitize_html(body)
     text_content = sanitizer.extract_text(html_content, max_len=_MAX_SUMMARY_LEN)
 
-    content = EntryContent()
+    content = Entry()
     content.entry_uid = entry.id
     content.title = entry.title
     if "author" in entry:

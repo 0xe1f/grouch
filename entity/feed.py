@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import build_key
-from datatype.flex_object import FlexObject
+from .entity import Entity
 import hashlib
 import json
 
-class FeedContent(FlexObject):
+class Feed(Entity):
 
     DOC_TYPE = "feed"
 
@@ -103,4 +102,4 @@ class FeedContent(FlexObject):
         if not self.feed_url:
             raise ValueError("Missing feed URL")
 
-        return build_key(self.doc_type, self.feed_url)
+        return self.build_key(self.doc_type, self.feed_url)

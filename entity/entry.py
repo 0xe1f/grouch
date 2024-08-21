@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import build_key
-from datatype.flex_object import FlexObject
+from .entity import Entity
 import hashlib
 import json
 
-class EntryContent(FlexObject):
+class Entry(Entity):
 
     DOC_TYPE = "entry"
 
@@ -122,4 +121,4 @@ class EntryContent(FlexObject):
         if not self.entry_uid:
             raise ValueError("Missing entry uid")
 
-        return build_key(self.doc_type, self.feed_id, self.entry_uid)
+        return self.build_key(self.doc_type, self.feed_id, self.entry_uid)

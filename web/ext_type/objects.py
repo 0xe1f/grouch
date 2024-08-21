@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datatype
+import entity
 import datetime
 import http
 
@@ -41,7 +41,7 @@ class Article(JsonObject):
 
     # 	Media []*EntryMedia   `datastore:"-" json:"media,omitempty"`
 
-    def __init__(self, article: datatype.Article|None=None, entry: datatype.EntryContent|None=None, source: dict={}):
+    def __init__(self, article: entity.Article|None=None, entry: entity.Entry|None=None, source: dict={}):
         super().__init__(source)
         if article:
             self.set_prop("id", article.id)
@@ -112,7 +112,7 @@ class Error(JsonObject):
 
 class Folder(JsonObject):
 
-    def __init__(self, folder: datatype.Folder|None=None, source: dict={}):
+    def __init__(self, folder: entity.Folder|None=None, source: dict={}):
         super().__init__(source)
         if folder:
             self.set_prop("id", folder.id)
@@ -128,7 +128,7 @@ class Folder(JsonObject):
 
 class Subscription(JsonObject):
 
-    def __init__(self, sub: datatype.Subscription|None=None, feed: datatype.FeedContent|None=None, source: dict={}):
+    def __init__(self, sub: entity.Subscription|None=None, feed: entity.Feed|None=None, source: dict={}):
         super().__init__(source)
         if sub:
             self.set_prop("id", sub.id)
@@ -233,7 +233,7 @@ class TableOfContents(JsonObject):
 
 class User(JsonObject):
 
-    def __init__(self, user: datatype.User|None=None, source: dict={}):
+    def __init__(self, user: entity.User|None=None, source: dict={}):
         super().__init__(source)
         if user:
             self.set_prop("id", user.id)

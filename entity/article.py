@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import build_key
-from common import decompose_key
-from datatype.flex_object import FlexObject
-from datatype.user import User
+from .entity import Entity
+from .user import User
 
-class Article(FlexObject):
+class Article(Entity):
 
     PROP_UNREAD = "unread"
     PROP_LIKED = "like"
@@ -115,13 +113,13 @@ class Article(FlexObject):
         if not self.entry_id:
             raise ValueError("Missing entry id")
 
-        return build_key(self.doc_type, self.user_id, self.entry_id)
+        return self.build_key(self.doc_type, self.user_id, self.entry_id)
 
-    @staticmethod
-    def extract_owner_id(obj_id: str) -> str|None:
-        doc_type, parts = decompose_key(obj_id)
+    @classmethod
+    def extract_owner_id(cls, obj_id: str) -> str|None:
+        doc_type, parts = __class__.decompose_key(obj_id)
         if doc_type != __class__.DOC_TYPE:
             return None
         if len(parts) != 3:
             return None
-        return build_key(User.DOC_TYPE, parts[0])
+        return __class__.build_key(User.DOC_TYPE, parts[0])
