@@ -26,7 +26,7 @@ class BulkUpdateQueue:
         self,
         db: Database,
         max_size: int=DEFAULT_MAX,
-        track_ids: bool=True,
+        track_ids: bool=False,
     ):
         self._max_size = max_size
         self._entities = []

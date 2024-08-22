@@ -15,7 +15,9 @@
 # limitations under the License.
 
 from argparse import ArgumentParser
-from tasks import refresh_feeds
+from tasks.feeds import refresh_feeds
+from tasks.objects import Database
+from tasks.objects import TaskContext
 import logging
 import dao
 import tomllib
@@ -44,8 +46,15 @@ conn.connect(
     config.get("DATABASE_PORT")
 )
 
+task_context = TaskContext(
+    Database(conn.db),
+    None,
+    None,
+    None,
+)
+
 def main():
     freshness_seconds = args.fresh * 60
-    refresh_feeds(conn, freshness_seconds)
+    refresh_feeds(task_context, freshness_seconds)
 
 main()

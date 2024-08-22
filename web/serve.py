@@ -145,7 +145,7 @@ def export_opml():
     feed_map = { feed.id:feed for feed in feeds }
 
     output = port.export_opml(
-        title=f"{current_user.username} subscriptions in grouch",
+        title=f"{current_user.username} subscriptions in Grouch",
         subs=[(sub, feed_map[sub.feed_id]) for sub in subs],
         folders=stores.folders.find_by_user(current_user.id),
     )

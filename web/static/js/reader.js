@@ -1243,7 +1243,7 @@
             // Update the title bar
 
             var root = subscriptionMap[""];
-            var title = 'grouch';
+            var title = 'Grouch';
 
             if (root.unread > 0)
                 title += ' (' + root.unread + ')';
