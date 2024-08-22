@@ -1,0 +1,37 @@
+name: Grouch
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup CouchDB
+      uses: iamssen/couchdb-github-action@0.3.0
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+    - name: Set up
+      run: |
+        ./setup.sh
+        echo -e "# Database
+          DATABASE_USERNAME = \"admin\"
+          DATABASE_PASSWORD = \"password\"
+          DATABASE_HOST = \"localhost\"
+        " > config.toml
+    - name: Run tests
+      run: |
+        . venv/bin/activate
+        ./tests.sh

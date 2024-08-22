@@ -14,132 +14,87 @@
 
 from dao import Connection
 from dao import Database
-import bcrypt
-import entity
+from entity import Entity
 import tomllib
 import unittest
+import uuid
+
+class TestEntity(Entity):
+
+    DOC_TYPE = "test"
+
+    def __init__(self, source: dict={}):
+        super().__init__(source)
+        if not source:
+            self.doc_type = self.__class__.DOC_TYPE
+            self.uid = TestDao.random_string()
+
+    @property
+    def uid(self) -> str:
+        return self.get_prop("uid")
+
+    @uid.setter
+    def uid(self, val: str):
+        self.set_prop("uid", val)
+
+    @property
+    def test(self) -> str:
+        return self.get_prop("test")
+
+    @test.setter
+    def test(self, val: str):
+        self.set_prop("test", val)
+
+    def new_key(self) -> str|None:
+        return self.build_key(self.doc_type, self.uid)
 
 class TestDao(unittest.TestCase):
 
     TEST_DB_NAME = "test__test"
 
-    @classmethod
-    def setUpClass(cls):
-        cls._conn = Connection()
+    def setUp(self):
+        self._conn = Connection()
 
         with open("config.toml", "rb") as file:
             config = tomllib.load(file)
 
-        cls._conn.connect(
+        self._conn.connect(
             __class__.TEST_DB_NAME,
             config["DATABASE_USERNAME"],
             config["DATABASE_PASSWORD"],
             config["DATABASE_HOST"],
             config.get("DATABASE_PORT"),
         )
-        cls._dao = Database(cls._conn.db)
+        self._dao = Database(self._conn.db)
+
+    def tearDown(self):
+        self._conn.destroy()
+
+    @property
+    def connection(self):
+        return self._conn
+
+    @property
+    def users(self):
+        return self._dao.users
 
     @classmethod
-    def tearDownClass(cls):
-        cls._conn.destroy()
+    def random_string(cls) -> str:
+        return uuid.uuid4().hex
 
-    def setUp(self) -> None:
-        self.users = self.__class__._dao.users
+    @classmethod
+    def new_test(cls) -> TestEntity:
+        test = TestEntity()
+        test.test = cls.random_string()
 
-    def tearDown(self) -> None:
-        # FIXME: delete all matching entities
-        if user := self.users.find_by_username("username"):
-            self.users.delete_by_id(user.id)
+        return test
 
-    def test_user_create(self):
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-        user.set_hashed_password("password", bcrypt.gensalt())
+    @classmethod
+    def new_tests(cls, count: int) -> list[TestEntity]:
+        tests = []
+        for _ in range(count):
+            test = TestEntity()
+            test.test = cls.random_string()
+            tests.append(test)
 
-        # Random field checks
-        self.assertTrue(user.hashed_password)
-        self.assertNotEqual(user.hashed_password, "password")
-        self.assertTrue(user.uid)
-        self.assertNotEqual(user.uid, user.username)
-
-        # Ensure user created
-        self.assertTrue(self.users.create(user))
-
-        # Ensure user is loaded
-        loaded_user = self.users.find_by_id(user.id)
-        self.assertIsNotNone(loaded_user)
-
-        # Compare records - except revision
-        user.rev = loaded_user.rev
-        self.assertEqual(user, loaded_user)
-
-    def test_user_find_by_username(self):
-        # FIXME: inject some random users too
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-
-        self.assertTrue(self.users.create(user))
-
-        loaded_user = self.users.find_by_username(user.username)
-        self.assertIsNotNone(loaded_user)
-        self.assertEqual(loaded_user.username, user.username)
-
-    def test_user_find_by_email_address(self):
-        # FIXME: inject some random users too
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-
-        self.assertTrue(self.users.create(user))
-
-        loaded_user = self.users.find_by_email_address(user.email_address)
-        self.assertIsNotNone(loaded_user)
-        self.assertEqual(loaded_user.email_address, user.email_address)
-
-    def test_user_dedupe_id(self):
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-
-        # Ensure user created
-        self.assertTrue(self.users.create(user))
-
-        # Ensure user creation fails second time
-        self.assertFalse(self.users.create(user))
-
-    def test_user_dedupe_username(self):
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-
-        # Ensure user created
-        self.assertTrue(self.users.create(user))
-
-        # Change uid (affects id) and email address
-        user.uid = "something else"
-        user.email_address = "another email"
-
-        # Ensure user creation fails second time
-        self.assertFalse(self.users.create(user))
-        self.assertIsNone(self.users.find_by_email_address(user.email_address))
-
-    def test_user_dedupe_email_address(self):
-        user = entity.User()
-        user.username = "username"
-        user.email_address = "email"
-
-        # Ensure user created
-        self.assertTrue(self.users.create(user))
-
-        # Change uid (affects id) and username
-        user.uid = "something else"
-        user.username = "another username"
-
-        # Ensure user creation fails second time
-        self.assertFalse(self.users.create(user))
-        self.assertIsNone(self.users.find_by_username(user.username))
-
-if __name__ == '__main__':
-    unittest.main()
+        return tests

@@ -20,9 +20,16 @@ from datetime import datetime
 # Not thread-safe
 class BulkUpdateQueue:
 
-    def __init__(self, db: Database, max_size: int=40, track_ids: bool=True):
+    DEFAULT_MAX=40
+
+    def __init__(
+        self,
+        db: Database,
+        max_size: int=DEFAULT_MAX,
+        track_ids: bool=True,
+    ):
         self._max_size = max_size
-        self._docs = []
+        self._entities = []
         self._db = db
         self._enqueued_count = 0
         self._success_count = 0
@@ -40,23 +47,20 @@ class BulkUpdateQueue:
     def enqueue(self, *objs: Entity):
         # Update update time & attach an id
         for obj in objs:
-            if not obj.id:
-                obj.id = obj.new_key()
-            obj.updated = datetime.now().timestamp()
-            self._docs.append(obj.as_dict())
+            self._entities.append(obj)
 
         self._enqueued_count += len(objs)
 
         # If queue overflows, write
-        if len(self._docs) > self._max_size:
-            pending = self._docs[:self._max_size]
-            self._docs = self._docs[self._max_size:]
+        if len(self._entities) > self._max_size:
+            pending = self._entities[:self._max_size]
+            self._entities = self._entities[self._max_size:]
             if pending:
                 self._commit(pending)
 
     def flush(self):
-        pending = self._docs
-        self._docs = []
+        pending = self._entities
+        self._entities = []
         self._commit(pending)
 
     @property
@@ -69,7 +73,7 @@ class BulkUpdateQueue:
 
     @property
     def pending_count(self) -> int:
-        return len(self._docs)
+        return len(self._entities)
 
     @property
     def conflict_count(self) -> int:
@@ -86,15 +90,26 @@ class BulkUpdateQueue:
         self._success_ids = []
         return success_ids
 
-    def _commit(self, docs: list):
-        if not len(docs):
+    def _commit(self, entities: list[Entity]):
+        if not len(entities):
             # logging.debug("Nothing to write")
             return
 
         self._commit_count += 1
+
+        docs = []
+        map = {}
+        for entity in entities:
+            if not entity.id:
+                entity.id = entity.new_key()
+            entity.updated = datetime.now().timestamp()
+            docs.append(entity.as_dict())
+            map[entity.id] = entity
+
         for result in self._db.update(docs):
             success, id, status = result
             if success:
+                map[id].rev = status
                 self._success_count += 1
                 if self._track_ids:
                     self._success_ids.append(id)

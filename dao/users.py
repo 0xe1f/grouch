@@ -69,8 +69,10 @@ class UserDao(Dao):
         user.updated = user.created
 
         try:
-            new_id, _ = self.db.save(user.as_dict())
-        except ResourceConflict as e:
+            new_id, rev = self.db.save(user.as_dict())
+            if rev:
+                user.rev = rev
+        except ResourceConflict:
             return False
 
         # Ensure we didn't end up writing multiple addresses

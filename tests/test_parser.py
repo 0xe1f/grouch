@@ -174,6 +174,3 @@ class TestRss2Parsing(unittest.TestCase):
 
             self.assertTrue(entry.digest, f"Check failed, entry index #{ix}")
             self.assertEqual(entry.digest, entry.computed_digest(), f"Check failed, entry index #{ix}")
-
-if __name__ == '__main__':
-    unittest.main()

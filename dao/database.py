@@ -55,5 +55,9 @@ class Database:
     def users(self) -> UserDao:
         return self._users
 
-    def new_q(self, track_ids: bool=False) -> BulkUpdateQueue:
-        return BulkUpdateQueue(self._db, track_ids=track_ids)
+    def new_q(
+        self,
+        max_size: int=BulkUpdateQueue.DEFAULT_MAX,
+        track_ids: bool=False,
+    ) -> BulkUpdateQueue:
+        return BulkUpdateQueue(self._db, max_size, track_ids=track_ids)

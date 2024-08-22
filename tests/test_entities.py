@@ -138,6 +138,3 @@ class TestEntryContent(unittest.TestCase):
             self.assertTrue(digest)
             self.assertEqual(previous_digest, digest)
             previous_digest = digest
-
-if __name__ == '__main__':
-    unittest.main()
