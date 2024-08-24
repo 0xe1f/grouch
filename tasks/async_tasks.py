@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from common import first_or_none
-from dao import BulkUpdateQueue
 from port import PortDoc
 from tasks.objects import TaskContext
 from time import time
@@ -31,11 +30,17 @@ def subs_sync(
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written; {bulk_q.commit_count} commits")
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 def subs_subscribe_url(
     tc: TaskContext,
     url: str,
 ):
     tasks_sub.subscribe_user_unknown_url(tc, tc.user_id, url)
+
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
 
 def subs_import(
     tc: TaskContext,
@@ -43,11 +48,17 @@ def subs_import(
 ):
     tasks_sub.import_user_subs(tc, tc.user_id, doc)
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 def subs_unsubscribe(
     tc: TaskContext,
     *sub_ids: int,
 ):
     tasks_sub.unsubscribe(tc, *sub_ids)
+
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
 
 def subs_mark_read_by_user(
     tc: TaskContext,
@@ -60,6 +71,9 @@ def subs_mark_read_by_user(
             bulk_q.enqueue(sub)
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
+
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
 
 def subs_mark_read_by_folder(
     tc: TaskContext,
@@ -75,6 +89,9 @@ def subs_mark_read_by_folder(
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 def subs_mark_read_by_sub(
     tc: TaskContext,
     sub_id: str,
@@ -88,6 +105,9 @@ def subs_mark_read_by_sub(
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 # Articles
 
 def articles_move(
@@ -100,6 +120,9 @@ def articles_move(
         tc.dao.articles.move_by_sub(bulk_q, sub_id, dest_folder_id)
     logging.info(f"Moved {bulk_q.written_count}/{bulk_q.enqueued_count} articles ({time() - start_time:.2}s)")
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 def articles_remove_tag(
     tc: TaskContext,
     tag: str,
@@ -109,7 +132,13 @@ def articles_remove_tag(
         tc.dao.articles.remove_all_tags_by_user_by_name(bulk_q, tag)
     logging.info(f"Updated {bulk_q.written_count}/{bulk_q.enqueued_count} articles ({time() - start_time:.2}s)")
 
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)
+
 # Folders
 
 def folders_delete(tc: TaskContext, folder_id: str):
     tasks_folders.delete_folder(tc, folder_id)
+
+    if tc._completion_message:
+        tc.send_message(tc._completion_message)

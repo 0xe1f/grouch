@@ -15,20 +15,35 @@
 from dao import Database
 from typing import Callable
 
+class Message:
+
+    def __init__(self, name: str, payload=None):
+        self._name = name
+        self._payload = payload
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def payload(self):
+        return self._payload
+
 class TaskContext:
 
     def __init__(
-            self,
-            dao: Database,
-            user_id: str|None=None,
-            async_q: Callable|None=None,
-            message_sender: Callable|None=None,
-        ):
+        self,
+        dao: Database,
+        user_id: str|None=None,
+        async_q: Callable|None=None,
+        message_sender: Callable|None=None,
+        completion_message: Message|None=None,
+    ):
         self._dao = dao
         self._user_id = user_id
         self._async_q = async_q
         self._message_sender = message_sender
-
+        self._completion_message = completion_message
 
     @property
     def dao(self) -> Database:
@@ -43,10 +58,10 @@ class TaskContext:
             raise TaskException("No task enqueuer defined")
         self._async_q(fn, *args, **kwargs)
 
-    def send_message(self, name: str, payload):
+    def send_message(self, message: Message):
         if not self._message_sender:
             raise TaskException("No message sender defined")
-        self._message_sender(name, payload)
+        self._message_sender(message.name, message.payload)
 
 class TaskException(BaseException):
     def __init__(self, message: str, *args: object) -> None:

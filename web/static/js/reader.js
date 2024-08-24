@@ -1959,6 +1959,10 @@
     socket
         .on("connect", function() {
             console.debug("Connected");
+        })
+        .on("refresh", function(response) {
+            console.debug(`Refresh received: ${response}`);
+            refresh(response && response.includes("articles"));
         });
 
     ui.init();

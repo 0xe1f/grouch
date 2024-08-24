@@ -25,6 +25,7 @@ from flask_login import current_user
 from io import BytesIO
 from dao import Connection
 from dao import Database
+from tasks.objects import Message
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
 from web.ext_type import requests
@@ -170,7 +171,7 @@ def subscribe():
     # FIXME: validate url
 
     # Kick off a task
-    executor.submit(async_tasks.subs_subscribe_url, _create_task_context(), arg.url)
+    _submit(async_tasks.subs_subscribe_url, arg.url, message=Message("refresh"))
 
     return responses.SubscribeResponse().as_dict()
 
@@ -286,7 +287,7 @@ def remove_tag():
         return ext_objs.Error("FIXME!!").as_dict()
 
     # Remove tags asynchronously
-    executor.submit(async_tasks.articles_remove_tag, _create_task_context(), arg.tag)
+    _submit(async_tasks.articles_remove_tag, arg.tag)
 
     # Remove it from the list manually
     toc = _fetch_table_of_contents()
@@ -339,7 +340,7 @@ def mark_all_as_read():
 
     match arg.scope:
         case requests.MarkAllAsReadRequest.SCOPE_ALL:
-            executor.submit(async_tasks.subs_mark_read_by_user, _create_task_context())
+            _submit(async_tasks.subs_mark_read_by_user)
         case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
             if not arg.id:
                 app.logger.error(f"Missing id")
@@ -348,7 +349,7 @@ def mark_all_as_read():
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
-            executor.submit(async_tasks.subs_mark_read_by_folder, _create_task_context(), arg.id)
+            _submit(async_tasks.subs_mark_read_by_folder, arg.id)
         case requests.MarkAllAsReadRequest.SCOPE_SUB:
             if not arg.id:
                 app.logger.error(f"Missing id")
@@ -357,7 +358,7 @@ def mark_all_as_read():
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
-            executor.submit(async_tasks.subs_mark_read_by_sub, _create_task_context(), arg.id)
+            _submit(async_tasks.subs_mark_read_by_sub, arg.id)
 
     toc = _fetch_table_of_contents()
     match arg.scope:
@@ -375,7 +376,7 @@ def mark_all_as_read():
 def sync_feeds():
     try:
         next_sync = sync_tasks.subs_sync(
-            _create_task_context(),
+            _create_task_context(message=Message("refresh")),
             datetime.now(),
             FEED_SYNC_TIMEOUT_SECS,
         )
@@ -414,7 +415,7 @@ def import_feeds():
         app.logger.error(f"Unable to import document")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    executor.submit(async_tasks.subs_import, _create_task_context(), doc)
+    _submit(async_tasks.subs_import, doc, message=Message("refresh"))
 
     return responses.ImportFeedsResponse().as_dict()
 
@@ -433,12 +434,15 @@ def socketio_disconnect():
     flask_socketio.leave_room(current_user.id)
     app.logger.debug("Disconnected")
 
-def _create_task_context() -> TaskContext:
+def _create_task_context(
+    message: Message|None=None,
+) -> TaskContext:
     return TaskContext(
         stores,
         current_user.id if current_user.is_authenticated else None,
         executor.submit,
         _send_message,
+        message,
     )
 
 def _fetch_table_of_contents() -> ext_objs.TableOfContents:
@@ -459,6 +463,10 @@ def _send_message(message_name: str, payload):
         socketio.emit(message_name, payload, to=current_user.id)
     else:
         app.logger.warning(f"Cannot send {message_name}; user not authenticated")
+
+def _submit(fn, *args, **kwargs):
+    message = kwargs.pop("message", None)
+    executor.submit(fn, _create_task_context(message), *args, **kwargs)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

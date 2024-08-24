@@ -19,6 +19,10 @@ import random
 
 class TestDaoUsers(TestDao):
 
+    @property
+    def users(self):
+        return self.dao.users
+
     def test_user_create(self):
         self._create_random_users(random.randrange(3, 8))
 
@@ -39,8 +43,6 @@ class TestDaoUsers(TestDao):
         # Ensure user is loaded
         loaded_user = self.users.find_by_id(user.id)
         self.assertIsNotNone(loaded_user)
-
-        # Compare records - except revision
         self.assertEqual(user, loaded_user)
 
     def test_user_find_by_username(self):

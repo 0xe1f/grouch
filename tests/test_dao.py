@@ -75,8 +75,8 @@ class TestDao(unittest.TestCase):
         return self._conn
 
     @property
-    def users(self):
-        return self._dao.users
+    def dao(self):
+        return self._dao
 
     @classmethod
     def random_string(cls) -> str:

@@ -44,12 +44,14 @@ class BulkUpdateQueue:
     def __exit__(self, *_):
         self.flush()
 
-    def enqueue(self, *objs: Entity):
+    def enqueue(self, *entities: Entity):
         # Update update time & attach an id
-        for obj in objs:
-            self._entities.append(obj)
+        for entity in entities:
+            if not entity.id:
+                entity.id = entity.new_key()
+            self._entities.append(entity)
 
-        self._enqueued_count += len(objs)
+        self._enqueued_count += len(entities)
 
         # If queue overflows, write
         if len(self._entities) > self._max_size:
@@ -100,8 +102,6 @@ class BulkUpdateQueue:
         docs = []
         map = {}
         for entity in entities:
-            if not entity.id:
-                entity.id = entity.new_key()
             entity.updated = datetime.now().timestamp()
             docs.append(entity.as_dict())
             map[entity.id] = entity
