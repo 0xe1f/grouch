@@ -82,12 +82,6 @@ def articles_set_property(
 
     if is_set != (prop_name in article.props):
         with tc.dao.new_q() as bulk_q:
-            if prop_name == Article.PROP_UNREAD:
-                # Need to also update sub
-                if not (sub := first_or_none(tc.dao.subs.find_by_id(article.subscription_id))):
-                    raise TaskException(f"No sub with id {article.subscription_id}")
-                sub.unread_count += 1 if is_set else -1
-                bulk_q.enqueue(sub)
             article.toggle_prop(prop_name, is_set)
             bulk_q.enqueue(article)
 

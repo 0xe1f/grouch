@@ -66,9 +66,6 @@ def subs_mark_read_by_user(
     start_time = time()
     with tc.dao.new_q() as bulk_q:
         tc.dao.articles.mark_as_read_by_user(bulk_q, tc.user_id)
-        for sub in tc.dao.subs.iter_by_user(tc.user_id):
-            sub.unread_count = 0
-            bulk_q.enqueue(sub)
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
@@ -82,10 +79,6 @@ def subs_mark_read_by_folder(
     start_time = time()
     with tc.dao.new_q() as bulk_q:
         tc.dao.articles.mark_as_read_by_folder(bulk_q, folder_id)
-        for sub in tc.dao.subs.iter_by_folder(folder_id):
-            # TODO: this is potentially inacurate
-            sub.unread_count = 0
-            bulk_q.enqueue(sub)
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 
@@ -98,10 +91,7 @@ def subs_mark_read_by_sub(
 ):
     start_time = time()
     with tc.dao.new_q() as bulk_q:
-        changed = tc.dao.articles.mark_as_read_by_sub(bulk_q, sub_id)
-        if sub := first_or_none(tc.dao.subs.find_by_id(sub_id)):
-            sub.unread_count -= changed
-            bulk_q.enqueue(sub)
+        tc.dao.articles.mark_as_read_by_sub(bulk_q, sub_id)
 
     logging.info(f"Marked {bulk_q.written_count}/{bulk_q.enqueued_count} objects ({time() - start_time:.2}s)")
 

@@ -86,7 +86,6 @@ def sync_subs(
         if updated_article_count:
             sub = first_or_none(tc.dao.subs.find_by_id(sub_id))
             sub.last_synced = max_synced
-            sub.unread_count += marked_unread
             bulk_q.enqueue(sub)
 
 def subscribe_user_unknown_url(

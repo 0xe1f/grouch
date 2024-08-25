@@ -109,6 +109,15 @@ class SyncFeedsResponse(JsonObject):
             },
         )
 
+class UnreadCountsResponse(JsonObject):
+
+    def __init__(self, counts: dict[str, int]|None=None):
+        super().__init__(
+            {
+                "counts": counts,
+            },
+        )
+
 class UnsubscribeResponse(JsonObject):
 
     def __init__(self, toc: TableOfContents):

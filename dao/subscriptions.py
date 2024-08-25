@@ -20,6 +20,7 @@ class SubscriptionDao(Dao):
     BY_FOLDER = "maint/subs_by_folder"
     BY_USER = "maint/subs_by_user"
     BY_USER_BY_SYNC = "maint/subs_by_user"
+    BY_USER_UNREAD_COUNT = "maint/subs_by_user_unread_count"
 
     def find_by_id(
         self,
@@ -66,6 +67,23 @@ class SubscriptionDao(Dao):
             matches.append((doc.id, doc.value["feed_id"], doc.value.get("folder_id"), doc.value.get("last_sync")))
 
         return matches
+
+    def get_unread_counts_by_user(
+        self,
+        user_id: str,
+    ) -> dict[str, int]:
+        options = {
+            "start_key": [ user_id ],
+            "end_key": [ user_id, {} ],
+            "reduce": True,
+            "group": True,
+        }
+        counts = {}
+        for item in self.db.view(self.__class__.BY_USER_UNREAD_COUNT, **options):
+            _, sub_id = item.key
+            counts[sub_id] = item.value
+
+        return counts
 
     def iter_by_folder(
         self,

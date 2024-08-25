@@ -23,7 +23,6 @@ class Subscription(Entity):
         super().__init__(source)
         if not source:
             self.doc_type = self.__class__.DOC_TYPE
-            self.unread_count = 0
 
     @property
     def title(self) -> str:
@@ -32,14 +31,6 @@ class Subscription(Entity):
     @title.setter
     def title(self, val: str):
         self.set_prop("title", val)
-
-    @property
-    def unread_count(self) -> str:
-        return self.get_prop("unread_count")
-
-    @unread_count.setter
-    def unread_count(self, val: str):
-        self.set_prop("unread_count", val)
 
     @property
     def subscribed(self) -> int:

@@ -134,6 +134,16 @@ class Connection:
                         }
                     """
                 },
+                subs_by_user_unread_count={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'article' && doc.props.includes('unread')) {
+                                emit(doc.subscription_id);
+                            }
+                        }
+                    """,
+                    "reduce": "_count"
+                },
                 subs_by_folder={
                     "map": """
                         function (doc) {

@@ -128,16 +128,22 @@ class Folder(JsonObject):
 
 class Subscription(JsonObject):
 
-    def __init__(self, sub: entity.Subscription|None=None, feed: entity.Feed|None=None, source: dict={}):
+    def __init__(
+        self,
+        sub: entity.Subscription|None=None,
+        feed: entity.Feed|None=None,
+        unread_count: int|None=None,
+        source: dict={},
+    ):
         super().__init__(source)
         if sub:
             self.set_prop("id", sub.id)
             self.set_prop("title", sub.title)
-            self.set_prop("unread", sub.unread_count)
             self.set_prop("parent", sub.folder_id)
         if feed:
             self.set_prop("faviconUrl", feed.favicon_url)
             self.set_prop("link", feed.site_url)
+        self.set_prop("unread", unread_count or 0)
 
     @property
     def id(self) -> str:

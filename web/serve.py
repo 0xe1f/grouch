@@ -447,13 +447,18 @@ def _create_task_context(
 
 def _fetch_table_of_contents() -> ext_objs.TableOfContents:
     subs = stores.subs.find_by_user(current_user.id)
+    unread_counts = stores.subs.get_unread_counts_by_user(current_user.id)
     feeds = stores.feeds.find_by_id(*[sub.feed_id for sub in subs])
     folders = stores.folders.find_by_user(current_user.id)
     feed_map = { feed.id:feed for feed in feeds }
     tags = stores.articles.find_tags_by_user(current_user.id)
 
     return ext_objs.TableOfContents(
-        subs=[ext_objs.Subscription(sub, feed_map[sub.feed_id]) for sub in subs],
+        subs=[ext_objs.Subscription(
+            sub,
+            feed_map[sub.feed_id],
+            unread_counts.get(sub.id),
+        ) for sub in subs],
         folders=[ext_objs.Folder(folder) for folder in folders],
         tags=[ext_objs.Tag(tag) for tag in tags],
     )
