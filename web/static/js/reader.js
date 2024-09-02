@@ -40,7 +40,7 @@
         while ((m = re.exec(str)) !== null) {
             var url = m[1];
             var text = m[2];
-            var anchor = '<a href="' + url + '" target="_blank">%s</a>';
+            var anchor = `<a href="${url}" target="_blank">%s</a>`;
 
             html += str.substr(start, m.index - start) + anchor;
             start = m.index + m[0].length;
@@ -55,7 +55,7 @@
 
     var _l = function(str, args) {
         var localized = null;
-        if (typeof gofrStrings !== 'undefined' && gofrStrings != null)
+        if (typeof gofrStrings !== "undefined" && gofrStrings != null)
             localized = gofrStrings[str];
 
         if (localized == null)
@@ -85,33 +85,33 @@
 
     // Automatic pager
 
-    $('.gofr-entries-container').scroll(function() {
-        var pagerHeight = $('.next-page').outerHeight();
+    $(".gofr-entries-container").scroll(function() {
+        var pagerHeight = $(".next-page").outerHeight();
         if (!pagerHeight)
             return; // No pager
 
         if (lastContinued == continueFrom)
             return;
 
-        var offset = $('#gofr-entries').height() - ($('.gofr-entries-container').scrollTop() + $('.gofr-entries-container').height()) - pagerHeight;
+        var offset = $("#gofr-entries").height() - ($(".gofr-entries-container").scrollTop() + $(".gofr-entries-container").height()) - pagerHeight;
         if (offset < 36)
-            $('.next-page').click();
+            $(".next-page").click();
     });
 
     // Default click handler
 
-    $('html')
+    $("html")
         .click(function() {
             ui.unfloatAll();
         })
         .mouseup(function(e) {
-            $('#subscriptions').unbind("mousemove");
-            $('#subscriptions .dragging').remove();
-            $('#subscriptions .dragged').removeClass('dragged');
+            $("#subscriptions").unbind("mousemove");
+            $("#subscriptions .dragging").remove();
+            $("#subscriptions .dragged").removeClass("dragged");
 
             if ($dragSource && dragDestination) {
-                var dragSource = $dragSource.data('subscription');
-                if (dragDestination.id != (dragSource.parent || ''))
+                var dragSource = $dragSource.data("subscription");
+                if (dragDestination.id != (dragSource.parent || ""))
                     dragSource.moveTo(dragDestination);
             }
 
@@ -120,8 +120,8 @@
             dragDestination = null;
         });
 
-    $('.modal-blocker').click(function() {
-        $('.modal').showModal(false);
+    $(".modal-blocker").click(function() {
+        $(".modal").showModal(false);
     });
 
     // Default error handler
@@ -143,24 +143,24 @@
     });
 
     var articleGroupingMethods = {
-        'getFilter': function() {
+        "getFilter": function() {
             return { };
         },
-        'getSourceUrl': function() {
+        "getSourceUrl": function() {
             // returns source URL (e.g. http://www.arstechnica.com/)
             // or null if N/A
             return null;
         },
-        'supportsAggregateActions': function() {
+        "supportsAggregateActions": function() {
             return false;
         },
-        'supportsPropertyFilters': function() {
+        "supportsPropertyFilters": function() {
             return false;
         },
-        'getDom': function() {
-            return $('#subscriptions').find('.' + this.domId);
+        "getDom": function() {
+            return $("#subscriptions").find(`.${this.domId}`);
         },
-        'loadEntries': function() {
+        "loadEntries": function() {
             lastContinued = continueFrom;
 
             const subscription = this;
@@ -178,34 +178,34 @@
                 }
             });
         },
-        'refresh': function() {
+        "refresh": function() {
             continueFrom = null;
             lastContinued = null;
 
-            $('#gofr-entries').empty();
+            $("#gofr-entries").empty();
             this.loadEntries();
         },
-        'select': function(reloadItems /* = true */) {
-            if (typeof reloadItems === 'undefined')
+        "select": function(reloadItems /* = true */) {
+            if (typeof reloadItems === "undefined")
                 reloadItems = true;
 
-            $('#subscriptions').find('.subscription.selected').removeClass('selected');
-            this.getDom().addClass('selected');
+            $("#subscriptions").find(".subscription.selected").removeClass("selected");
+            this.getDom().addClass("selected");
 
             if (reloadItems) {
                 this.selectedEntry = null;
 
                 var sourceUrl = this.getSourceUrl();
-                $('#gofr-entries').toggleClass('single-source',
+                $("#gofr-entries").toggleClass("single-source",
                     sourceUrl != null);
 
                 if (sourceUrl == null)
-                    $('.gofr-entries-header').text(this.title);
+                    $(".gofr-entries-header").text(this.title);
                 else
-                    $('.gofr-entries-header').html($('<a />', {
-                        'href' : sourceUrl,
-                        'target' : '_blank'
-                    }).text(this.title).append($('<span />').text(' »')));
+                    $(".gofr-entries-header").html($("<a />", {
+                        "href" : sourceUrl,
+                        "target" : "_blank"
+                    }).text(this.title).append($("<span />").text(" »")));
 
                 this.refresh();
                 syncFeeds();
@@ -213,9 +213,9 @@
 
             ui.onScopeChanged();
         },
-        'addPage': function(entries) {
+        "addPage": function(entries) {
             var subscription = this;
-            var idCounter = $('#gofr-entries').find('.gofr-entry').length;
+            var idCounter = $("#gofr-entries").find(".gofr-entry").length;
 
             $.each(entries, function() {
                 var entry = this;
@@ -231,29 +231,29 @@
                 var sourceTitle = entrySubscription != null ? entrySubscription.title : null;
 
                 entry.areExtrasDirty = true;
-                entry.extras = { 'likeCount': 0 };
-                entry.domId = 'gofr-entry-' + idCounter++;
+                entry.extras = { "likeCount": 0 };
+                entry.domId = `gofr-entry-${idCounter++}`;
 
-                var $entry = $('<div />', { 'class': 'gofr-entry ' + entry.domId})
-                    .data('entry', entry)
-                    .append($('<div />', { 'class' : 'gofr-entry-item' })
-                        .append($('<div />', { 'class' : 'action-star' })
+                var $entry = $("<div />", { "class": `gofr-entry ${entry.domId}` })
+                    .data("entry", entry)
+                    .append($("<div />", { "class" : "gofr-entry-item" })
+                        .append($("<div />", { "class" : "action-star" })
                             .click(function(e) {
                                 entry.toggleStarred();
                                 e.stopPropagation();
                             }))
-                        .append($('<span />', { 'class' : 'gofr-entry-source' })
+                        .append($("<span />", { "class" : "gofr-entry-source" })
                             .text(sourceTitle))
-                        .append($('<a />', { 'class' : 'gofr-entry-link', 'href' : entry.link, 'target' : '_blank' })
+                        .append($("<a />", { "class" : "gofr-entry-link", "href" : entry.link, "target" : "_blank" })
                             .click(function(e) {
                                 // Prevent expansion
                                 e.stopPropagation();
                             }))
-                        .append($('<span />', { 'class' : 'gofr-entry-pubDate' })
+                        .append($("<span />", { "class" : "gofr-entry-pubDate" })
                             .text(getPublishedDate(entry.published)))
-                        .append($('<div />', { 'class' : 'gofr-entry-excerpt' })
-                            .append($('<h2 />', { 'class' : 'gofr-entry-title' })
-                            // .append($('<a />', { 'class' : 'gofr-entry-title', 'href' : entry.link, 'target' : '_blank' })
+                        .append($("<div />", { "class" : "gofr-entry-excerpt" })
+                            .append($("<h2 />", { "class" : "gofr-entry-title" })
+                            // .append($("<a />", { "class" : "gofr-entry-title", "href" : entry.link, "target" : "_blank" })
                                 // .click(function(e) {
                                 // 	entry.markAsRead();
 
@@ -261,8 +261,8 @@
                                 // 	e.stopPropagation();
                                 // })
                                 .text(entry.title))
-                            .append($('<span />', { 'class' : 'gofr-entry-source-mobile' })
-                                .text(" - " + sourceTitle))
+                            .append($("<span />", { "class" : "gofr-entry-source-mobile" })
+                                .text(` - ${sourceTitle}`))
                             ))
                     .click(function() {
                         entry.select();
@@ -277,24 +277,24 @@
                     });
 
                 if (entry.summary) {
-                    $entry.find('.gofr-entry-excerpt')
-                        .append($('<span />', { 'class' : 'gofr-entry-spacer' }).text(' - '))
-                        .append($('<span />', { 'class' : 'gofr-entry-summary' }).text(entry.summary));
+                    $entry.find(".gofr-entry-excerpt")
+                        .append($("<span />", { "class" : "gofr-entry-spacer" }).text(" - "))
+                        .append($("<span />", { "class" : "gofr-entry-summary" }).text(entry.summary));
                 }
 
-                $('#gofr-entries').append($entry);
+                $("#gofr-entries").append($entry);
 
                 entry.syncView();
             });
 
-            $('.next-page').remove();
+            $(".next-page").remove();
 
             ui.onEntryListUpdate();
 
             if (continueFrom) {
-                $('#gofr-entries')
-                    .append($('<div />', { 'class' : 'next-page' })
-                        .text(_l('Continue'))
+                $("#gofr-entries")
+                    .append($("<div />", { "class" : "next-page" })
+                        .text(_l("Continue"))
                         .click(function(e) {
                             subscription.loadEntries();
                         }));
@@ -303,8 +303,8 @@
     };
 
     var subscriptionMethods = $.extend({}, articleGroupingMethods, {
-        'getFilter': function() {
-            const selectedPropertyFilter = $('.group-filter.selected-menu-item').data('value');
+        "getFilter": function() {
+            const selectedPropertyFilter = $(".group-filter.selected-menu-item").data("value");
 
             const filter = { "sub": this.id };
             if (selectedPropertyFilter) {
@@ -312,28 +312,28 @@
             }
             return filter;
         },
-        'supportsAggregateActions': function() {
+        "supportsAggregateActions": function() {
             return true;
         },
-        'supportsPropertyFilters': function() {
+        "supportsPropertyFilters": function() {
             return true;
         },
-        'getDom': function() {
-            return $('#subscriptions').find('.' + this.domId);
+        "getDom": function() {
+            return $("#subscriptions").find(`.${this.domId}`);
         },
-        'isFolder': function() {
+        "isFolder": function() {
             return false;
         },
-        'isRoot': function() {
+        "isRoot": function() {
             return false;
         },
-        'getSourceUrl': function() {
+        "getSourceUrl": function() {
             return this.link;
         },
-        'getFavIconUrl': function() {
+        "getFavIconUrl": function() {
             return this.favIconUrl;
         },
-        'getChildren': function() {
+        "getChildren": function() {
             var subscription = this;
             var children = [];
 
@@ -344,18 +344,18 @@
 
             return children;
         },
-        'syncView': function($sub) {
+        "syncView": function($sub) {
             var $sub = this.getDom();
-            var $item = $sub.find('> .subscription-item');
-            var $title = $item.find('.subscription-title');
-            var $unreadCount = $item.find('.subscription-unread-count');
+            var $item = $sub.find("> .subscription-item");
+            var $title = $item.find(".subscription-title");
+            var $unreadCount = $item.find(".subscription-unread-count");
 
             $title.text(this.title);
             $unreadCount.text(_l("(%d)", [this.unread]));
             $item
-                .toggleClass('has-unread', this.unread > 0)
-                .attr('title', this.title);
-            $sub.toggleClass('no-unread', this.unread < 1);
+                .toggleClass("has-unread", this.unread > 0)
+                .attr("title", this.title);
+            $sub.toggleClass("no-unread", this.unread < 1);
 
             var parent = this.getParent();
             if (parent)
@@ -364,24 +364,24 @@
             var len = $title.outerWidth() + $unreadCount.outerWidth() + 14;
             var available = $item.width() - $title.offset().left;
 
-            $item.toggleClass('too-long', len >= available);
+            $item.toggleClass("too-long", len >= available);
 
             if (!this.isRoot())
                 this.getRoot().syncView();
         },
-        'getType': function() {
-            return 'leaf';
+        "getType": function() {
+            return "leaf";
         },
-        'getParent': function() {
+        "getParent": function() {
             if (!this.parent)
                 return null;
 
             return subscriptionMap[this.parent];
         },
-        'getRoot': function() {
-            return subscriptionMap[''];
+        "getRoot": function() {
+            return subscriptionMap[""];
         },
-        'updateUnreadCount': function(byHowMuch) {
+        "updateUnreadCount": function(byHowMuch) {
             this.unread += byHowMuch;
 
             var parent = this.getParent();
@@ -390,7 +390,7 @@
 
             this.getRoot().unread += byHowMuch;
         },
-        'rename': function(newName) {
+        "rename": function(newName) {
             const sub = this;
             $.ajax({
                 url: "rename",
@@ -406,7 +406,7 @@
                 }
             });
         },
-        'unsubscribe': function() {
+        "unsubscribe": function() {
             var sub = this;
             if (!sub.isFolder()) {
                 $.ajax({
@@ -424,7 +424,7 @@
                 });
             }
         },
-        'markAllAsRead': function() {
+        "markAllAsRead": function() {
             var sub = this;
             $.ajax({
                 url: "markAllAsRead",
@@ -446,7 +446,7 @@
                 }
             });
         },
-        'moveTo': function(folder) {
+        "moveTo": function(folder) {
             var sub = this;
             $.ajax({
                 url: "moveSub",
@@ -465,8 +465,8 @@
     });
 
     var folderMethods = $.extend({}, subscriptionMethods, {
-        'getFilter': function() {
-            var selectedPropertyFilter = $('.group-filter.selected-menu-item').data('value');
+        "getFilter": function() {
+            var selectedPropertyFilter = $(".group-filter.selected-menu-item").data("value");
 
             const filter = {};
             if (this.id) {
@@ -477,10 +477,10 @@
             }
             return filter;
         },
-        'getSourceUrl': function() {
+        "getSourceUrl": function() {
             return null;
         },
-        'subscribe': function(url) {
+        "subscribe": function(url) {
             const folderId = this.id;
             $.ajax({
                 url: "subscribe",
@@ -497,19 +497,19 @@
                 }
             });
         },
-        'isFolder': function() {
+        "isFolder": function() {
             return true;
         },
-        'isRoot': function() {
+        "isRoot": function() {
             return this.id == "";
         },
-        'getType': function() {
+        "getType": function() {
             if (this.isRoot())
-                return 'root';
+                return "root";
 
-            return 'folder';
+            return "folder";
         },
-        'remove': function() {
+        "remove": function() {
             var folder = this;
             $.ajax({
                 url: "deleteFolder",
@@ -528,19 +528,19 @@
     });
 
     var tagMethods = $.extend({}, articleGroupingMethods, {
-        'getFilter': function() {
+        "getFilter": function() {
             return { "tag": this.title, };
         },
-        'getSourceUrl': function() {
+        "getSourceUrl": function() {
             return null;
         },
-        'supportsAggregateActions': function() {
+        "supportsAggregateActions": function() {
             return false;
         },
-        'supportsPropertyFilters': function() {
+        "supportsPropertyFilters": function() {
             return false;
         },
-        'remove': function() {
+        "remove": function() {
             var tag = this;
             $.ajax({
                 url: "removeTag",
@@ -558,35 +558,35 @@
     });
 
     var specialFolderMethods = $.extend({}, articleGroupingMethods, {
-        'getFilter': function() {
+        "getFilter": function() {
             return this.filter;
         },
-        'getSourceUrl': function() {
+        "getSourceUrl": function() {
             return null;
         },
-        'supportsAggregateActions': function() {
+        "supportsAggregateActions": function() {
             return false;
         },
-        'supportsPropertyFilters': function() {
+        "supportsPropertyFilters": function() {
             return false;
         },
     });
 
     var entryMethods = {
-        'getSubscription': function() {
+        "getSubscription": function() {
             return subscriptionMap[this.source];
         },
-        'getDom': function() {
-            return $('#gofr-entries').find('.' + this.domId);
+        "getDom": function() {
+            return $("#gofr-entries").find(`.${this.domId}`);
         },
-        'hasProperty': function(propertyName) {
+        "hasProperty": function(propertyName) {
             return $.inArray(propertyName, this.properties) > -1;
         },
-        'markAsRead': function(force) {
+        "markAsRead": function(force) {
             if (this.hasProperty("unread") || force)
                 this.setProperty("unread", false);
         },
-        'setProperty': function(propertyName, propertyValue) {
+        "setProperty": function(propertyName, propertyValue) {
             if (propertyValue == this.hasProperty(propertyName))
                 return; // Already set
 
@@ -612,7 +612,7 @@
 
                         subscription.syncView();
                         ui.updateUnreadCount();
-                    } else if (propertyName == 'like') {
+                    } else if (propertyName == "like") {
                         var delta = propertyValue ? 1 : -1;
                         entry.extras.likeCount += delta;
                     }
@@ -621,44 +621,44 @@
                 }
             });
         },
-        'toggleStarred': function(propertyName) {
+        "toggleStarred": function(propertyName) {
             this.toggleProperty("star");
         },
-        'toggleUnread': function() {
+        "toggleUnread": function() {
             this.toggleProperty("unread");
         },
-        'toggleLike': function() {
+        "toggleLike": function() {
             this.toggleProperty("like");
         },
-        'toggleProperty': function(propertyName) {
+        "toggleProperty": function(propertyName) {
             this.setProperty(propertyName,
                 !this.hasProperty(propertyName));
         },
-        'syncView': function() {
+        "syncView": function() {
             var $entry = this.getDom();
             $entry
-                .toggleClass('star', this.hasProperty('star'))
-                .toggleClass('like', this.hasProperty('like'))
+                .toggleClass("star", this.hasProperty("star"))
+                .toggleClass("like", this.hasProperty("like"))
                 .toggleClass("read", !this.hasProperty("unread"));
-            $entry.find('.gofr-like-count')
+            $entry.find(".gofr-like-count")
                 .text(_l("(%d)", [this.extras.likeCount]))
-                .toggleClass('unliked', this.extras.likeCount < 1);
+                .toggleClass("unliked", this.extras.likeCount < 1);
 
-            var $tagNode = $entry.find('.action-tag');
-            $tagNode.toggleClass('has-tags', this.tags.length > 0);
-            $tagNode.find('.gofr-action-text')
+            var $tagNode = $entry.find(".action-tag");
+            $tagNode.toggleClass("has-tags", this.tags.length > 0);
+            $tagNode.find(".gofr-action-text")
                 .text(this.tags.length > 0
                     ? _l("%s", [ this.tags.join(", ") ])
                     : _l("Tag"));
         },
-        'isExpanded': function() {
-            return this.getDom().hasClass('open');
+        "isExpanded": function() {
+            return this.getDom().hasClass("open");
         },
-        'resolveUrl': function(url) {
+        "resolveUrl": function(url) {
             if (!url || url.match(/^\s*(?:[a-z]+:)?\/\//))
                 return url; // Invalid or already absolute
 
-            if (typeof this.articleRoot === 'undefined')
+            if (typeof this.articleRoot === "undefined")
             {
                 // Determine and store article root and path
                 var articleUrl = this.link;
@@ -676,15 +676,15 @@
             }
 
             if (url) {
-                if (url.substr(0, 1) == '/')
+                if (url.substr(0, 1) == "/")
                     url = this.articleRoot + url;
                 else
-                    url = this.articlePath + '/' + url;
+                    url = `${this.articlePath}/${url}`;
             }
 
             return url;
         },
-        'expand': function() {
+        "expand": function() {
             var entry = this;
             var subscription = this.getSubscription();
             var $entry = this.getDom();
@@ -698,78 +698,78 @@
                 entry.loadExtras();
 
             var $content =
-                $('<div />', { 'class' : 'gofr-entry-content' })
-                    .append($('<div />', { 'class': 'gofr-article' })
-                        .append($('<a />', { 'href': entry.link, 'target': '_blank', 'class': 'gofr-article-title' })
-                            .append($('<h2 />')
+                $("<div />", { "class" : "gofr-entry-content" })
+                    .append($("<div />", { "class": "gofr-article" })
+                        .append($("<a />", { "href": entry.link, "target": "_blank", "class": "gofr-article-title" })
+                            .append($("<h2 />")
                                 .text(entry.title)))
-                        .append($('<div />', { 'class': 'gofr-article-author' }))
-                        .append($('<div />', { 'class': 'gofr-article-pubDate' })
+                        .append($("<div />", { "class": "gofr-article-author" }))
+                        .append($("<div />", { "class": "gofr-article-pubDate" })
                             .text(_l("Published %s", [getPublishedDate(entry.published)])))
-                        .append($('<div />', { 'class': 'gofr-media-container' }))
-                        .append($('<div />', { 'class': 'gofr-article-body' })
+                        .append($("<div />", { "class": "gofr-media-container" }))
+                        .append($("<div />", { "class": "gofr-article-body" })
                             .append(entry.content)))
-                    .append($('<div />', { 'class': 'gofr-entry-footer'})
-                        .append($('<span />', { 'class': 'action-star' })
+                    .append($("<div />", { "class": "gofr-entry-footer"})
+                        .append($("<span />", { "class": "action-star" })
                             .click(function(e) {
                                 entry.toggleStarred();
                             }))
-                        .append($('<span />', { 'class' : 'action-unread gofr-entry-action'})
+                        .append($("<span />", { "class" : "action-unread gofr-entry-action"})
                             .html("&nbsp;")
-                            .append($('<span />', { 'class': 'gofr-action-text' })
+                            .append($("<span />", { "class": "gofr-action-text" })
                                 .text(_l("Keep unread")))
                             .click(function(e) {
                                 entry.toggleUnread();
                             }))
-                        .append($('<span />', { 'class' : 'action-tag gofr-entry-action' })
+                        .append($("<span />", { "class" : "action-tag gofr-entry-action" })
                             .html("&nbsp;")
-                            .append($('<span />', { 'class': 'gofr-action-text' })
+                            .append($("<span />", { "class": "gofr-action-text" })
                                 .text(this.tags.length > 0
                                     ? _l("%s", [ this.tags.join(", ") ])
                                     : _l("Tag")))
                             .click(function(e) {
                                 ui.editTags(entry);
                             }))
-                        .append($('<span />', { 'class' : 'action-like gofr-entry-action'})
+                        .append($("<span />", { "class" : "action-like gofr-entry-action"})
                             .html("&nbsp;")
-                            .append($('<span />', { 'class': 'gofr-action-text' })
+                            .append($("<span />", { "class": "gofr-action-text" })
                                 .text(_l("Like")))
-                            .append($('<span />', { 'class': 'gofr-like-count' })
+                            .append($("<span />", { "class": "gofr-like-count" })
                                 .text(_l("(%d)", [entry.extras.likeCount]))
-                                .toggleClass('unliked', this.extras.likeCount < 1))
+                                .toggleClass("unliked", this.extras.likeCount < 1))
                             .click(function(e) {
                                 entry.toggleLike();
                             }))
-                        .append($('<span />', { 'class' : 'gofr-entry-action-group gofr-entry-share-group'})
-                            .append($('<span />', { 'class': 'gofr-action-text' })
+                        .append($("<span />", { "class" : "gofr-entry-action-group gofr-entry-share-group"})
+                            .append($("<span />", { "class": "gofr-action-text" })
                                 .text(_l("Share: "))))
-                        .append($('<a />', {
-                            'class': 'action-share-gplus gofr-entry-share',
-                            'href': 'https://plus.google.com/share?url=' + encodeURIComponent(entry.link),
-                            'data-flags': 'width=600,height=460,menubar=no,location=no,status=no',
-                            'title': _l('Share on Google+'),
+                        .append($("<a />", {
+                            "class": "action-share-gplus gofr-entry-share",
+                            "href": `https://plus.google.com/share?url=${encodeURIComponent(entry.link)}`,
+                            "data-flags": "width=600,height=460,menubar=no,location=no,status=no",
+                            "title": _l("Share on Google+"),
                         })
-                        .html('&nbsp;')
+                        .html("&nbsp;")
                         .click(function(e) {
                             return ui.share($(this));
                         }))
-                        .append($('<a />', {
-                            'class': 'action-share-fb gofr-entry-share',
-                            'href': 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(entry.link),
-                            'data-flags': 'width=626,height=436,menubar=no,location=no,status=no',
-                            'title': _l('Share on Facebook'),
+                        .append($("<a />", {
+                            "class": "action-share-fb gofr-entry-share",
+                            "href": `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(entry.link)}`,
+                            "data-flags": "width=626,height=436,menubar=no,location=no,status=no",
+                            "title": _l("Share on Facebook"),
                         })
-                        .html('&nbsp;')
+                        .html("&nbsp;")
                         .click(function(e) {
                             return ui.share($(this));
                         }))
-                        .append($('<a />', {
-                            'class': 'action-share-twitter gofr-entry-share',
-                            'href': 'https://twitter.com/share?url=' + encodeURIComponent(entry.link),
-                            'data-flags': 'width=470,height=257,menubar=no,location=no,status=no',
-                            'title': _l('Tweet'),
+                        .append($("<a />", {
+                            "class": "action-share-twitter gofr-entry-share",
+                            "href": `https://twitter.com/share?url=${encodeURIComponent(entry.link)}`,
+                            "data-flags": "width=470,height=257,menubar=no,location=no,status=no",
+                            "title": _l("Tweet"),
                         })
-                        .html('&nbsp;')
+                        .html("&nbsp;")
                         .click(function(e) {
                             return ui.share($(this));
                         })))
@@ -784,24 +784,24 @@
             else
                 template = _l("From (%s)[%s]", [subscription.link, subscription.title]);
 
-            $content.find('.gofr-article-author').html(template);
+            $content.find(".gofr-article-author").html(template);
             if (!subscription.link)
-                $content.find('.gofr-article-author a').contents().unwrap();
+                $content.find(".gofr-article-author a").contents().unwrap();
 
             // Whether tags are set
-            $content.find('.action-tag').toggleClass('has-tags', this.tags.length > 0);
+            $content.find(".action-tag").toggleClass("has-tags", this.tags.length > 0);
 
             // Links in the content should open in a new window
-            $content.find('.gofr-article-body a').attr('target', '_blank');
+            $content.find(".gofr-article-body a").attr("target", "_blank");
 
             // Resolve relative URLs
-            $content.find('.gofr-article-body img').not('[src^="http"],[src^="https"]').each(function() {
-                $(this).attr('src', function(index, value) {
+            $content.find(".gofr-article-body img").not("[src^='http'],[src^='https']").each(function() {
+                $(this).attr("src", function(index, value) {
                     return entry.resolveUrl(value);
                 })
             });
-            $content.find('.gofr-article-body a').not('[href^="http"],[href^="https"]').each(function() {
-                $(this).attr('href', function(index, value) {
+            $content.find(".gofr-article-body a").not("[href^='http'],[href^='https']").each(function() {
+                $(this).attr("href", function(index, value) {
                     if (!value)
                         return value;
 
@@ -811,34 +811,34 @@
 
             // Add any media
             if (entry.media) {
-                var $mediaContainer = $content.find('.gofr-media-container');
+                var $mediaContainer = $content.find(".gofr-media-container");
                 $.each(entry.media, function() {
                     var media = this;
-                    var $audio = $('<audio />', { 'controls': 'controls' })
-                        .append($('<source />', { 'src': media.url, 'type': media.type }))
-                        .append($('<embed />', { 'class': 'gofr-embedded-media', 'src': media.url }));
+                    var $audio = $("<audio />", { "controls": "controls" })
+                        .append($("<source />", { "src": media.url, "type": media.type }))
+                        .append($("<embed />", { "class": "gofr-embedded-media", "src": media.url }));
 
                     $mediaContainer.append($audio);
                 });
             }
 
-            $entry.toggleClass('open', true);
+            $entry.toggleClass("open", true);
             $entry.append($content);
         },
-        'scrollIntoView': function() {
+        "scrollIntoView": function() {
             this.getDom().scrollintoview({ duration: 0});
         },
-        'collapse': function() {
+        "collapse": function() {
             this.getDom()
-                .removeClass('open')
-                .find('.gofr-entry-content')
+                .removeClass("open")
+                .find(".gofr-entry-content")
                     .remove();
         },
-        'select': function() {
-            $('#gofr-entries').find('.gofr-entry.selected').removeClass('selected');
-            this.getDom().addClass('selected');
+        "select": function() {
+            $("#gofr-entries").find(".gofr-entry.selected").removeClass("selected");
+            this.getDom().addClass("selected");
         },
-        'loadExtras': function() {
+        "loadExtras": function() {
             var entry = this;
             // FIXME: this call is missing
             $.ajax({
@@ -860,44 +860,44 @@
 
     $$menu.click(function(e) {
         var $item = e.$item;
-        if ($item.is('.menu-all-items, .menu-new-items')) {
+        if ($item.is(".menu-all-items, .menu-new-items")) {
             var subscription = getSelectedSubscription();
             if (subscription != null)
                 subscription.refresh();
             ui.onScopeChanged();
-        } else if ($item.is('.menu-show-sidebar')) {
+        } else if ($item.is(".menu-show-sidebar")) {
             ui.toggleSidebar(e.isChecked);
-        } else if ($item.is('.menu-import-subscriptions')) {
+        } else if ($item.is(".menu-import-subscriptions")) {
             ui.showImportSubscriptionsModal();
-        } else if ($item.is('.menu-export-subscriptions')) {
+        } else if ($item.is(".menu-export-subscriptions")) {
             ui.exportSubscriptions();
-        } else if ($item.is('.menu-show-all-subs')) {
+        } else if ($item.is(".menu-show-all-subs")) {
             ui.toggleReadSubscriptions(e.isChecked);
-        } else if ($item.is('.menu-create-folder')) {
+        } else if ($item.is(".menu-create-folder")) {
             ui.createFolder();
-        } else if ($item.is('.menu-sign-out')) {
-            $('#sign-out')[0].click();
-        } else if ($item.is('.menu-shortcuts')) {
-            $('.shortcuts').show();
-        } else if ($item.is('.menu-subscribe, .menu-rename, .menu-unsubscribe, .menu-delete-folder')) {
+        } else if ($item.is(".menu-sign-out")) {
+            $("#sign-out")[0].click();
+        } else if ($item.is(".menu-shortcuts")) {
+            $(".shortcuts").show();
+        } else if ($item.is(".menu-subscribe, .menu-rename, .menu-unsubscribe, .menu-delete-folder")) {
             var subscription = subscriptionMap[e.context];
-            if ($item.is('.menu-subscribe')) {
+            if ($item.is(".menu-subscribe")) {
                 ui.subscribe(subscription);
-            } else if ($item.is('.menu-rename')) {
+            } else if ($item.is(".menu-rename")) {
                 ui.rename(subscription);
-            } else if ($item.is('.menu-unsubscribe')) {
+            } else if ($item.is(".menu-unsubscribe")) {
                 ui.unsubscribe(subscription);
-            } else if ($item.is('.menu-delete-folder')) {
+            } else if ($item.is(".menu-delete-folder")) {
                 ui.removeFolder(subscription);
             }
-        } else if ($item.is('.menu-delete-tag')) {
-            var tag = $('.' + e.context).data('subscription');
+        } else if ($item.is(".menu-delete-tag")) {
+            var tag = $(`.${e.context}`).data("subscription");
             ui.deleteTag(tag);
         }
     });
 
     var ui = {
-        'init': function() {
+        "init": function() {
             this.localizeStatics();
             this.initHelp();
             this.initButtons();
@@ -906,50 +906,50 @@
             this.initModals();
             this.initBookmarklet();
 
-            $('#menu-filter').selectItem('.menu-all-items');
+            $("#menu-filter").selectItem(".menu-all-items");
             this.onScopeChanged();
 
-            this.toggleSidebar($.cookie('show-sidebar') !== 'false');
-            this.toggleReadSubscriptions($.cookie('show-all-subs') !== 'false');
+            this.toggleSidebar($.cookie("show-sidebar") !== "false");
+            this.toggleReadSubscriptions($.cookie("show-all-subs") !== "false");
 
-            $('a').not('#sign-out').attr('target', '_blank');
+            $("a").not("#sign-out").attr("target", "_blank");
         },
-        'isNavBarVisible': function() {
-            return $('body').is(".sidebar-open");
+        "isNavBarVisible": function() {
+            return $("body").is(".sidebar-open");
         },
-        'toggleNavBar': function(show) {
-            if (typeof show === 'undefined')
+        "toggleNavBar": function(show) {
+            if (typeof show === "undefined")
                 show = !ui.isNavBarVisible();
 
-            $('body').toggleClass('sidebar-open', show);
+            $("body").toggleClass("sidebar-open", show);
         },
-        'initButtons': function() {
-            $('button.refresh').click(function() {
+        "initButtons": function() {
+            $("button.refresh").click(function() {
                 refresh();
             });
-            $('button.subscribe').click(function() {
+            $("button.subscribe").click(function() {
                 ui.subscribe();
             });
-            $('button.navigate').click(function(e) {
+            $("button.navigate").click(function(e) {
                 $$menu.hideAll();
                 ui.toggleNavBar(true);
                 e.stopPropagation();
             });
-            $('.select-article.up').click(function() {
+            $(".select-article.up").click(function() {
                 ui.openArticle(-1);
             });
-            $('.select-article.down').click(function() {
+            $(".select-article.down").click(function() {
                 ui.openArticle(1);
             });
-            $('.mark-all-as-read').click(function() {
+            $(".mark-all-as-read").click(function() {
                 ui.markAllAsRead();
             });
 
-            $('#import-subscriptions .modal-ok').click(function() {
-                var $modal = $(this).closest('.modal');
-                var $form = $('#import-subscriptions form');
+            $("#import-subscriptions .modal-ok").click(function() {
+                var $modal = $(this).closest(".modal");
+                var $form = $("#import-subscriptions form");
 
-                if (!$form.find('input[type=file]').val()) {
+                if (!$form.find("input[type=file]").val()) {
                     // No file specified
                     return;
                 }
@@ -969,75 +969,75 @@
                 });
             });
         },
-        'initMenus': function() {
-            $('body')
-                .append($('<ul />', { 'id': 'menu-filter', 'class': 'menu selectable' })
-                    .append($('<li />', { 'class': 'menu-all-items group-filter' }).text(_l("All items")))
-                    .append($('<li />', { 'class': 'menu-new-items group-filter', 'data-value': 'unread' }).text(_l("New items"))))
-                .append($('<ul />', { 'id': 'menu-settings', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-show-sidebar checkable' }).text(_l("Show sidebar")))
-                    .append($('<li />', { 'class': 'menu-show-all-subs checkable' }).text(_l("Show read subscriptions")))
-                    .append($('<li />', { 'class': 'divider' }))
-                    .append($('<li />', { 'class': 'menu-shortcuts' }).text(_l("View shortcut keys…"))))
-                .append($('<ul />', { 'id': 'menu-view', 'class': 'menu selectable' })
-                    .append($('<li />', { 'class': 'menu-all-items group-filter' }).text(_l("All items")))
-                    .append($('<li />', { 'class': 'menu-new-items group-filter', 'data-value': 'unread' }).text(_l("New items"))))
-                .append($('<ul />', { 'id': 'menu-user-options', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-import-subscriptions' }).text(_l("Import subscriptions…")))
-                    .append($('<li />', { 'class': 'menu-export-subscriptions' }).text(_l("Export subscriptions")))
-                    .append($('<li />', { 'class': 'divider' }))
-                    .append($('<li />', { 'class': 'menu-sign-out' }).text(_l("Sign out"))))
-                .append($('<ul />', { 'id': 'menu-folder', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-subscribe' }).text(_l("Subscribe…")))
-                    .append($('<li />', { 'class': 'menu-rename' }).text(_l("Rename…")))
-                    .append($('<li />', { 'class': 'menu-delete-folder' }).text(_l("Delete…"))))
-                .append($('<ul />', { 'id': 'menu-tag', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-delete-tag' }).text(_l("Remove tag…"))))
-                .append($('<ul />', { 'id': 'menu-root', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-create-folder' }).text(_l("New folder…")))
-                    .append($('<li />', { 'class': 'menu-subscribe' }).text(_l("Subscribe…"))))
-                .append($('<ul />', { 'id': 'menu-leaf', 'class': 'menu' })
-                    .append($('<li />', { 'class': 'menu-rename' }).text(_l("Rename…")))
-                    .append($('<li />', { 'class': 'menu-unsubscribe' }).text(_l("Unsubscribe…"))));
+        "initMenus": function() {
+            $("body")
+                .append($("<ul />", { "id": "menu-filter", "class": "menu selectable" })
+                    .append($("<li />", { "class": "menu-all-items group-filter" }).text(_l("All items")))
+                    .append($("<li />", { "class": "menu-new-items group-filter", "data-value": "unread" }).text(_l("New items"))))
+                .append($("<ul />", { "id": "menu-settings", "class": "menu" })
+                    .append($("<li />", { "class": "menu-show-sidebar checkable" }).text(_l("Show sidebar")))
+                    .append($("<li />", { "class": "menu-show-all-subs checkable" }).text(_l("Show read subscriptions")))
+                    .append($("<li />", { "class": "divider" }))
+                    .append($("<li />", { "class": "menu-shortcuts" }).text(_l("View shortcut keys…"))))
+                .append($("<ul />", { "id": "menu-view", "class": "menu selectable" })
+                    .append($("<li />", { "class": "menu-all-items group-filter" }).text(_l("All items")))
+                    .append($("<li />", { "class": "menu-new-items group-filter", "data-value": "unread" }).text(_l("New items"))))
+                .append($("<ul />", { "id": "menu-user-options", "class": "menu" })
+                    .append($("<li />", { "class": "menu-import-subscriptions" }).text(_l("Import subscriptions…")))
+                    .append($("<li />", { "class": "menu-export-subscriptions" }).text(_l("Export subscriptions")))
+                    .append($("<li />", { "class": "divider" }))
+                    .append($("<li />", { "class": "menu-sign-out" }).text(_l("Sign out"))))
+                .append($("<ul />", { "id": "menu-folder", "class": "menu" })
+                    .append($("<li />", { "class": "menu-subscribe" }).text(_l("Subscribe…")))
+                    .append($("<li />", { "class": "menu-rename" }).text(_l("Rename…")))
+                    .append($("<li />", { "class": "menu-delete-folder" }).text(_l("Delete…"))))
+                .append($("<ul />", { "id": "menu-tag", "class": "menu" })
+                    .append($("<li />", { "class": "menu-delete-tag" }).text(_l("Remove tag…"))))
+                .append($("<ul />", { "id": "menu-root", "class": "menu" })
+                    .append($("<li />", { "class": "menu-create-folder" }).text(_l("New folder…")))
+                    .append($("<li />", { "class": "menu-subscribe" }).text(_l("Subscribe…"))))
+                .append($("<ul />", { "id": "menu-leaf", "class": "menu" })
+                    .append($("<li />", { "class": "menu-rename" }).text(_l("Rename…")))
+                    .append($("<li />", { "class": "menu-unsubscribe" }).text(_l("Unsubscribe…"))));
 
-            $('.menu li').not('.divider').wrapInner('<span />');
+            $(".menu li").not(".divider").wrapInner("<span />");
         },
-        'initHelp': function() {
+        "initHelp": function() {
             var categories = [{
-                'title': _l('Navigation'),
-                'shortcuts': [
-                    { keys: _l('[J]/[K]'),       action: _l("Open next/previous article") },
-                    { keys: _l('[N]/[P]'),       action: _l("Move to next/previous article") },
-                    { keys: _l('[Shift]+[N]/[P]'), action: _l("Move to next/previous subscription") },
-                    { keys: _l('[Shift]+[O]'),   action: _l("Open subscription or folder") },
-                    { keys: _l('[G] then [A]'), action: _l("Open All Items") },
+                "title": _l("Navigation"),
+                "shortcuts": [
+                    { keys: _l("[J]/[K]"),       action: _l("Open next/previous article") },
+                    { keys: _l("[N]/[P]"),       action: _l("Move to next/previous article") },
+                    { keys: _l("[Shift]+[N]/[P]"), action: _l("Move to next/previous subscription") },
+                    { keys: _l("[Shift]+[O]"),   action: _l("Open subscription or folder") },
+                    { keys: _l("[G] then [A]"), action: _l("Open All Items") },
                 ]}, {
-                'title': _l('Application'),
-                'shortcuts': [
-                    { keys: _l('[R]'), action: _l("Refresh") },
-                    { keys: _l('[U]'), action: _l("Toggle sidebar") },
-                    { keys: _l('[A]'), action: _l("Add subscription") },
-                    { keys: _l('[?]'), action: _l("Help") },
+                "title": _l("Application"),
+                "shortcuts": [
+                    { keys: _l("[R]"), action: _l("Refresh") },
+                    { keys: _l("[U]"), action: _l("Toggle sidebar") },
+                    { keys: _l("[A]"), action: _l("Add subscription") },
+                    { keys: _l("[?]"), action: _l("Help") },
                 ]}, {
-                'title': _l('Articles'),
-                'shortcuts': [
-                    { keys: _l('[M]'),       action: _l("Mark as read/unread") },
-                    { keys: _l('[S]'),       action: _l("Star article") },
-                    { keys: _l('[V]'),       action: _l("Open link") },
-                    { keys: _l('[O]'),       action: _l("Open article") },
-                    { keys: _l('[T]'),       action: _l("Tag article") },
-                    { keys: _l('[L]'),         action: _l("Like article") },
-                    { keys: _l('[Shift]+[A]'), action: _l("Mark all as read") },
+                "title": _l("Articles"),
+                "shortcuts": [
+                    { keys: _l("[M]"),       action: _l("Mark as read/unread") },
+                    { keys: _l("[S]"),       action: _l("Star article") },
+                    { keys: _l("[V]"),       action: _l("Open link") },
+                    { keys: _l("[O]"),       action: _l("Open article") },
+                    { keys: _l("[T]"),       action: _l("Tag article") },
+                    { keys: _l("[L]"),         action: _l("Like article") },
+                    { keys: _l("[Shift]+[A]"), action: _l("Mark all as read") },
                 ]}];
 
             var maxColumns = 2; // Number of columns in the resulting table
 
             // Build the table
-            var $table = $('<table/>');
+            var $table = $("<table/>");
             for (var i = 0, n = categories.length; i < n; i += maxColumns) {
                 var keepGoing = true;
                 for (var k = -1; keepGoing; k++) {
-                    var $row = $('<tr/>');
+                    var $row = $("<tr/>");
                     $table.append($row);
                     keepGoing = false;
 
@@ -1045,187 +1045,187 @@
                         var category = categories[i + j];
 
                         if (k < 0) { // Header
-                            $row.append($('<th/>', { 'colspan': 2 })
+                            $row.append($("<th/>", { "colspan": 2 })
                                 .text(category.title));
                             keepGoing = true;
                         } else if (k < category.shortcuts.length) {
                             var words = category.shortcuts[k].keys.split(/\[|\]/) ;
-                            var $div = $('<div />');
+                            var $div = $("<div />");
 
                             for (var w = 0; w < words.length; w++) {
                                 if (w % 2)
-                                    $div.append($('<span />', { 'class': 'key' }).text(words[w]));
+                                    $div.append($("<span />", { "class": "key" }).text(words[w]));
                                 else
                                     $div.append(words[w]);
                             }
 
-                            $row.append($('<td/>', { 'class': 'sh-keys' })
+                            $row.append($("<td/>", { "class": "sh-keys" })
                                 .append($div))
-                            .append($('<td/>', { 'class': 'sh-action' })
+                            .append($("<td/>", { "class": "sh-action" })
                                 .text(category.shortcuts[k].action));
                             keepGoing = true;
                         } else { // Empty cell
-                            $row.append($('<td/>', { 'colspan': 2 }));
+                            $row.append($("<td/>", { "colspan": 2 }));
                         }
                     }
                 }
             }
 
-            $('.about').click(function() {
+            $(".about").click(function() {
                 ui.showAbout();
                 return false;
             });
 
-            $('body').append($('<div />', { 'class': 'shortcuts' }).append($table));
+            $("body").append($("<div />", { "class": "shortcuts" }).append($table));
         },
-        'initBookmarklet': function() {
-            var subscribeUrl = location.protocol + '//' + location.host + '/subBm?url=';
-            var bookmarklet = 'javascript:(function(){open(\'' + subscribeUrl + '\' + encodeURIComponent(location.href));})()';
+        "initBookmarklet": function() {
+            var subscribeUrl = `${location.protocol}//${location.host}/subBm?url=`;
+            var bookmarklet = "javascript:(function(){open(\"" + subscribeUrl + "\" + encodeURIComponent(location.href));})()";
 
-            $('.bookmarklet')
-                .attr('href', bookmarklet)
+            $(".bookmarklet")
+                .attr("href", bookmarklet)
                 .click(function() {
                     window.alert(_l("1. Drop this shortcut in your Bookmarks bar\n2. While browsing the web, click the bookmark to subscribe"));
 
                     return false;
                 });
         },
-        'initShortcuts': function() {
+        "initShortcuts": function() {
             $(document)
-                .bind('keypress', '', function(e) {
+                .bind("keypress", "", function(e) {
                     var isNavBarKey = e.charCode >= 78 && e.charCode <= 80;
                     if (!ui.isNavBarVisible() || !isNavBarKey)
                         ui.toggleNavBar(false);
 
-                    $('.shortcuts').hide();
+                    $(".shortcuts").hide();
                     $$menu.hideAll();
                 })
-                .bind('keypress', 'n', function() {
+                .bind("keypress", "n", function() {
                     ui.selectArticle(1);
                 })
-                .bind('keypress', 'p', function() {
+                .bind("keypress", "p", function() {
                     ui.selectArticle(-1);
                 })
-                .bind('keypress', 'j', function() {
+                .bind("keypress", "j", function() {
                     ui.openArticle(1);
                 })
-                .bind('keypress', 'k', function() {
+                .bind("keypress", "k", function() {
                     ui.openArticle(-1);
                 })
-                .bind('keypress', 'o', function() {
+                .bind("keypress", "o", function() {
                     ui.openArticle(0);
                 })
-                .bind('keypress', 'r', function() {
+                .bind("keypress", "r", function() {
                     refresh();
                 })
-                .bind('keypress', 's', function() {
-                    if ($('.gofr-entry.selected').length)
-                        $('.gofr-entry.selected').data('entry').toggleStarred();
+                .bind("keypress", "s", function() {
+                    if ($(".gofr-entry.selected").length)
+                        $(".gofr-entry.selected").data("entry").toggleStarred();
                 })
-                .bind('keypress', 'm', function() {
-                    if ($('.gofr-entry.selected').length)
-                        $('.gofr-entry.selected').data('entry').toggleUnread();
+                .bind("keypress", "m", function() {
+                    if ($(".gofr-entry.selected").length)
+                        $(".gofr-entry.selected").data("entry").toggleUnread();
                 })
-                .bind('keypress', 'l', function() {
-                    if ($('.gofr-entry.selected').length)
-                        $('.gofr-entry.selected').data('entry').toggleLike();
+                .bind("keypress", "l", function() {
+                    if ($(".gofr-entry.selected").length)
+                        $(".gofr-entry.selected").data("entry").toggleLike();
                 })
-                .bind('keypress', 'shift+n', function() {
+                .bind("keypress", "shift+n", function() {
                     ui.highlightSubscription(1);
                 })
-                .bind('keypress', 'shift+p', function() {
+                .bind("keypress", "shift+p", function() {
                     ui.highlightSubscription(-1);
                 })
-                .bind('keypress', 'shift+o', function() {
-                    if ($('.subscription.highlighted').length) {
-                        $('.subscription.highlighted')
-                            .removeClass('highlighted')
-                            .data('subscription').select();
+                .bind("keypress", "shift+o", function() {
+                    if ($(".subscription.highlighted").length) {
+                        $(".subscription.highlighted")
+                            .removeClass("highlighted")
+                            .data("subscription").select();
                     }
                 })
-                .bind('keypress', 'g', function() {
+                .bind("keypress", "g", function() {
                     lastGPressTime = new Date().getTime();
                 })
-                .bind('keypress', 'a', function() {
+                .bind("keypress", "a", function() {
                     if (ui.isGModifierActive())
-                        $('.subscription.root')
-                            .data('subscription').select();
+                        $(".subscription.root")
+                            .data("subscription").select();
                     else
                         ui.subscribe();
                 })
-                .bind('keypress', 'u', function() {
+                .bind("keypress", "u", function() {
                     ui.toggleSidebar();
                 })
-                .bind('keypress', 'v', function() {
-                    if ($('.gofr-entry.selected').length)
-                        $('.gofr-entry.selected').find('.gofr-entry-link')[0].click();
+                .bind("keypress", "v", function() {
+                    if ($(".gofr-entry.selected").length)
+                        $(".gofr-entry.selected").find(".gofr-entry-link")[0].click();
                 })
-                .bind('keypress', 't', function() {
-                    if ($('.gofr-entry.selected').length)
-                        ui.editTags($('.gofr-entry.selected').data('entry'));
+                .bind("keypress", "t", function() {
+                    if ($(".gofr-entry.selected").length)
+                        ui.editTags($(".gofr-entry.selected").data("entry"));
                 })
-                .bind('keypress', 'shift+a', function() {
+                .bind("keypress", "shift+a", function() {
                     ui.markAllAsRead();
                 })
-                .bind('keypress', 'shift+?', function() {
-                    $('.shortcuts').show();
+                .bind("keypress", "shift+?", function() {
+                    $(".shortcuts").show();
                 });
         },
-        'initModals': function() {
-            $('.modal').wrapInner('<div class="modal-inner"></div>').hide();
+        "initModals": function() {
+            $(".modal").wrapInner("<div class=\"modal-inner\"></div>").hide();
 
             $.fn.showModal = function(show) {
-                if (!$(this).hasClass('modal'))
+                if (!$(this).hasClass("modal"))
                     return;
 
-                $('body').toggleClass('modal-open', show);
+                $("body").toggleClass("modal-open", show);
 
                 if (show) {
-                    $(this).css('margin-top', -($(this).outerHeight() / 2) + 'px');
+                    $(this).css("margin-top", -($(this).outerHeight() / 2) + "px");
                     $(this).show();
                 } else {
                     $(this).hide();
                 }
             };
 
-            $('.modal-cancel').click(function() {
-                $(this).closest('.modal').showModal(false);
+            $(".modal-cancel").click(function() {
+                $(this).closest(".modal").showModal(false);
                 return false;
             });
         },
-        'showImportSubscriptionsModal': function() {
-            $('#import-subscriptions').find('form')[0].reset();
-            $('#import-subscriptions').showModal(true);
+        "showImportSubscriptionsModal": function() {
+            $("#import-subscriptions").find("form")[0].reset();
+            $("#import-subscriptions").showModal(true);
         },
-        'exportSubscriptions': function() {
-            window.location.href = '/exportOpml';
+        "exportSubscriptions": function() {
+            window.location.href = "/exportOpml";
         },
-        'showAbout': function() {
-            $('#about').showModal(true);
+        "showAbout": function() {
+            $("#about").showModal(true);
         },
-        'isGModifierActive': function() {
+        "isGModifierActive": function() {
             return new Date().getTime() - lastGPressTime < 1000;
         },
-        'toggleSidebar': function(showSidebar) {
-            if (typeof showSidebar === 'undefined')
-                showSidebar = $('.navigate').is(':visible');
+        "toggleSidebar": function(showSidebar) {
+            if (typeof showSidebar === "undefined")
+                showSidebar = $(".navigate").is(":visible");
 
-            $('body').toggleClass('floated-sidebar', !showSidebar);
-            $('.menu-show-sidebar').setChecked(showSidebar);
+            $("body").toggleClass("floated-sidebar", !showSidebar);
+            $(".menu-show-sidebar").setChecked(showSidebar);
 
-            $.cookie('show-sidebar', showSidebar);
+            $.cookie("show-sidebar", showSidebar);
         },
-        'toggleReadSubscriptions': function(showAllSubscriptions) {
-            if (typeof showAllSubscriptions === 'undefined')
-                showAllSubscriptions = $('body').hasClass('hide-read-subs');
+        "toggleReadSubscriptions": function(showAllSubscriptions) {
+            if (typeof showAllSubscriptions === "undefined")
+                showAllSubscriptions = $("body").hasClass("hide-read-subs");
 
-            $('body').toggleClass('hide-read-subs', !showAllSubscriptions);
-            $('.menu-show-all-subs').setChecked(showAllSubscriptions);
+            $("body").toggleClass("hide-read-subs", !showAllSubscriptions);
+            $(".menu-show-all-subs").setChecked(showAllSubscriptions);
 
-            $.cookie('show-all-subs', showAllSubscriptions);
+            $.cookie("show-all-subs", showAllSubscriptions);
         },
-        'updateUnreadCount': function() {
-            // Update the 'new items' caption in the dropdown to reflect
+        "updateUnreadCount": function() {
+            // Update the "new items" caption in the dropdown to reflect
             // the unread count
 
             var selectedSubscription = getSelectedSubscription();
@@ -1238,25 +1238,25 @@
             else
                 caption = _l("%1$s new item(s)", [selectedSubscription.unread]);
 
-            $('.menu-new-items').setTitle(caption);
+            $(".menu-new-items").setTitle(caption);
 
             // Update the title bar
 
             var root = subscriptionMap[""];
-            var title = 'Grouch';
+            var title = "Grouch";
 
             if (root.unread > 0)
-                title += ' (' + root.unread + ')';
+                title += ` (${root.unread})`;
 
             document.title = title;
         },
-        'highlightSubscription': function(which, scrollIntoView) {
-            var $highlighted = $('.subscription.highlighted');
+        "highlightSubscription": function(which, scrollIntoView) {
+            var $highlighted = $(".subscription.highlighted");
             if (!$highlighted.length)
-                $highlighted = $('.subscription.selected');
+                $highlighted = $(".subscription.selected");
 
             var $next = null;
-            var $allFeeds = $('#subscriptions .subscription:visible');
+            var $allFeeds = $("#subscriptions .subscription:visible");
             var highlightedIndex = $allFeeds.index($highlighted);
 
             if (which < 0) {
@@ -1272,71 +1272,71 @@
             }
 
             if ($next) {
-                $('.subscription.highlighted').removeClass('highlighted');
-                $next.addClass('highlighted');
+                $(".subscription.highlighted").removeClass("highlighted");
+                $next.addClass("highlighted");
 
-                scrollIntoView = (typeof scrollIntoView !== 'undefined') ? scrollIntoView : true;
+                scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
                 if (scrollIntoView)
-                    $('.subscription.highlighted').scrollintoview({ duration: 0});
+                    $(".subscription.highlighted").scrollintoview({ duration: 0});
             }
         },
-        'selectArticle': function(which, scrollIntoView) {
+        "selectArticle": function(which, scrollIntoView) {
             if (which < 0) {
-                if ($('.gofr-entry.selected').prev('.gofr-entry').length > 0)
-                    $('.gofr-entry.selected')
-                        .removeClass('selected')
-                        .prev('.gofr-entry')
-                        .addClass('selected');
+                if ($(".gofr-entry.selected").prev(".gofr-entry").length > 0)
+                    $(".gofr-entry.selected")
+                        .removeClass("selected")
+                        .prev(".gofr-entry")
+                        .addClass("selected");
             } else if (which > 0) {
                 var $next = null;
-                var $selected = $('.gofr-entry.selected');
+                var $selected = $(".gofr-entry.selected");
 
                 if ($selected.length < 1)
-                    $next = $('#gofr-entries .gofr-entry:first');
+                    $next = $("#gofr-entries .gofr-entry:first");
                 else
-                    $next = $selected.next('.gofr-entry');
+                    $next = $selected.next(".gofr-entry");
 
-                $('.gofr-entry.selected').removeClass('selected');
-                $next.addClass('selected');
+                $(".gofr-entry.selected").removeClass("selected");
+                $next.addClass("selected");
 
-                if ($next.next('.gofr-entry').length < 1)
-                    $('.next-page').click(); // Load another page - this is the last item
+                if ($next.next(".gofr-entry").length < 1)
+                    $(".next-page").click(); // Load another page - this is the last item
             }
 
-            scrollIntoView = (typeof scrollIntoView !== 'undefined') ? scrollIntoView : true;
+            scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
             if (scrollIntoView)
-                $('.gofr-entry.selected').scrollintoview({ duration: 0});
+                $(".gofr-entry.selected").scrollintoview({ duration: 0});
         },
-        'openArticle': function(which) {
+        "openArticle": function(which) {
             this.selectArticle(which, false);
 
-            if (!$('.gofr-entry-content', $('.gofr-entry.selected')).length || which === 0)
-                $('.gofr-entry.selected')
+            if (!$(".gofr-entry-content", $(".gofr-entry.selected")).length || which === 0)
+                $(".gofr-entry.selected")
                     .click()
                     .scrollintoview();
         },
-        'collapseAllEntries': function() {
-            $('.gofr-entry.open').removeClass('open');
-            $('.gofr-entry .gofr-entry-content').remove();
+        "collapseAllEntries": function() {
+            $(".gofr-entry.open").removeClass("open");
+            $(".gofr-entry .gofr-entry-content").remove();
         },
-        'showToast': function(message, isError) {
+        "showToast": function(message, isError) {
             if (message) {
-                $('#toast span').text(message);
-                $('#toast').attr('class', isError ? 'error' : 'info');
+                $("#toast span").text(message);
+                $("#toast").attr("class", isError ? "error" : "info");
 
-                if ($('#toast').is(':hidden')) {
-                    $('#toast')
+                if ($("#toast").is(":hidden")) {
+                    $("#toast")
                         .fadeIn()
                         .delay(8000)
-                        .fadeOut('slow');
+                        .fadeOut("slow");
                 }
             }
         },
-        'subscribe': function(parentFolder) {
+        "subscribe": function(parentFolder) {
             var url = prompt(_l("Site or feed URL:"));
             if (url) {
-                if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0)
-                    url = 'http://' + url;
+                if (url.indexOf("http://") != 0 && url.indexOf("https://") != 0)
+                    url = `http://${url}`;
 
                 if (!parentFolder)
                     parentFolder = getRootSubscription();
@@ -1344,13 +1344,13 @@
                 parentFolder.subscribe(url);
             }
         },
-        'rename': function(subscription) {
+        "rename": function(subscription) {
             var newName = prompt(_l("New name:"), subscription.title);
             if (newName && newName != subscription.title)
                 subscription.rename(newName);
         },
-        'createFolder': function() {
-            var title = prompt(_l('Name of folder:'));
+        "createFolder": function() {
+            var title = prompt(_l("Name of folder:"));
             if (title) {
                 $.ajax({
                     url: "createFolder",
@@ -1366,11 +1366,11 @@
                 });
             }
         },
-        'unsubscribe': function(subscription) {
+        "unsubscribe": function(subscription) {
             if (confirm(_l("Unsubscribe from %s?", [subscription.title])))
                 subscription.unsubscribe();
         },
-        'markAllAsRead': function() {
+        "markAllAsRead": function() {
             var subscription = getSelectedSubscription();
             if (subscription == null ||
                 subscription.unread < 1 ||
@@ -1385,31 +1385,31 @@
 
             subscription.markAllAsRead();
         },
-        'removeFolder': function(folder) {
+        "removeFolder": function(folder) {
             if (!confirm(_l("You will be unsubscribed from all subscriptions in this folder. Delete %s?", [folder.title])))
                 return;
 
             folder.remove();
         },
-        'deleteTag': function(tag) {
+        "deleteTag": function(tag) {
             if (!confirm(_l("Tag \"%s\" will be removed from all matching articles. Continue?", [tag.title])))
                 return;
 
             tag.remove();
         },
-        'removeSubscriptionEntries': function(subscription) {
-            $('#gofr-entries .gofr-entry').each(function() {
+        "removeSubscriptionEntries": function(subscription) {
+            $("#gofr-entries .gofr-entry").each(function() {
                 var $entry = $(this);
-                var entry = $entry.data('entry');
+                var entry = $entry.data("entry");
 
                 if (entry.source == subscription.id)
                     $entry.remove();
             });
         },
-        'pruneDeadEntries': function() {
-            $('#gofr-entries .gofr-entry').each(function() {
+        "pruneDeadEntries": function() {
+            $("#gofr-entries .gofr-entry").each(function() {
                 var $entry = $(this);
-                var entry = $entry.data('entry');
+                var entry = $entry.data("entry");
 
                 if (!subscriptionMap[entry.source])
                     $entry.remove();
@@ -1417,30 +1417,30 @@
 
             this.onEntryListUpdate();
         },
-        'onEntryListUpdate': function() {
-            var $centerMessage = $('.center-message');
-            if ($('#gofr-entries .gofr-entry').length)
+        "onEntryListUpdate": function() {
+            var $centerMessage = $(".center-message");
+            if ($("#gofr-entries .gofr-entry").length)
                 $centerMessage.hide();
             else {
                 // List of entries is empty
                 $centerMessage.empty();
-                $('.next-page').remove();
+                $(".next-page").remove();
 
-                if ($('.subscription').length <= 1) {
+                if ($(".subscription").length <= 1) {
                     // User has no subscriptions (root node doesn't count)
                     $centerMessage
-                        .append($('<p />')
+                        .append($("<p />")
                             .text(_l("You have not subscribed to any feeds.")))
-                        .append($('<p />')
-                            .append($('<a />', { 'href': '#' })
+                        .append($("<p />")
+                            .append($("<a />", { "href": "#" })
                                 .text(_l("Subscribe"))
                                 .click(function() {
                                     ui.subscribe();
                                     return false;
                                 }))
-                            .append($('<span />')
+                            .append($("<span />")
                                 .text(_l(" or ")))
-                            .append($('<a />', { 'href': '#' })
+                            .append($("<a />", { "href": "#" })
                                 .text(_l("Import subscriptions"))
                                 .click(function() {
                                     ui.showImportSubscriptionsModal();
@@ -1449,21 +1449,21 @@
                 } else {
                     // User has at least one (non-root) subscription
                     $centerMessage
-                        .append($('<p />')
+                        .append($("<p />")
                             .text(_l("No items are available for the current view.")));
 
-                    if (!$('#menu-filter').isSelected('.menu-all-items')) {
-                        // Something other than 'All items' is selected
+                    if (!$("#menu-filter").isSelected(".menu-all-items")) {
+                        // Something other than "All items" is selected
                         // Show a toggle link
                         $centerMessage
-                            .append($('<p />')
-                                .append($('<a />', { 'href' : '#' })
+                            .append($("<p />")
+                                .append($("<a />", { "href" : "#" })
                                     .text(_l("Show all items"))
                                     .click(function() {
                                         var selectedSubscription = getSelectedSubscription();
                                         if (selectedSubscription != null) {
-                                            $('#menu-filter').selectItem('.menu-all-items');
-                                            $('#menu-view').selectItem('.menu-all-items');
+                                            $("#menu-filter").selectItem(".menu-all-items");
+                                            $("#menu-view").selectItem(".menu-all-items");
                                             selectedSubscription.refresh();
                                         }
 
@@ -1475,26 +1475,26 @@
                 $centerMessage.show();
             }
         },
-        'localizeStatics': function() {
-            $('._l').each(function() {
+        "localizeStatics": function() {
+            $("._l").each(function() {
                 var $el = $(this);
                 if ($el.text())
                     $el.html(function(index, text) { return _l(text); });
-                if ($el.attr('title'))
-                    $el.attr('title', function(index, value) { return _l(value); });
+                if ($el.attr("title"))
+                    $el.attr("title", function(index, value) { return _l(value); });
             });
         },
-        'share': function($anchor) {
-            window.open($anchor.attr('href'), 'share', $anchor.attr('data-flags'));
+        "share": function($anchor) {
+            window.open($anchor.attr("href"), "share", $anchor.attr("data-flags"));
             return false;
         },
-        'unfloatAll': function() {
-            $('.shortcuts').hide();
+        "unfloatAll": function() {
+            $(".shortcuts").hide();
             ui.toggleNavBar(false);
             $$menu.hideAll();
         },
-        'editTags': function(entry) {
-            const currentTags = entry.tags.join(', ');
+        "editTags": function(entry) {
+            const currentTags = entry.tags.join(", ");
             const enteredTags = prompt(
                 _l("Separate multiple tags with commas"),
                 currentTags
@@ -1520,14 +1520,14 @@
                 });
             }
         },
-        'onScopeChanged': function() {
+        "onScopeChanged": function() {
             var subscription = getSelectedSubscription();
             if (subscription != null) {
-                $('.mark-all-as-read').toggleClass('unavailable',
+                $(".mark-all-as-read").toggleClass("unavailable",
                     !subscription.supportsAggregateActions());
-                $('.filter').toggleClass('unavailable',
+                $(".filter").toggleClass("unavailable",
                     !subscription.supportsPropertyFilters());
-                $('.view-button').toggleClass('unavailable',
+                $(".view-button").toggleClass("unavailable",
                     !subscription.supportsPropertyFilters());
 
                 ui.updateUnreadCount();
@@ -1536,15 +1536,15 @@
     };
 
     var getRootSubscription = function() {
-        if ($('.subscription.root').length > 0)
-            return $('.subscription.root').data('subscription');
+        if ($(".subscription.root").length > 0)
+            return $(".subscription.root").data("subscription");
 
         return null;
     };
 
     var getSelectedSubscription = function() {
-        if ($('.subscription.selected').length > 0)
-            return $('.subscription.selected').data('subscription');
+        if ($(".subscription.selected").length > 0)
+            return $(".subscription.selected").data("subscription");
 
         return null;
     };
@@ -1555,12 +1555,12 @@
         var idCounter = 0;
 
         userSubs.folders.push({
-            'id': '',
+            "id": "",
         });
 
         // Create a combined list of folders & subscriptions
         $.each(userSubs.folders, function(index, folder) {
-            folder.domId = 'sub-' + idCounter++;
+            folder.domId = `sub-${idCounter++}`;
             folder.link = null;
             folder.unread = 0;
 
@@ -1591,7 +1591,7 @@
         });
 
         $.each(userSubs.tags, function(index, tag) {
-            tag.id = tag.domId = ('tag-' + idCounter++);
+            tag.id = tag.domId = `tag-${idCounter++}`;
 
             // Inject methods
             for (var name in tagMethods)
@@ -1600,7 +1600,7 @@
 
         var root = fmap[""];
         $.each(userSubs.subscriptions, function(index, subscription) {
-            subscription.domId = 'sub-' + idCounter++;
+            subscription.domId = `sub-${idCounter++}`;
 
             for (var name in subscriptionMethods)
                 subscription[name] = subscriptionMethods[name];
@@ -1649,17 +1649,17 @@
 
         // Special folders
         specialFolders = [{
-            'id':     'sf-liked',
-            'domId':  'sf-liked',
-            'type':   'liked',
-            'title':  _l("Liked items"),
-            'filter': { "prop": "like" },
+            "id":     "sf-liked",
+            "domId":  "sf-liked",
+            "type":   "liked",
+            "title":  _l("Liked items"),
+            "filter": { "prop": "like" },
         }, {
-            'id':    'sf-starred',
-            'domId': 'sf-starred',
-            'type':  'starred',
-            'title': _l("Starred items"),
-            'filter': { "prop": "star" },
+            "id":    "sf-starred",
+            "domId": "sf-starred",
+            "type":  "starred",
+            "title": _l("Starred items"),
+            "filter": { "prop": "star" },
         }];
 
         $.each(specialFolders, function(index, specialFolder) {
@@ -1669,37 +1669,37 @@
         });
 
         var collapsedFolderIds = [];
-        $.each($('#subscriptions .folder-collapsed'), function() {
-            var $subscription = $(this).closest('.subscription');
-            var subscription = $subscription.data('subscription');
+        $.each($("#subscriptions .folder-collapsed"), function() {
+            var $subscription = $(this).closest(".subscription");
+            var subscription = $subscription.data("subscription");
 
             collapsedFolderIds.push(subscription.id);
         });
 
-        var $newSubscriptions = $('<ul />', { 'id': 'subscriptions' });
+        var $newSubscriptions = $("<ul />", { "id": "subscriptions" });
         var newSubscriptionMap = {};
         var newSubscriptions = [];
         var markedFirstSub = false;
 
         var subMap = generateSubscriptionMap(userSubscriptions);
         var createSubDom = function(subscription) {
-            var $subscription = $('<li />', { 'class' : 'subscription ' + subscription.domId })
-                .data('subscription', subscription)
-                .append($('<div />', { 'class' : 'subscription-item' })
-                    .append($('<span />', { 'class' : 'chevron' })
+            var $subscription = $("<li />", { "class" : `subscription ${subscription.domId}` })
+                .data("subscription", subscription)
+                .append($("<div />", { "class" : "subscription-item" })
+                    .append($("<span />", { "class" : "chevron" })
                         .click(function(e) {
-                            var $menu = $('#menu-' + subscription.getType());
+                            var $menu = $(`#menu-${subscription.getType()}`);
                             $menu.openMenu(e.pageX, e.pageY, subscription.id);
                             e.stopPropagation();
                         }))
-                    .append($('<img />', {
-                        'class' : 'subscription-icon',
-                        'src': transparentIcon,
+                    .append($("<img />", {
+                        "class" : "subscription-icon",
+                        "src": transparentIcon,
                     }))
-                    .append($('<span />', { 'class' : 'subscription-title' })
+                    .append($("<span />", { "class" : "subscription-title" })
                         .text(subscription.title))
-                    .attr('title', subscription.title)
-                    .append($('<span />', { 'class' : 'subscription-unread-count' }))
+                    .attr("title", subscription.title)
+                    .append($("<span />", { "class" : "subscription-unread-count" }))
                     .click(function() {
                         subscription.select();
                     }));
@@ -1707,10 +1707,10 @@
             if (!subscription.isFolder()) {
                 // Favicons
                 if (subscription.favIconUrl) {
-                    $subscription.find('.subscription-icon')
-                        .attr('src', subscription.favIconUrl);
+                    $subscription.find(".subscription-icon")
+                        .attr("src", subscription.favIconUrl);
                 } else {
-                    $subscription.find('.subscription-icon').addClass('no-favicon');
+                    $subscription.find(".subscription-icon").addClass("no-favicon");
                 }
 
                 // Drag-and-drop code
@@ -1719,50 +1719,50 @@
                         if (e.which != 1)
                             return;
 
-                        var $elem = $(document.elementFromPoint(e.pageX, e.pageY)).closest('.subscription');
+                        var $elem = $(document.elementFromPoint(e.pageX, e.pageY)).closest(".subscription");
                         if (!$elem.length)
                             return;
 
-                        $('#subscriptions').mousemove(function(e) {
+                        $("#subscriptions").mousemove(function(e) {
                             if (!$dragSource) {
                                 $dragSource = $elem;
-                                $dragSource.addClass('dragged');
-                                $dragClone = $dragSource.clone().removeClass('dragged').addClass('dragging');
+                                $dragSource.addClass("dragged");
+                                $dragClone = $dragSource.clone().removeClass("dragged").addClass("dragging");
                                 dragDestination = null;
 
                                 return;
                             }
 
-                            var dragSource = $dragSource.data('subscription');
+                            var dragSource = $dragSource.data("subscription");
                             var $hoveredElement = $(document.elementFromPoint(e.pageX, e.pageY));
 
                             if ($hoveredElement) {
-                                var $sub = $hoveredElement.closest('.subscription');
-                                var sub = $sub.data('subscription');
+                                var $sub = $hoveredElement.closest(".subscription");
+                                var sub = $sub.data("subscription");
 
                                 var $newParent = null;
                                 var newParentId = null;
 
-                                if ($sub.is('li.folder')) {
-                                    $newParent = $sub.children('ul:first');
+                                if ($sub.is("li.folder")) {
+                                    $newParent = $sub.children("ul:first");
                                     newParentId = sub.id;
                                     dragDestination = sub;
                                 } else if (sub != null) {
-                                    $newParent = $sub.closest('ul');
+                                    $newParent = $sub.closest("ul");
                                     newParentId = sub.parent;
-                                    dragDestination = subscriptionMap[sub.parent || ''];
+                                    dragDestination = subscriptionMap[sub.parent || ""];
                                 } else {
                                     return false;
                                 }
 
-                                $('#subscriptions .dragging').remove();
+                                $("#subscriptions .dragging").remove();
 
                                 if (newParentId != dragSource.parent) {
                                     var $followingElement = null;
 
-                                    $newParent.children('li').each(function() {
+                                    $newParent.children("li").each(function() {
                                         var $child = $(this);
-                                        var child = $child.data('subscription');
+                                        var child = $child.data("subscription");
 
                                         if (dragSource.title.toUpperCase() < child.title.toUpperCase()) {
                                             $followingElement = $child;
@@ -1782,24 +1782,24 @@
                     });
             } else /* if (subscription.isFolder()) */ {
                 if (!subscription.isRoot()) {
-                    $subscription.find('.subscription-item')
-                        .append($('<span />', { 'class' : 'folder-toggle' })
+                    $subscription.find(".subscription-item")
+                        .append($("<span />", { "class" : "folder-toggle" })
                             .click(function(e) {
                                 var $toggleIcon = $(this);
-                                $toggleIcon.toggleClass('folder-collapsed');
-                                if ($toggleIcon.hasClass('folder-collapsed'))
-                                    $subscription.find('ul').slideUp('fast');
+                                $toggleIcon.toggleClass("folder-collapsed");
+                                if ($toggleIcon.hasClass("folder-collapsed"))
+                                    $subscription.find("ul").slideUp("fast");
                                 else
-                                    $subscription.find('ul').slideDown('fast');
+                                    $subscription.find("ul").slideDown("fast");
 
                                 return false;
                             })
-                            .toggleClass('folder-collapsed', $.inArray(subscription.id, collapsedFolderIds) > -1));
+                            .toggleClass("folder-collapsed", $.inArray(subscription.id, collapsedFolderIds) > -1));
                 }
             }
 
             if (!subscription.isRoot() && !markedFirstSub) {
-                $subscription.addClass('first');
+                $subscription.addClass("first");
                 markedFirstSub = true;
             }
 
@@ -1815,7 +1815,7 @@
                 if (subscription.id) {
                     var children = subMap[subscription.id];
                     if (children) {
-                        var $child = $('<ul />');
+                        var $child = $("<ul />");
                         if ($.inArray(subscription.id, collapsedFolderIds) > -1)
                             $child.hide();
 
@@ -1839,67 +1839,67 @@
 
         buildDom($newSubscriptions, subMap[""]);
 
-        var $appendAfter = $newSubscriptions.find('.root.subscription');
-        var firstClass = 'first';
+        var $appendAfter = $newSubscriptions.find(".root.subscription");
+        var firstClass = "first";
 
         $.each(specialFolders, function(index, specialFolder) {
-            var $specialFolder = $('<li />', { 'class' : 'subscription special-folder ' + specialFolder.domId + ' ' + firstClass})
-                .data('subscription', specialFolder)
-                .append($('<div />', { 'class' : 'subscription-item' })
-                    .append($('<img />', {
-                        'class' : 'subscription-icon',
-                        'src': transparentIcon,
+            var $specialFolder = $("<li />", { "class" : `subscription special-folder ${specialFolder.domId} ${firstClass}` })
+                .data("subscription", specialFolder)
+                .append($("<div />", { "class" : "subscription-item" })
+                    .append($("<img />", {
+                        "class" : "subscription-icon",
+                        "src": transparentIcon,
                     }))
-                    .append($('<span />', { 'class' : 'subscription-title' })
+                    .append($("<span />", { "class" : "subscription-title" })
                         .text(specialFolder.title))
-                    .attr('title', specialFolder.title)
+                    .attr("title", specialFolder.title)
                     .click(function() {
                         specialFolder.select();
                     }));
 
             $appendAfter.after($specialFolder);
 
-            firstClass = '';
+            firstClass = "";
             $appendAfter = $specialFolder;
         });
 
-        firstClass = 'first';
+        firstClass = "first";
         $.each(userSubscriptions.tags, function(index, tag) {
-            var $tag = $('<li />', { 'class' : 'subscription tag ' + tag.domId + ' ' + firstClass })
-                .data('subscription', tag)
-                .append($('<div />', { 'class' : 'subscription-item' })
-                    .append($('<span />', { 'class' : 'chevron' })
+            var $tag = $("<li />", { "class" : `subscription tag ${tag.domId} ${firstClass}` })
+                .data("subscription", tag)
+                .append($("<div />", { "class" : "subscription-item" })
+                    .append($("<span />", { "class" : "chevron" })
                         .click(function(e) {
-                            var $menu = $('#menu-tag');
+                            var $menu = $("#menu-tag");
                             $menu.openMenu(e.pageX, e.pageY, tag.id);
                             e.stopPropagation();
                         }))
-                    .append($('<img />', {
-                        'class' : 'subscription-icon',
-                        'src': transparentIcon,
+                    .append($("<img />", {
+                        "class" : "subscription-icon",
+                        "src": transparentIcon,
                     }))
-                    .append($('<span />', { 'class' : 'subscription-title' })
+                    .append($("<span />", { "class" : "subscription-title" })
                         .text(tag.title))
-                    .attr('title', tag.title)
+                    .attr("title", tag.title)
                     .click(function() {
                         tag.select();
                     }));
 
-            firstClass = '';
+            firstClass = "";
             $newSubscriptions.append($tag);
         });
 
-        $('#subscriptions').replaceWith($newSubscriptions)
+        $("#subscriptions").replaceWith($newSubscriptions)
 
         subscriptionMap = newSubscriptionMap;
 
-        $('body').toggleClass('sidebar-hidden', true);
+        $("body").toggleClass("sidebar-hidden", true);
 
         $.each(newSubscriptions, function() {
             this.syncView();
         });
 
-        $('body').toggleClass('sidebar-hidden', false);
+        $("body").toggleClass("sidebar-hidden", false);
 
         ui.updateUnreadCount();
         selectedSubscription.select(reloadItems);
@@ -1962,7 +1962,7 @@
         })
         .on("refresh", function(response) {
             console.debug(`Refresh received: ${response}`);
-            refresh(response && response.includes("articles"));
+            refresh(response != null && response.includes("articles"));
         });
 
     ui.init();

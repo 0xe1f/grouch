@@ -96,6 +96,12 @@ def login_post():
 
     return flask.redirect(next or flask.url_for("/"))
 
+@app.get("/logout")
+@flask_login.login_required
+def logout():
+    flask_login.logout_user()
+    return flask.redirect(flask.url_for("login_get"))
+
 @app.get("/")
 @flask_login.login_required
 def index():
