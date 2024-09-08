@@ -75,7 +75,11 @@ def login_post():
         arg.validate()
     except requests.ValidationException as e:
         app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        flask.flash(e.message)
+        return flask.render_template(
+            "login.html",
+            login_request=arg,
+        )
 
     try:
         user = sync_tasks.users_authenticate(
@@ -85,7 +89,11 @@ def login_post():
         )
     except TaskException as e:
         app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        flask.flash("Username or password incorrect")
+        return flask.render_template(
+            "login.html",
+            login_request=arg,
+        )
 
     flask_login.utils.login_user(ext_objs.User(user))
 
@@ -94,13 +102,17 @@ def login_post():
             logging.warn(f"{next} is not a valid redirection URL")
             next = None
 
-    return flask.redirect(next or flask.url_for("/"))
+    return flask.redirect(next or flask.url_for("index"))
 
 @app.get("/logout")
 @flask_login.login_required
 def logout():
     flask_login.logout_user()
     return flask.redirect(flask.url_for("login_get"))
+
+@app.get("/create_account")
+def create_account():
+    raise ValueError("FIXME")
 
 @app.get("/")
 @flask_login.login_required
