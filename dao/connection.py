@@ -138,7 +138,7 @@ class Connection:
                     "map": """
                         function (doc) {
                             if (doc.doc_type == 'article' && doc.props.includes('unread')) {
-                                emit(doc.subscription_id);
+                                emit([ doc.user_id, doc.subscription_id ]);
                             }
                         }
                     """,
