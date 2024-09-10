@@ -78,7 +78,7 @@ def login_post():
         flask.flash(e.message)
         return flask.render_template(
             "login.html",
-            login_request=arg,
+            arg=arg,
         )
 
     try:
@@ -92,7 +92,7 @@ def login_post():
         flask.flash("Username or password incorrect")
         return flask.render_template(
             "login.html",
-            login_request=arg,
+            arg=arg,
         )
 
     flask_login.utils.login_user(ext_objs.User(user))
@@ -111,8 +111,42 @@ def logout():
     return flask.redirect(flask.url_for("login_get"))
 
 @app.get("/create_account")
-def create_account():
-    raise ValueError("FIXME")
+def create_account_get():
+    return flask.render_template(
+        "create_account.html",
+    )
+
+@app.post("/create_account")
+def create_account_post():
+    arg = requests.CreateAccountRequest(flask.request.form)
+
+    try:
+        arg.validate()
+    except requests.ValidationException as e:
+        app.logger.error(e.message)
+        flask.flash(e.message)
+        return flask.render_template(
+            "create_account.html",
+            arg=arg,
+        )
+
+    try:
+        user = sync_tasks.users_create_user(
+            _create_task_context(),
+            arg.username,
+            arg.email_address,
+            arg.password,
+        )
+    except TaskException as e:
+        app.logger.error(e.message)
+        flask.flash("Duplicate username or email address")
+        return flask.render_template(
+            "create_account.html",
+            arg=arg,
+        )
+
+    flask.flash(f"Account '{user.username}' created successfully", "success")
+    return flask.redirect(flask.url_for("login_get"))
 
 @app.get("/")
 @flask_login.login_required

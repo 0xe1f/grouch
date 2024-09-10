@@ -21,6 +21,7 @@ from entity import User
 from dao import BulkUpdateQueue
 from tasks.objects import TaskContext
 from tasks.objects import TaskException
+import bcrypt
 import datetime
 import tasks.async_tasks as async_tasks
 
@@ -227,5 +228,24 @@ def users_authenticate(
         raise TaskException("User not found")
     elif not user.plaintext_matching_stored(password):
         raise TaskException("Password mismatch")
+
+    return user
+
+
+def users_create_user(
+    tc: TaskContext,
+    username: str,
+    email_address: str,
+    password: str,
+) -> User:
+    salt = bcrypt.gensalt()
+
+    user = User()
+    user.username = username
+    user.set_hashed_password(password, salt)
+    user.email_address = email_address
+
+    if not tc.dao.users.create(user):
+        raise TaskException("Cannot create user")
 
     return user
