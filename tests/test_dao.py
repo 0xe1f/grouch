@@ -14,7 +14,9 @@
 
 from dao import Connection
 from dao import Database
+from datetime import datetime
 from entity import Entity
+import random
 import tomllib
 import unittest
 import uuid
@@ -81,6 +83,10 @@ class TestDao(unittest.TestCase):
     @classmethod
     def random_string(cls) -> str:
         return uuid.uuid4().hex
+
+    @classmethod
+    def random_timestamp(cls, jitter: int=0, factor: int=1) -> int:
+        return datetime.now().timestamp() + random.randint(-jitter // 2, jitter // 2) * factor
 
     @classmethod
     def new_test(cls) -> TestEntity:

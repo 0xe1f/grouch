@@ -172,14 +172,14 @@ class ArticleDao(Dao):
 
     def get_page_by_folder(
         self,
-        sub_id: str,
+        folder_id: str,
         start: str=None,
         unread_only: bool=False,
         limit: int=40,
     ) -> ArticlePage:
         options = {
-            "end_key": [sub_id],
-            "start_key": start if start else [sub_id, {}],
+            "end_key": [folder_id],
+            "start_key": start if start else [folder_id, {}],
             "descending": True,
             "include_docs": True,
             "limit": limit + 1,

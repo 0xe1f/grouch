@@ -35,9 +35,7 @@ cd grouch
 . venv/bin/activate
 
 # Create a config.toml file, using config.toml.example as a template
-
-./users.py -u [username] -p [password] -e [email_address]   # Add a new in-app user
-./serve.py        # Start server
+./serve.py   # Start server on port 8080
 ```
 
 To routinely update feeds, set up a `cron` job that calls `refresh.py`:
