@@ -64,9 +64,14 @@ _CLEANER = clean.Cleaner(
 REGEX_WHITESPACE = r"\s+"
 
 def sanitize_html(content: str) -> str:
+    if not content:
+        return content
     return _SANITIZER.clean_html(content)
 
 def extract_text(content: str, max_len: int=None) -> str:
+    if not content:
+        return content
+
     # Strip out HTML
     content = _CLEANER.clean_html(content)
     content = _strip_bookend_tags(content)

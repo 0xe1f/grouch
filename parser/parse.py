@@ -135,8 +135,10 @@ def _entry_body(entry: feedparser.FeedParserDict) -> str:
     elif "summary_detail" in entry:
         if (summary_detail := entry.summary_detail) and "value" in summary_detail:
             return summary_detail.value
+    elif "description" in entry:
+        return entry.description
 
-    return entry.description
+    return ""
 
 def _utc_struct_as_timestamp(t: time.struct_time) -> int:
     yr, mo, dy, hr, min, sec, *_ = t
