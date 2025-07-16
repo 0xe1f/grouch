@@ -651,13 +651,6 @@
                 .text(this.tags.length > 0
                     ? _l("%s", [ this.tags.join(", ") ])
                     : _l("Tag"));
-            $entry
-                .find(".action-unread .gofr-action-icon")
-                .text(
-                    this.hasProperty("unread")
-                        ? "📩"
-                        : "✉️"
-                );
     },
         "isExpanded": function() {
             return this.getDom().hasClass("open");
@@ -726,11 +719,7 @@
                             $("<span />", { "class" : "action-unread gofr-entry-action"})
                                 .append(
                                     $("<span />", { "class": "gofr-action-icon" })
-                                        .text(
-                                            entry.hasProperty("unread")
-                                                ? "📩"
-                                                : "✉️"
-                                        )
+                                        .text("📩")
                                 )
                                 .append(
                                     $("<span />", { "class": "gofr-action-text" })
