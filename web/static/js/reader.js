@@ -551,6 +551,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
+                    // FIXME: remove all matching tags from existing entries
                     resetSubscriptionDom(response.subscriptions, false);
                 }
             });
@@ -650,7 +651,14 @@
                 .text(this.tags.length > 0
                     ? _l("%s", [ this.tags.join(", ") ])
                     : _l("Tag"));
-        },
+            $entry
+                .find(".action-unread .gofr-action-icon")
+                .text(
+                    this.hasProperty("unread")
+                        ? "📩"
+                        : "✉️"
+                );
+    },
         "isExpanded": function() {
             return this.getDom().hasClass("open");
         },
@@ -714,65 +722,96 @@
                             .click(function(e) {
                                 entry.toggleStarred();
                             }))
-                        .append($("<span />", { "class" : "action-unread gofr-entry-action"})
-                            .html("&nbsp;")
-                            .append($("<span />", { "class": "gofr-action-text" })
-                                .text(_l("Keep unread")))
-                            .click(function(e) {
-                                entry.toggleUnread();
-                            }))
-                        .append($("<span />", { "class" : "action-tag gofr-entry-action" })
-                            .html("&nbsp;")
-                            .append($("<span />", { "class": "gofr-action-text" })
-                                .text(this.tags.length > 0
-                                    ? _l("%s", [ this.tags.join(", ") ])
-                                    : _l("Tag")))
-                            .click(function(e) {
-                                ui.editTags(entry);
-                            }))
-                        .append($("<span />", { "class" : "action-like gofr-entry-action"})
-                            .html("&nbsp;")
-                            .append($("<span />", { "class": "gofr-action-text" })
-                                .text(_l("Like")))
-                            .append($("<span />", { "class": "gofr-like-count" })
-                                .text(_l("(%d)", [entry.extras.likeCount]))
-                                .toggleClass("unliked", this.extras.likeCount < 1))
-                            .click(function(e) {
-                                entry.toggleLike();
-                            }))
-                        .append($("<span />", { "class" : "gofr-entry-action-group gofr-entry-share-group"})
-                            .append($("<span />", { "class": "gofr-action-text" })
-                                .text(_l("Share: "))))
-                        .append($("<a />", {
-                            "class": "action-share-gplus gofr-entry-share",
-                            "href": `https://plus.google.com/share?url=${encodeURIComponent(entry.link)}`,
-                            "data-flags": "width=600,height=460,menubar=no,location=no,status=no",
-                            "title": _l("Share on Google+"),
-                        })
-                        .html("&nbsp;")
-                        .click(function(e) {
-                            return ui.share($(this));
-                        }))
-                        .append($("<a />", {
-                            "class": "action-share-fb gofr-entry-share",
-                            "href": `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(entry.link)}`,
-                            "data-flags": "width=626,height=436,menubar=no,location=no,status=no",
-                            "title": _l("Share on Facebook"),
-                        })
-                        .html("&nbsp;")
-                        .click(function(e) {
-                            return ui.share($(this));
-                        }))
-                        .append($("<a />", {
-                            "class": "action-share-twitter gofr-entry-share",
-                            "href": `https://twitter.com/share?url=${encodeURIComponent(entry.link)}`,
-                            "data-flags": "width=470,height=257,menubar=no,location=no,status=no",
-                            "title": _l("Tweet"),
-                        })
-                        .html("&nbsp;")
-                        .click(function(e) {
-                            return ui.share($(this));
-                        })))
+                        .append(
+                            $("<span />", { "class" : "action-unread gofr-entry-action"})
+                                .append(
+                                    $("<span />", { "class": "gofr-action-icon" })
+                                        .text(
+                                            entry.hasProperty("unread")
+                                                ? "📩"
+                                                : "✉️"
+                                        )
+                                )
+                                .append(
+                                    $("<span />", { "class": "gofr-action-text" })
+                                        .text(_l("Keep unread"))
+                                )
+                                .click(function(e) {
+                                    entry.toggleUnread();
+                                    entry.syncView();
+                                })
+                        )
+                        .append(
+                            $("<span />", { "class" : "action-tag gofr-entry-action" })
+                                .append(
+                                    $("<span />", { "class": "gofr-action-icon" })
+                                        .text("🏷️")
+                                )
+                                .append(
+                                    $("<span />", { "class": "gofr-action-text" })
+                                        .text(
+                                            this.tags.length
+                                                ? _l("%s", [ this.tags.join(", ") ])
+                                                : _l("Tag")
+                                        )
+                                )
+                                .click(function(e) {
+                                    ui.editTags(entry);
+                                })
+                        )
+                        .append(
+                            $("<span />", { "class" : "action-like gofr-entry-action"})
+                                .append(
+                                    $("<span />", { "class": "gofr-action-icon" })
+                                        .text("👍")
+                                )
+                                .append(
+                                    $("<span />", { "class": "gofr-action-text" })
+                                        .text(_l("Like"))
+                                )
+                                .append(
+                                    $("<span />", { "class": "gofr-like-count" })
+                                        .text(_l("(%d)", [entry.extras.likeCount]))
+                                        .toggleClass("unliked", this.extras.likeCount < 1)
+                                )
+                                .click(function(e) {
+                                    entry.toggleLike();
+                                })
+                        )
+                        // .append($("<span />", { "class" : "gofr-entry-action-group gofr-entry-share-group"})
+                        //     .append($("<span />", { "class": "gofr-action-text" })
+                        //         .text(_l("Share: "))))
+                        // .append($("<a />", {
+                        //     "class": "action-share-gplus gofr-entry-share",
+                        //     "href": `https://plus.google.com/share?url=${encodeURIComponent(entry.link)}`,
+                        //     "data-flags": "width=600,height=460,menubar=no,location=no,status=no",
+                        //     "title": _l("Share on Google+"),
+                        // })
+                        // .html("&nbsp;")
+                        // .click(function(e) {
+                        //     return ui.share($(this));
+                        // }))
+                        // .append($("<a />", {
+                        //     "class": "action-share-fb gofr-entry-share",
+                        //     "href": `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(entry.link)}`,
+                        //     "data-flags": "width=626,height=436,menubar=no,location=no,status=no",
+                        //     "title": _l("Share on Facebook"),
+                        // })
+                        // .html("&nbsp;")
+                        // .click(function(e) {
+                        //     return ui.share($(this));
+                        // }))
+                        // .append($("<a />", {
+                        //     "class": "action-share-twitter gofr-entry-share",
+                        //     "href": `https://twitter.com/share?url=${encodeURIComponent(entry.link)}`,
+                        //     "data-flags": "width=470,height=257,menubar=no,location=no,status=no",
+                        //     "title": _l("Tweet"),
+                        // })
+                        // .html("&nbsp;")
+                        // .click(function(e) {
+                        //     return ui.share($(this));
+                        // }))
+                    )
                     .click(function(e) {
                         ui.unfloatAll();
                         e.stopPropagation();

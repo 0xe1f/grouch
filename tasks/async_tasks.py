@@ -119,7 +119,7 @@ def articles_remove_tag(
 ):
     start_time = time()
     with tc.dao.new_q() as bulk_q:
-        tc.dao.articles.remove_all_tags_by_user_by_name(bulk_q, tag)
+        tc.dao.articles.remove_all_tags_by_user_by_name(bulk_q, tc.user_id, tag)
     logging.info(f"Updated {bulk_q.written_count}/{bulk_q.enqueued_count} articles ({time() - start_time:.2}s)")
 
     if tc._completion_message:

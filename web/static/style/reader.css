@@ -16,8 +16,8 @@
  */
 
 body {
-	font-family: helvetica, arial, sans-serif;
-	font-size: 10pt;
+	font-family: helvetica neue, helvetica, arial, sans-serif;
+	font-size: 12pt;
 	color: #444;
 	margin: 0;
 	background-color: #fff;
@@ -51,7 +51,7 @@ body {
 	right: 0;
 	bottom: 0;
 	height: 22px;
-	font-size: 12px;
+	font-size: 12pt;
 	padding-top: 7px;
 	border-top: solid 1px #ccc;
 	background-color: #eee;
@@ -73,12 +73,8 @@ a {
 	display: none;
 }
 
-.houmu-rogo {
-	margin: 3px;
-}
-
 .infobar a {
-	font-size: 10pt;
+	font-size: 12pt;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -140,7 +136,7 @@ a {
 }
 
 .gofr-entries-header {
-	font-size: 10.5pt;
+	font-size: 12pt;
 	font-weight: bold;
 	padding: 0.5em;
 	color: #444;
@@ -181,9 +177,9 @@ a {
 .gofr-entry.selected.open .gofr-entry-item {
 	padding-left: 0.5em;
 	padding-right: 0.5em;
-	height: 37px;
+	height: 42px;
 	background-color: #fff;
-	line-height: 37px;
+	line-height: 42px;
 	position: relative;
 }
 
@@ -199,7 +195,7 @@ a {
 .gofr-entry-source {
 	overflow: hidden;
 	white-space: nowrap;
-	margin-left: 20px;
+	margin-left: 24px;
 	width: 10em;
 	display: block;
 	position: absolute;
@@ -251,7 +247,7 @@ a {
 .gofr-entry-title {
 	color: black;
 	font-weight: bold;
-	font-size: 10pt;
+	font-size: 12pt;
 	display: inline;
 	margin: 0;
 }
@@ -330,49 +326,25 @@ a.gofr-entry-title:hover {
 
 .gofr-entry-share,
 .gofr-entry-action {
-	background-repeat: no-repeat;
-	padding-left: 20px;
 	margin-left: 1em;
 	cursor: pointer;
-	display: inline-block;
-	height: 15px;
 }
 
 .gofr-entry-share {
 	margin-left: 0;
 }
 
-.action-unread {
-	background-image: url(sprites.png);
-	background-position: -15px -15px;
+.gofr-action-icon {
+	font-size: 14pt;
+	padding-right: 0.5em;
 }
 
-.action-tag {
-	background-image: url(sprites.png);
-	background-position: -120px -120px;
-}
-
-.action-tag.has-tags {
-	background-position: -105px -105px;
-}
-
-.action-share-gplus {
-	background-image: url(sprites.png);
-	background-position: -195px -15px;
-}
-
-.action-share-fb {
-	background-image: url(sprites.png);
-	background-position: -180px 0;
-}
-
-.action-share-twitter {
-	background-image: url(sprites.png);
-	background-position: -210px -30px;
-}
-
-.gofr-entry.read .action-unread {
-	background-position: 0 0;
+.action-tag:not(.has-tags) .gofr-action-icon,
+.gofr-entry:not(.like) .action-like .gofr-action-icon,
+.gofr-entry.read .action-unread .gofr-action-icon {
+	text-shadow: #000000 0 0 1px;
+	filter: grayscale(100%);
+	opacity: 60%;
 }
 
 .action-star {
@@ -382,11 +354,6 @@ a.gofr-entry-title:hover {
 	background-image: url(sprites.png);
 	background-position: -30px -30px;
 	cursor: pointer;
-}
-
-.action-like {
-	background-image: url(sprites.png);
-	background-position: -60px -60px;
 }
 
 .star .action-star {
@@ -593,14 +560,14 @@ ul#subscriptions,
 }
 
 button {
-	height: 30px;
+	height: 32px;
 	margin: 0 0.25em;
 	padding: 0.5em 1.5em;
 	background-color: #eee;
 	border: solid 1px #aaa;
 	border-radius: 3px;
 	box-shadow: 1px 1px 1px #ddd;
-	font-size: 8pt;
+	font-size: 10pt;
 	font-weight: bold;
 	color: #555;
 }
@@ -629,7 +596,7 @@ button.dropdown {
 	background-position: 100% -273px;
 	cursor: pointer;
 	font-weight: normal;
-	font-size: 10pt;
+	font-size: 12pt;
 	height: auto;
 	color: #777;
 }
@@ -736,7 +703,7 @@ button.subscribe {
 	border-radius: 3px;
 	padding: 0.5em 2em;
 	box-shadow: 1px 1px 1px #aaa;
-	font-size: 9pt;
+	font-size: 12pt;
 	color: #000;
 }
 
@@ -814,7 +781,7 @@ ul.menu {
 .shortcuts table {
 	margin: auto;
 	color: #fff;
-	font-size: 15pt;
+	font-size: 18pt;
 }
 
 .shortcuts th {
@@ -825,13 +792,13 @@ ul.menu {
 .shortcuts .sh-keys {
 	text-align: right;
 	white-space: nowrap;
-	font-size: 11pt;
+	font-size: 14pt;
 }
 
 .shortcuts .sh-action {
 	text-align: left;
 	padding-right: 2em;
-	font-size: 11pt;
+	font-size: 14pt;
 }
 
 .key {
@@ -842,7 +809,7 @@ ul.menu {
 	border: solid 3px #fff;
 	border-radius: 3px;
 	background-color: #fffacd;
-	font-size: 11pt;
+	font-size: 14pt;
 	font-weight: normal;
 	text-align: center;
 	min-width: 1.05em;
@@ -880,7 +847,7 @@ ul.menu {
 }
 
 .modal h1 {
-	font-size: 14pt;
+	font-size: 16pt;
 	margin: 0 0 1em 0;
 }
 
@@ -890,7 +857,7 @@ ul.menu {
 }
 
 #about p {
-	font-size: 12pt;
+	font-size: 14pt;
 	line-height: 1.5;
 }
 
@@ -1057,7 +1024,7 @@ ul.menu {
 	}
 
 	.gofr-article-title h2 {
-		font-size: 12pt;
+		font-size: 16pt;
 	}
 
 	#footer {
@@ -1100,20 +1067,6 @@ only screen and (min-device-pixel-ratio: 2) {
 
 	.navigate,
 	.navigate:hover,
-
-	.action-tag,
-	.action-tag.has-tags,
-
-	.action-like,
-	.like .action-like,
-	.action-star,
-	.star .action-star,
-	.action-unread,
-	.gofr-entry.read .action-unread,
-
-	.action-share-gplus,
-	.action-share-fb,
-	.action-share-twitter,
 
 	.gofr-entry-link,
 
