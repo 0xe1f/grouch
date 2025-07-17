@@ -165,6 +165,11 @@
 
             const subscription = this;
             const filter = subscription.getFilter();
+            if (filter.prop === undefined) {
+                Cookies.remove('filter');
+            } else {
+                Cookies.set('filter', filter.prop);
+            }
             if (continueFrom) {
                 $.extend(filter, { "start": continueFrom });
             }
@@ -695,8 +700,9 @@
 
             this.markAsRead();
 
-            if (entry.areExtrasDirty)
-                entry.loadExtras();
+            // FIXME
+            // if (entry.areExtrasDirty)
+            //     entry.loadExtras();
 
             var $content =
                 $("<div />", { "class" : "gofr-entry-content" })
@@ -854,7 +860,7 @@
             $entry.append($content);
         },
         "scrollIntoView": function() {
-            this.getDom().scrollintoview({ duration: 0});
+            this.getDom()[0].scrollIntoView({ duration: 0});
         },
         "collapse": function() {
             this.getDom()
@@ -934,11 +940,15 @@
             this.initModals();
             this.initBookmarklet();
 
-            $("#menu-filter").selectItem(".menu-all-items");
+            if (Cookies.get('filter') == 'unread') {
+                $('#menu-filter').selectItem('.menu-new-items');
+            } else {
+                $('#menu-filter').selectItem('.menu-all-items');
+            }
             this.onScopeChanged();
 
-            this.toggleSidebar($.cookie("show-sidebar") !== "false");
-            this.toggleReadSubscriptions($.cookie("show-all-subs") !== "false");
+            this.toggleSidebar(Cookies.get("show-sidebar") !== "false");
+            this.toggleReadSubscriptions(Cookies.get("show-all-subs") !== "false");
 
             $("a").not("#sign-out").attr("target", "_blank");
         },
@@ -1241,7 +1251,7 @@
             $("body").toggleClass("floated-sidebar", !showSidebar);
             $(".menu-show-sidebar").setChecked(showSidebar);
 
-            $.cookie("show-sidebar", showSidebar);
+            Cookies.set("show-sidebar", showSidebar);
         },
         "toggleReadSubscriptions": function(showAllSubscriptions) {
             if (typeof showAllSubscriptions === "undefined")
@@ -1250,7 +1260,7 @@
             $("body").toggleClass("hide-read-subs", !showAllSubscriptions);
             $(".menu-show-all-subs").setChecked(showAllSubscriptions);
 
-            $.cookie("show-all-subs", showAllSubscriptions);
+            Cookies.set("show-all-subs", showAllSubscriptions);
         },
         "updateUnreadCount": function() {
             // Update the "new items" caption in the dropdown to reflect
@@ -1305,7 +1315,7 @@
 
                 scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
                 if (scrollIntoView)
-                    $(".subscription.highlighted").scrollintoview({ duration: 0});
+                    $(".subscription.highlighted")[0].scrollIntoView({ duration: 0});
             }
         },
         "selectArticle": function(which, scrollIntoView) {
@@ -1333,7 +1343,7 @@
 
             scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
             if (scrollIntoView)
-                $(".gofr-entry.selected").scrollintoview({ duration: 0});
+                $(".gofr-entry.selected")[0].scrollIntoView({ duration: 0});
         },
         "openArticle": function(which) {
             this.selectArticle(which, false);
@@ -1341,7 +1351,8 @@
             if (!$(".gofr-entry-content", $(".gofr-entry.selected")).length || which === 0)
                 $(".gofr-entry.selected")
                     .click()
-                    .scrollintoview();
+                    [0]
+                    .scrollIntoView();
         },
         "collapseAllEntries": function() {
             $(".gofr-entry.open").removeClass("open");
