@@ -73,6 +73,9 @@
     };
 
     var getPublishedDate = function(dateAsString) {
+        if (dateAsString === undefined) {
+            return "";
+        }
         var now = new Date();
         var date = new Date(dateAsString);
 
