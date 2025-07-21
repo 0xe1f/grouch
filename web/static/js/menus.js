@@ -83,19 +83,21 @@ $().ready(function() {
 
 	$.fn.extend({
 		selectItem: function(itemSelector) {
-			var $menu = $(this);
-			if ($menu.is('.menu.selectable')) {
-				var $selected = $(itemSelector); // $menu.find(itemSelector);
+			return this.each(function () {
+				var $menu = $(this);
+				if ($menu.is('.menu.selectable')) {
+					var $selected = $(itemSelector); // $menu.find(itemSelector);
 
-				$menu.find('li').removeClass('selected-menu-item');
-				$selected.addClass('selected-menu-item');
+					$menu.find('li').removeClass('selected-menu-item');
+					$selected.addClass('selected-menu-item');
 
-				$('.dropdown').each(function() {
-					var $dropdown = $(this);
-					if ($dropdown.data('dropdown') == $menu.attr('id'))
-						$dropdown.text($menu.find(itemSelector).text());
-				});
-			}
+					$('.dropdown').each(function() {
+						var $dropdown = $(this);
+						if ($dropdown.data('dropdown') == $menu.attr('id'))
+							$dropdown.text($menu.find(itemSelector).text());
+					});
+				}
+			});
 		},
 		isSelected: function(itemSelector) {
 			var $menu = $(this);
@@ -104,30 +106,35 @@ $().ready(function() {
 			return false;
 		},
 		setChecked: function(checked) {
-			var $item = $(this);
-			if ($item.is('.menu li'))
-				$item.toggleClass('checked', checked);
+			return this.each(function () {
+				var $item = $(this);
+				if ($item.is('.menu li'))
+					$item.toggleClass('checked', checked);
+			});
 		},
 		setTitle: function(title) {
-			var $item = $(this);
-			if ($item.is('.menu li')) {
+			return this.each(function () {
+				var $item = $(this);
 				$item.find('span').text(title);
 				if ($item.hasClass('selected-menu-item')) {
 					var $menu = $item.closest('ul');
-					$('.dropdown').each(function() {
+					$('.dropdown').each(function () {
 						var $dropdown = $(this);
+						console.debug($dropdown.data('dropdown') + ' <> ' + $menu.attr('id'));
 						if ($dropdown.data('dropdown') == $menu.attr('id'))
 							$dropdown.text(title);
 					});
 				}
-			}
+			});
 		},
 		openMenu: function(x, y, context) {
-			var $menu = $(this);
-			if ($menu.hasClass('menu')) {
-				$('.menu').hide();
-				$menu.css( { top: y, left: x }).data('context', context).show();
-			}
+			return this.each(function () {
+				var $menu = $(this);
+				if ($menu.hasClass('menu')) {
+					$('.menu').hide();
+					$menu.css( { top: y, left: x }).data('context', context).show();
+				}
+			});
 		}
 	});
 });

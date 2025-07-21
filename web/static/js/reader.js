@@ -945,8 +945,10 @@
 
             if (Cookies.get('filter') == 'unread') {
                 $('#menu-filter').selectItem('.menu-new-items');
+                $('#menu-view').selectItem('.menu-new-items');
             } else {
                 $('#menu-filter').selectItem('.menu-all-items');
+                $('#menu-view').selectItem('.menu-all-items');
             }
             this.onScopeChanged();
 
