@@ -1,5 +1,5 @@
 /*****************************************************************************
- ** Copyright (C) 2024 Akop Karapetyan
+ ** Copyright (C) 2024-2025 Akop Karapetyan
  **
  ** Licensed under the Apache License, Version 2.0 (the "License");
  ** you may not use this file except in compliance with the License.
@@ -20,24 +20,24 @@ html, body, .fields {
 }
 
 #header {
-	border-bottom: solid 1px #ccc;
-	background-color: #eee;
-	padding: 0.5em 1em;
+    border-bottom: solid 1px #ccc;
+    background-color: #eee;
+    padding: 0.5em 1em;
 }
 
 #header h1 {
-	font-size: 24px;
-	color: #222;
-	text-shadow: 0px 1px 1px #fff;
-	margin: 0.25em 0;
+    font-size: 24px;
+    color: #222;
+    text-shadow: 0px 1px 1px #fff;
+    margin: 0.25em 0;
 }
 
 body {
-	font-family: helvetica, arial, sans-serif;
-	font-size: 10pt;
-	color: #444;
-	margin: 0;
-	background-color: #f5f5f5;
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 10pt;
+    color: #444;
+    margin: 0;
+    background-color: #f5f5f5;
 }
 
 .fields {
@@ -52,15 +52,20 @@ form {
     border-radius: 5px;
     margin: auto auto;
     width: 300px;
-    padding: 8px 24px;
+    padding: 16px 24px;
     display: grid;
     grid-template-columns: 3fr 1fr;
     align-items: center;
 }
 
+.fields input {
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 16pt;
+    font-weight: normal;
+}
+
 .fields input[type=text],
 .fields input[type=password] {
-    font-size: 20pt;
     border: solid 1px #777;
     border-radius: 5px;
     display: block;
@@ -81,19 +86,18 @@ form {
 }
 
 .fields input[type=submit] {
+    margin: 8px 0;
     padding: 0.5em 1.5em;
-    border: solid 1px #999;
+    background-color: #eee;
+    border: solid 1px #aaa;
     border-radius: 3px;
-    margin: 8px 0px;
-    font-size: 16pt;
-    text-shadow: 0px -1px 1px #888;
-    color: #fff;
-    background: linear-gradient(to bottom,  #ccc 0%,#bbb 100%);
+    box-shadow: 1px 1px 1px #ddd;
+    color: #999;
+    font-weight: 500;
 }
 
 .fields input[type=submit]:enabled {
-    /* http://www.colorzilla.com/gradient-editor/ */
-    background: linear-gradient(to bottom,  #f9c667 0%,#f79621 100%);
+    color: #555;
 }
 
 .fields input[type=submit]:hover:enabled {
@@ -101,7 +105,7 @@ form {
 }
 
 .fields input[type=submit]:active:enabled {
-    background: linear-gradient(to bottom,  #f9c667 0%,#d8811e 100%);
+    color: #555;
 }
 
 .fields ul {
