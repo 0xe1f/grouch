@@ -16,12 +16,13 @@ from entity import Entry
 from entity import Feed
 from parser import ParseResult
 from parser import sanitizer
+from parser import consts
 import datetime
 import feedparser
 import logging
+from parser.custom import custom_parsers
 import time
 
-_MAX_SUMMARY_LEN = 400
 _FEED_TYPES = [
     "application/atom+xml",
     "application/rss+xml",
@@ -55,6 +56,11 @@ def parse_url(url: str) -> ParseResult:
     if (alt_urls := [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]):
         logging.debug(f"No feeds for '{url}', but found {len(alt_urls)} alternatives")
         return ParseResult(url, alts=alt_urls)
+
+    for (matcher, parser) in custom_parsers.items():
+        if matcher(url):
+            logging.error(f"Custom parser matched '{url}'")
+            return parser(url)
 
     logging.error(f"No feeds for '{url}'")
     return None
@@ -110,7 +116,7 @@ def _create_feed(url: str, feed: feedparser.FeedParserDict) -> Feed:
 def _create_entry(entry: feedparser.FeedParserDict) -> Entry:
     body = _entry_body(entry)
     html_content = sanitizer.sanitize_html(body)
-    text_content = sanitizer.extract_text(html_content, max_len=_MAX_SUMMARY_LEN)
+    text_content = sanitizer.extract_text(html_content, max_len=consts.MAX_SUMMARY_LEN)
 
     content = Entry()
     content.entry_uid = entry.id
