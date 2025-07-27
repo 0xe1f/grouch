@@ -59,7 +59,7 @@ def parse_url(url: str) -> ParseResult:
 
     for (matcher, parser) in custom_parsers.items():
         if matcher(url):
-            logging.error(f"Custom parser matched '{url}'")
+            logging.debug(f"Custom parser matched '{url}'")
             return parser(url)
 
     logging.error(f"No feeds for '{url}'")

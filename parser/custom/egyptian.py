@@ -82,12 +82,12 @@ def extract_detail_url(title_blob):
 def extract_cast(title_blob):
     return re.sub(r'\s+', " ", title_blob["Cast"] or "")
 
-def extract_opening(title_blob):
-    return datetime.strptime(title_blob["OpeningDate"], '%Y-%m-%d').timestamp()
+def extract_ymd(title_blob, key):
+    return datetime.strptime(title_blob[key], '%Y-%m-%d')
 
 def extract_updated(title_blob):
     updated_at = title_blob["updatedAt"]
-    return isoparse(updated_at).timestamp()
+    return isoparse(updated_at)
 
 def extract_text(title_blob, key):
     return (title_blob[key] or "").strip()
@@ -112,9 +112,9 @@ def generate_html_body(title_blob):
 {"\n".join(items)}
 </div>"""
 
-def _create_feed(metadata_map) -> Feed:
+def _create_feed(url, metadata_map) -> Feed:
     content = Feed()
-    content.feed_url = home_url
+    content.feed_url = url
     content.title = metadata_map["og:title"]
     content.description = metadata_map["og:description"]
     content.site_url = home_url
@@ -124,15 +124,23 @@ def _create_feed(metadata_map) -> Feed:
     return content
 
 def _create_entry(title_blob) -> Entry:
+    title = extract_text(title_blob, "FilmName")
     body = generate_html_body(title_blob)
+    opening = extract_ymd(title_blob, "OpeningDate")
+    closing = extract_ymd(title_blob, "ClosingDate")
+
+    if opening != closing:
+        time_range = f"{opening.strftime("%a %b %-d")} - {closing.strftime("%a %b %-d")}"
+    else:
+        time_range = opening.strftime("%a %b %-d")
 
     content = Entry()
     content.entry_uid = extract_text(title_blob, "Slug")
-    content.title = extract_text(title_blob, "FilmName")
+    content.title = f"""{title} ({time_range})"""
     content.author = extract_text(title_blob, "Director")
     content.link = extract_detail_url(title_blob)
     content.text_body = sanitizer.sanitize_html(body)
-    content.published = extract_updated(title_blob)
+    content.published = extract_updated(title_blob).timestamp()
     content.text_summary = sanitizer.extract_text(extract_text(title_blob, "Synopsis"), max_len=consts.MAX_SUMMARY_LEN)
     content.digest = content.computed_digest()
 
@@ -142,6 +150,9 @@ def matcher(url):
     return url.startswith(home_url)
 
 def parser(url):
+    if not matcher(url):
+        raise ValueError("URL not matching pattern")
+
     document = fetch_document(titles_url)
     md_map = extract_metadata(document)
     json_content = extract_json_blob(document)
@@ -149,6 +160,6 @@ def parser(url):
 
     return ParseResult(
         url,
-        feed=_create_feed(md_map),
+        feed=_create_feed(url, md_map),
         entries=[_create_entry(title) for title in titles],
     )
