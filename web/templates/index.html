@@ -63,7 +63,11 @@
             <h1 class="_l">Upload OPML file</h1>
             <form enctype="multipart/form-data" method="post">
                 <div>
-                    <input name="file" type="file" />
+                    <input name="file" type="file" id="upload-feed" />
+                    <label class="upload-proxy" for="upload-feed">
+                        <span class="faux-button _l">Browse...</span>
+                        <span class="upload-path _l">No file selected</span>
+                    </label>
                 </div>
             </form>
             <div class="buttons">

@@ -120,7 +120,6 @@ $().ready(function() {
                     var $menu = $item.closest('ul');
                     $('.dropdown').each(function () {
                         var $dropdown = $(this);
-                        console.debug($dropdown.data('dropdown') + ' <> ' + $menu.attr('id'));
                         if ($dropdown.data('dropdown') == $menu.attr('id'))
                             $dropdown.text(title);
                     });

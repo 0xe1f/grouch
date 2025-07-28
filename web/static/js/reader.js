@@ -863,7 +863,10 @@
             $entry.append($content);
         },
         "scrollIntoView": function() {
-            this.getDom()[0].scrollIntoView({ duration: 0});
+            this.getDom()[0].scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         },
         "collapse": function() {
             this.getDom()
@@ -941,6 +944,7 @@
             this.initMenus();
             this.initShortcuts();
             this.initModals();
+            this.initFileInputs();
             this.initBookmarklet();
 
             if (Cookies.get('filter') == 'unread') {
@@ -1218,22 +1222,48 @@
             $(".modal").wrapInner("<div class=\"modal-inner\"></div>").hide();
 
             $.fn.showModal = function(show) {
-                if (!$(this).hasClass("modal"))
+                if (!$(this).hasClass("modal")) {
                     return;
+                }
 
+                const $modal = $(this);
                 $("body").toggleClass("modal-open", show);
 
                 if (show) {
-                    $(this).css("margin-top", -($(this).outerHeight() / 2) + "px");
-                    $(this).show();
+                    $modal.css("margin-top", -($modal.outerHeight() / 2) + "px");
+                    $modal.show();
                 } else {
-                    $(this).hide();
+                    $modal.hide();
+                    $modal.find("form").each(function() {
+                        this.reset();
+                    });
                 }
             };
 
             $(".modal-cancel").click(function() {
                 $(this).closest(".modal").showModal(false);
                 return false;
+            });
+        },
+        "initFileInputs": function() {
+            $("input[type=file]").each(function() {
+                const $input = $(this);
+                const $label = $input.next(".upload-proxy");
+                const $path = $label.find(".upload-path")
+                $input.closest("form").on("reset", function() {
+                    $path.text(_l("No file selected"));
+                    $path.toggleClass("selected", false);
+                });
+                $input.on("change", function(e) {
+                    var path = _l("No file selected");
+                    if (this.files && this.files.length > 1) {
+                        path = ($input.attr("data-multiple-caption") || "").replace('{count}', this.files.length);
+                    } else if (e.target.value) {
+                        path = e.target.value.split('\\').pop();
+                    }
+                    $path.text(path);
+                    $path.toggleClass("selected", path);
+                });
             });
         },
         "showImportSubscriptionsModal": function() {
@@ -1319,8 +1349,12 @@
                 $next.addClass("highlighted");
 
                 scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
-                if (scrollIntoView)
-                    $(".subscription.highlighted")[0].scrollIntoView({ duration: 0});
+                if (scrollIntoView) {
+                    $(".subscription.highlighted")[0].scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }
             }
         },
         "selectArticle": function(which, scrollIntoView) {
@@ -1348,16 +1382,23 @@
 
             scrollIntoView = (typeof scrollIntoView !== "undefined") ? scrollIntoView : true;
             if (scrollIntoView)
-                $(".gofr-entry.selected")[0].scrollIntoView({ duration: 0});
+                $(".gofr-entry.selected")[0].scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
         },
         "openArticle": function(which) {
             this.selectArticle(which, false);
 
-            if (!$(".gofr-entry-content", $(".gofr-entry.selected")).length || which === 0)
+            if (!$(".gofr-entry-content", $(".gofr-entry.selected")).length || which === 0) {
                 $(".gofr-entry.selected")
                     .click()
                     [0]
-                    .scrollIntoView();
+                    .scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+            }
         },
         "collapseAllEntries": function() {
             $(".gofr-entry.open").removeClass("open");
