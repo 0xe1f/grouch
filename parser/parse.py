@@ -70,6 +70,11 @@ def parse_feed(url: str) -> ParseResult:
         logging.error(f"No document available for '{url}'")
         return ParseResult(url)
 
+    for (matcher, parser) in custom_parsers.items():
+        if matcher(url):
+            logging.debug(f"Custom parser matched '{url}'")
+            return parser(url)
+
     return _parse_feed(doc, url)
 
 def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
