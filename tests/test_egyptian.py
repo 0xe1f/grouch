@@ -15,6 +15,7 @@
 from datetime import datetime
 from os.path import abspath
 from parser.custom import egyptian
+from zoneinfo import ZoneInfo
 import json
 import pathlib
 import unittest
@@ -24,7 +25,7 @@ class TestEgyptianParser(unittest.TestCase):
     FEED_URL = "https://www.egyptiantheatre.com/"
     HTML_PATH = "tests/resources/egyptian.html"
     JSON_PATH = "tests/resources/egyptian.json"
-    REF_TIME = datetime(2025, 8, 18, 22, 32, 11)
+    REF_TIME = datetime(2025, 8, 18, 22, 32, 11, 0, tzinfo=ZoneInfo(key='America/Los_Angeles'))
 
     def test_egyptian_parsing_feed(self):
         request_uri = self.__class__.FEED_URL
