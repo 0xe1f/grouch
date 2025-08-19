@@ -112,13 +112,13 @@ def generate_html_body(title_blob):
 {"\n".join(items)}
 </div>"""
 
-def _create_feed(url, metadata_map) -> Feed:
+def _create_feed(url, metadata_map, ref_time) -> Feed:
     content = Feed()
     content.feed_url = url
     content.title = metadata_map["og:title"]
     content.description = metadata_map["og:description"]
     content.site_url = home_url
-    content.published = datetime.now().timestamp()
+    content.published = ref_time.timestamp()
     content.digest = content.computed_digest()
 
     return content
@@ -153,13 +153,16 @@ def parser(url):
     if not matcher(url):
         raise ValueError("URL not matching pattern")
 
-    document = fetch_document(titles_url)
+    return parse(url, titles_url, datetime.now())
+
+def parse(request_url, feed_url, ref_time):
+    document = fetch_document(feed_url)
     md_map = extract_metadata(document)
     json_content = extract_json_blob(document)
     titles = extract_titles(json_content)
 
     return ParseResult(
-        url,
-        feed=_create_feed(url, md_map),
+        request_url,
+        feed=_create_feed(request_url, md_map, ref_time),
         entries=[_create_entry(title) for title in titles],
     )

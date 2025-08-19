@@ -561,7 +561,6 @@ ul#subscriptions,
 
 .faux-button,
 button {
-    height: 32px;
     margin: 0 0.25em;
     padding: 0.5em 1.5em;
     background-color: #eee;
@@ -575,7 +574,6 @@ button {
 }
 
 span.faux-button {
-    height: auto;
     display: inline-block;
 }
 
@@ -653,7 +651,6 @@ input[type=file] {
 
 .select-article {
     width: 40px;
-    padding: 0;
 }
 
 .select-article.up {
@@ -695,7 +692,6 @@ input[type=file] {
 
 .settings.dropdown {
     width: 65px;
-    padding: 0;
     background: url(sprites.png) no-repeat 0 -210px #eee;
 }
 

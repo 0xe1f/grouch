@@ -865,7 +865,7 @@
         "scrollIntoView": function() {
             this.getDom()[0].scrollIntoView({
                 behavior: "smooth",
-                block: "center",
+                block: "start",
             });
         },
         "collapse": function() {
