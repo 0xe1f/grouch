@@ -92,9 +92,6 @@ def extract_updated(title_blob):
 def extract_text(title_blob, key):
     return (title_blob[key] or "").strip()
 
-def title_sort_fn(title_blob):
-    return ((title_blob["OpeningDate"] or ""), (title_blob["FilmName"] or ""))
-
 def generate_html_body(title_blob):
     items = []
     if showtime := extract_text(title_blob, "RedLabelOverride"):
