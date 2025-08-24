@@ -17,14 +17,14 @@ from entity import Feed
 from parser import ParseResult
 from parser import consts
 from parser import sanitizer
-
 from datetime import datetime
 from html import escape
 from json import loads
 from urllib.request import urlopen
-import re
+import pytz
 
 home_url = "https://www.americancinematheque.com/now-showing/"
+tz = pytz.timezone('US/Pacific')
 
 def fetch_document(url):
     with urlopen(url) as f:
@@ -34,7 +34,7 @@ def extract_text(blob, key):
     return (blob[key] or "").strip()
 
 def extract_date_time(blob, date_key, time_key):
-    return datetime.strptime(f"{blob[date_key]} {blob[time_key]}", '%Y%m%d %H:%M:%S')
+    return datetime.strptime(f"{blob[date_key]} {blob[time_key]}", '%Y%m%d %H:%M:%S').replace(tzinfo=tz)
 
 def extract_opening_date_time(blob):
     return extract_date_time(blob, "event_start_date", "event_start_time")
