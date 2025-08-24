@@ -29,6 +29,11 @@ _FEED_TYPES = [
 ]
 
 def parse_url(url: str) -> ParseResult:
+    for (matcher, parser) in custom_parsers.items():
+        if matcher(url):
+            logging.debug(f"Custom parser matched '{url}'")
+            return parser(url)
+
     if not (doc := feedparser.parse(url)):
         logging.error(f"FeedParser returned nothing for '{url}'")
         return None
@@ -56,11 +61,6 @@ def parse_url(url: str) -> ParseResult:
     if (alt_urls := [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]):
         logging.debug(f"No feeds for '{url}', but found {len(alt_urls)} alternatives")
         return ParseResult(url, alts=alt_urls)
-
-    for (matcher, parser) in custom_parsers.items():
-        if matcher(url):
-            logging.debug(f"Custom parser matched '{url}'")
-            return parser(url)
 
     logging.error(f"No feeds for '{url}'")
     return None

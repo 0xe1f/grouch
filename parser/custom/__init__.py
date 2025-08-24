@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parser.custom import amecine
 from parser.custom import egyptian
 
 custom_parsers = {
+    amecine.matcher: amecine.parser,
     egyptian.matcher: egyptian.parser,
 }

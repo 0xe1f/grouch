@@ -18,12 +18,14 @@ from parser import ParseResult
 from parser import consts
 from parser import sanitizer
 from datetime import datetime
+from datetime import timedelta
 from html import escape
 from json import loads
 from urllib.request import urlopen
 import pytz
 
 home_url = "https://www.americancinematheque.com/now-showing/"
+feed_url_template = "https://www.americancinematheque.com/wp-json/wp/v2/algolia_get_events?environment=production&startDate={0}&endDate={1}"
 tz = pytz.timezone('US/Pacific')
 
 def fetch_document(url):
@@ -94,7 +96,11 @@ def parser(url):
     if not matcher(url):
         raise ValueError("URL not matching pattern")
 
-    return parse(url, home_url, datetime.now())
+    start_dt = datetime.combine(datetime.today(), datetime.min.time())
+    end_dt = start_dt + timedelta(days=30)
+    feed_url = feed_url_template.format(int(start_dt.timestamp()), int(end_dt.timestamp()))
+
+    return parse(url, feed_url, datetime.now())
 
 def parse(request_url, feed_url, ref_time):
     document = loads(fetch_document(feed_url))
