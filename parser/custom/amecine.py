@@ -79,11 +79,10 @@ def _create_entry(blob) -> Entry:
     content = Entry()
     content.entry_uid = blob['objectID']
     content.title = generate_title(blob)
-    # content.author = extract_text(title_blob, "Director")
+    # content.author = ?
     content.link = extract_text(blob, 'url')
     content.text_body = sanitizer.sanitize_html(body)
-    # FIXME!!
-    content.published = extract_opening_date_time(blob).timestamp()
+    # content.published = ?
     content.text_summary = sanitizer.extract_text(synopsis, max_len=consts.MAX_SUMMARY_LEN)
     content.digest = content.computed_digest()
 
