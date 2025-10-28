@@ -27,6 +27,8 @@
     var lastRefresh = -1;
     var timeoutId = -1;
 
+    const cookies = Cookies.withAttributes({ expires: 365 });
+
     // A 15x15 transparent image
     var transparentIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH3QkaEBchBQxHYwAAAbxJREFUKM+lkr1rFEEYxn8zs7eXu1u4i3prwJOAqBeicCBYCYIgCgraSBRt/ANSia2FdsbCIkVsLDVaqdiJYJqQWGkTUEyQBYNfJ5ecObMfszMWl2wIuYiQt5qB+T3P+77zwA5KACw9uYyTqv+GtEqpXHmKBDJQeP663j9r/b2TtVDop3jhPjYJMa0A0/qMDmYxzU/bi2Rwrkj64yOyfxDl11F+nVz9LHp+ivj9JDbubA+b9iLh6zuAQHo+cu8wbuMSzsFTqNoxwle3MSvfN8Fy4+TQd/oW7vHryIFhdDDN6sub6IU3iL4y+ROjIFVvZ1neh/KHUP4QAO6Ri0QzE0RvHyJKVdTAUdzGCPG7ya3OphXw59ko4dQ9dDCLKFXJn7yBKO4imnmATUJyh8+AUD3aXvt122kSTY+TzL1AuB5uYwS72sL8/ADKRVZqPWDHpXBujML5u8hyjXjuOViDrB4CIP210AV2H9g6M2mKDZcAsEkHdIxZ/oKs7EfkPUxzvgtXBjfHc+XR1bWbAqVAx9kSbdjGRr9B5ZClPZj2N8DiXXvcddYq7UbOpqDTTNksL27sI00w7a9ZtndcfwE4Q5nI69qxywAAAABJRU5ErkJggg==";
 
@@ -169,9 +171,9 @@
             const subscription = this;
             const filter = subscription.getFilter();
             if (filter.prop === undefined) {
-                Cookies.remove('filter');
+                cookies.remove('filter');
             } else {
-                Cookies.set('filter', filter.prop);
+                cookies.set('filter', filter.prop);
             }
             if (continueFrom) {
                 $.extend(filter, { "start": continueFrom });
@@ -947,7 +949,19 @@
             this.initFileInputs();
             this.initBookmarklet();
 
-            if (Cookies.get('filter') == 'unread') {
+            const showSidebar = cookies.get("show-sidebar") !== "false";
+            const showAllSubs = cookies.get("show-all-subs") !== "false";
+            const filter = cookies.get("filter");
+
+            const cookieNames = [ "filter", "show-sidebar", "show-all-subs" ];
+            $.each(cookieNames, function(_, name) {
+                const value = cookies.get(name);
+                if (value) {
+                    cookies.set(name, value);
+                }
+            });
+
+            if (filter == 'unread') {
                 $('#menu-filter').selectItem('.menu-new-items');
                 $('#menu-view').selectItem('.menu-new-items');
             } else {
@@ -956,10 +970,16 @@
             }
             this.onScopeChanged();
 
-            this.toggleSidebar(Cookies.get("show-sidebar") !== "false");
-            this.toggleReadSubscriptions(Cookies.get("show-all-subs") !== "false");
+            this.toggleSidebar(showSidebar);
+            this.toggleReadSubscriptions(showAllSubs);
 
             $("a").not("#sign-out").attr("target", "_blank");
+            $("#sign-out")
+                .click(function(_) {
+                    $.each(cookieNames, function(_, name) {
+                        cookies.remove(name);
+                    });
+                });
         },
         "isNavBarVisible": function() {
             return $("body").is(".sidebar-open");
@@ -1286,7 +1306,7 @@
             $("body").toggleClass("floated-sidebar", !showSidebar);
             $(".menu-show-sidebar").setChecked(showSidebar);
 
-            Cookies.set("show-sidebar", showSidebar);
+            cookies.set("show-sidebar", showSidebar);
         },
         "toggleReadSubscriptions": function(showAllSubscriptions) {
             if (typeof showAllSubscriptions === "undefined")
@@ -1295,7 +1315,7 @@
             $("body").toggleClass("hide-read-subs", !showAllSubscriptions);
             $(".menu-show-all-subs").setChecked(showAllSubscriptions);
 
-            Cookies.set("show-all-subs", showAllSubscriptions);
+            cookies.set("show-all-subs", showAllSubscriptions);
         },
         "updateUnreadCount": function() {
             // Update the "new items" caption in the dropdown to reflect

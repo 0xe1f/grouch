@@ -95,6 +95,7 @@ def login_post():
             arg=arg,
         )
 
+    flask.session.permanent = True
     flask_login.utils.login_user(ext_objs.User(user))
 
     if next := flask.request.args.get("next"):
