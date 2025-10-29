@@ -27,7 +27,7 @@
     var lastRefresh = -1;
     var timeoutId = -1;
 
-    const cookies = Cookies.withAttributes({ expires: 365 });
+    const cookies = Cookies.withAttributes({ expires: 31 });
 
     // A 15x15 transparent image
     var transparentIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH3QkaEBchBQxHYwAAAbxJREFUKM+lkr1rFEEYxn8zs7eXu1u4i3prwJOAqBeicCBYCYIgCgraSBRt/ANSia2FdsbCIkVsLDVaqdiJYJqQWGkTUEyQBYNfJ5ecObMfszMWl2wIuYiQt5qB+T3P+77zwA5KACw9uYyTqv+GtEqpXHmKBDJQeP663j9r/b2TtVDop3jhPjYJMa0A0/qMDmYxzU/bi2Rwrkj64yOyfxDl11F+nVz9LHp+ivj9JDbubA+b9iLh6zuAQHo+cu8wbuMSzsFTqNoxwle3MSvfN8Fy4+TQd/oW7vHryIFhdDDN6sub6IU3iL4y+ROjIFVvZ1neh/KHUP4QAO6Ri0QzE0RvHyJKVdTAUdzGCPG7ya3OphXw59ko4dQ9dDCLKFXJn7yBKO4imnmATUJyh8+AUD3aXvt122kSTY+TzL1AuB5uYwS72sL8/ADKRVZqPWDHpXBujML5u8hyjXjuOViDrB4CIP210AV2H9g6M2mKDZcAsEkHdIxZ/oKs7EfkPUxzvgtXBjfHc+XR1bWbAqVAx9kSbdjGRr9B5ZClPZj2N8DiXXvcddYq7UbOpqDTTNksL27sI00w7a9ZtndcfwE4Q5nI69qxywAAAABJRU5ErkJggg==";
@@ -1788,6 +1788,12 @@
 
         var subMap = generateSubscriptionMap(userSubscriptions);
         var createSubDom = function(subscription) {
+            const url = URL.parse(subscription.link);
+            var favicon = transparentIcon;
+            if (url) {
+                url.pathname = "/favicon.ico";
+                favicon = url.toString();
+            }
             var $subscription = $("<li />", { "class" : `subscription ${subscription.domId}` })
                 .data("subscription", subscription)
                 .append($("<div />", { "class" : "subscription-item" })
@@ -1797,10 +1803,17 @@
                             $menu.openMenu(e.pageX, e.pageY, subscription.id);
                             e.stopPropagation();
                         }))
-                    .append($("<img />", {
-                        "class" : "subscription-icon",
-                        "src": transparentIcon,
-                    }))
+                    .append(
+                        $("<img />", {
+                            "class" : "subscription-icon",
+                            "src": favicon,
+                        })
+                        .one("error", function() {
+                            $(this)
+                                .attr("src", transparentIcon)
+                                .addClass("no-favicon");
+                        })
+                    )
                     .append($("<span />", { "class" : "subscription-title" })
                         .text(subscription.title))
                     .attr("title", subscription.title)
@@ -1810,14 +1823,6 @@
                     }));
 
             if (!subscription.isFolder()) {
-                // Favicons
-                if (subscription.favIconUrl) {
-                    $subscription.find(".subscription-icon")
-                        .attr("src", subscription.favIconUrl);
-                } else {
-                    $subscription.find(".subscription-icon").addClass("no-favicon");
-                }
-
                 // Drag-and-drop code
                 $subscription
                     .mousedown(function(e) {
