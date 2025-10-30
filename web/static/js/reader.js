@@ -1814,8 +1814,17 @@
                                 .addClass("no-favicon");
                         })
                     )
-                    .append($("<span />", { "class" : "subscription-title" })
-                        .text(subscription.title))
+                    .append(
+                        $("<a />", {
+                            "class" : "subscription-title",
+                            "href" : subscription.link,
+                            "target" : "_blank",
+                        })
+                            .text(subscription.title)
+                            .click(function(e) {
+                                e.preventDefault();
+                            })
+                    )
                     .attr("title", subscription.title)
                     .append($("<span />", { "class" : "subscription-unread-count" }))
                     .click(function() {
@@ -1952,7 +1961,7 @@
         var $appendAfter = $newSubscriptions.find(".root.subscription");
         var firstClass = "first";
 
-        $.each(specialFolders, function(index, specialFolder) {
+        $.each(specialFolders, function(_, specialFolder) {
             var $specialFolder = $("<li />", { "class" : `subscription special-folder ${specialFolder.domId} ${firstClass}` })
                 .data("subscription", specialFolder)
                 .append($("<div />", { "class" : "subscription-item" })
@@ -1974,7 +1983,7 @@
         });
 
         firstClass = "first";
-        $.each(userSubscriptions.tags, function(index, tag) {
+        $.each(userSubscriptions.tags, function(_, tag) {
             var $tag = $("<li />", { "class" : `subscription tag ${tag.domId} ${firstClass}` })
                 .data("subscription", tag)
                 .append($("<div />", { "class" : "subscription-item" })

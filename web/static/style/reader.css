@@ -525,6 +525,10 @@ ul#subscriptions,
     right: 25px;
 }
 
+.subscription-title {
+    color: #444;
+}
+
 .subscription-unread-count {
     color: #aaa;
     display: none;
