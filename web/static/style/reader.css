@@ -31,8 +31,7 @@ body {
 
 #header h1 {
     font-size: 24px;
-    color: #222;
-    text-shadow: 0px 1px 1px #fff;
+    text-shadow: 1px 1px 0 #ccc;
     margin: 0.25em 0;
 }
 
@@ -957,6 +956,17 @@ ul.menu {
 
 /*** Mobile ***/
 @media only screen and (max-width: 660px) {
+    .modal {
+        width: 100%;
+    }
+
+    .modal-inner {
+        border-left-style: none;
+        border-right-style: none;
+        border-radius: 2px;
+        box-shadow: 0 0.5em 0.5em #888;
+    }
+
     .view-button {
         display: inline;
     }
