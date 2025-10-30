@@ -95,7 +95,6 @@ class Entry(Entity):
     @published.setter
     def published(self, val: int):
         self.set_prop("published", val)
-        self._computed_digest = None
 
     @property
     def digest(self) -> str:
@@ -107,7 +106,7 @@ class Entry(Entity):
 
     def computed_digest(self):
         if not self._computed_digest:
-            hash_keys = [ "entry_uid", "title", "author", "link", "text_body", "text_summary", "published" ]
+            hash_keys = [ "entry_uid", "title", "author", "link", "text_body", "text_summary" ]
             hash_doc = { key:self._doc[key] for key in hash_keys if key in self._doc }
             m = hashlib.md5()
             m.update(json.dumps(hash_doc).encode())

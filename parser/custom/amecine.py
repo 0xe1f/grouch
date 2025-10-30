@@ -72,7 +72,7 @@ def _create_feed(url, ref_time) -> Feed:
 
     return content
 
-def _create_entry(blob) -> Entry:
+def _create_entry(blob, ref_time) -> Entry:
     body = generate_html_body(blob)
     synopsis = extract_text(blob, "event_card_excerpt")
 
@@ -82,7 +82,7 @@ def _create_entry(blob) -> Entry:
     # content.author = ?
     content.link = extract_text(blob, 'url')
     content.text_body = sanitizer.sanitize_html(body)
-    # content.published = ?
+    content.published = ref_time.timestamp()
     content.text_summary = sanitizer.extract_text(synopsis, max_len=consts.MAX_SUMMARY_LEN)
     content.digest = content.computed_digest()
 
@@ -106,5 +106,5 @@ def parse(request_url, feed_url, ref_time):
     return ParseResult(
         request_url,
         feed=_create_feed(request_url, ref_time),
-        entries=[_create_entry(title) for title in document['hits'] if title['post_type'] == 'event'],
+        entries=[_create_entry(title, ref_time) for title in document['hits'] if title['post_type'] == 'event'],
     )

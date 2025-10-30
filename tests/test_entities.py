@@ -91,7 +91,6 @@ class TestEntryContent(unittest.TestCase):
         "link": uuid.uuid4().hex,
         "text_body": uuid.uuid4().hex,
         "text_summary": uuid.uuid4().hex,
-        "published": uuid.uuid4().hex,
     }   
 
     def test_entry_properties(self):
