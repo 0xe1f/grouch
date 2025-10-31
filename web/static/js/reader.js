@@ -435,7 +435,7 @@
             }
         },
         "markAllAsRead": function() {
-            var sub = this;
+            const sub = this;
             $.ajax({
                 url: "markAllAsRead",
                 type: "POST",
@@ -452,7 +452,20 @@
                 dataType: "json",
                 success: function(response) {
                     resetSubscriptionDom(response.subscriptions, false);
-                    // FIXME: mark visible entries as read
+                    // build sub id to unread count map
+                    const map = response.subscriptions.subscriptions.reduce(function(acc, sub) {
+                        acc[sub.id] = sub.unread;
+                        return acc;
+                    }, {});
+                    // for any entries with belonging to subs with unread count
+                    // zero, mark them as read
+                    $("#gofr-entries .gofr-entry").each(function() {
+                        const entry = $(this).data("entry");
+                        if (map[entry.source] == 0 && entry.hasProperty("unread")) {
+                            entry.properties = entry.properties.filter(p => p != "unread");
+                            entry.syncView();
+                        }
+                    });
                 }
             });
         },
@@ -594,8 +607,9 @@
             return $.inArray(propertyName, this.properties) > -1;
         },
         "markAsRead": function(force) {
-            if (this.hasProperty("unread") || force)
+            if (this.hasProperty("unread") || force) {
                 this.setProperty("unread", false);
+            }
         },
         "setProperty": function(propertyName, propertyValue) {
             if (propertyValue == this.hasProperty(propertyName))
@@ -661,7 +675,7 @@
                 .text(this.tags.length > 0
                     ? _l("%s", [ this.tags.join(", ") ])
                     : _l("Tag"));
-    },
+        },
         "isExpanded": function() {
             return this.getDom().hasClass("open");
         },

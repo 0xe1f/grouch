@@ -39,8 +39,6 @@ class JsonObject:
 
 class Article(JsonObject):
 
-    # 	Media []*EntryMedia   `datastore:"-" json:"media,omitempty"`
-
     def __init__(self, article: entity.Article|None=None, entry: entity.Entry|None=None, source: dict={}):
         super().__init__(source)
         if article:
@@ -143,7 +141,10 @@ class Subscription(JsonObject):
         if feed:
             self.set_prop("faviconUrl", feed.favicon_url)
             self.set_prop("link", feed.site_url)
-        self.set_prop("unread", unread_count or 0)
+        if unread_count:
+            self.set_prop("unread", unread_count)
+        elif self.get_prop("unread", None) == None:
+            self.set_prop("unread", 0)
 
     @property
     def id(self) -> str:
