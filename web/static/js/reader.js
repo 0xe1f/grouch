@@ -1428,10 +1428,7 @@
                 $(".gofr-entry.selected")
                     .click()
                     [0]
-                    .scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
+                    .scrollIntoView();
             }
         },
         "collapseAllEntries": function() {
