@@ -2051,14 +2051,12 @@
 
     var syncFeeds = function() {
         (function feedUpdater() {
-            var now = new Date().getTime();
-            var delta = now - lastRefresh;
+            console.debug("Updating feeds...");
+            const now = new Date().getTime();
+            const delta = now - lastRefresh;
 
             if (delta < 60000) {
-                if (console && console.debug) {
-                    console.debug(`Ignoring sync request (last sync ${delta / 1000}s ago)`);
-                }
-
+                console.debug(`Ignoring sync request (last sync ${delta / 1000}s ago)`);
                 return; // No need to sync yet
             }
 
@@ -2067,10 +2065,7 @@
                 timeoutId = -1;
             }
 
-            if (console && console.debug) {
-                console.debug(`Synchronizing feeds (last sync ${delta / 1000}s ago)`);
-            }
-
+            console.debug(`Synchronizing feeds (last sync ${delta / 1000}s ago)`);
             lastRefresh = now;
 
             $.ajax({
@@ -2084,6 +2079,9 @@
                         console.debug(`Next sync: ${response.nextSync}`);
                     }
                 }
+            })
+            .always(function() {
+                timeoutId = setTimeout(feedUpdater, 600000); // 10 minutes
             });
         })();
     };
