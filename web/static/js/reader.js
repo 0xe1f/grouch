@@ -1800,11 +1800,14 @@
         var newSubscriptions = [];
         var markedFirstSub = false;
 
+        const faviconless = $.map($(".subscription-icon.no-favicon").closest(".subscription:not(.folder)"), function(e) {
+            return $(e).data("subscription").id;
+        });
         var subMap = generateSubscriptionMap(userSubscriptions);
         var createSubDom = function(subscription) {
             const url = URL.parse(subscription.link);
             var favicon = transparentIcon;
-            if (url) {
+            if (url && $.inArray(subscription.id, faviconless) == -1) {
                 url.pathname = "/favicon.ico";
                 favicon = url.toString();
             }
@@ -1819,7 +1822,7 @@
                         }))
                     .append(
                         $("<img />", {
-                            "class" : "subscription-icon",
+                            "class" : `subscription-icon${favicon == transparentIcon ? " no-favicon" : ""}`,
                             "src": favicon,
                         })
                         .one("error", function() {
