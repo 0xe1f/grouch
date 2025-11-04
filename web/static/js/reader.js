@@ -33,16 +33,16 @@
     var transparentIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH3QkaEBchBQxHYwAAAbxJREFUKM+lkr1rFEEYxn8zs7eXu1u4i3prwJOAqBeicCBYCYIgCgraSBRt/ANSia2FdsbCIkVsLDVaqdiJYJqQWGkTUEyQBYNfJ5ecObMfszMWl2wIuYiQt5qB+T3P+77zwA5KACw9uYyTqv+GtEqpXHmKBDJQeP663j9r/b2TtVDop3jhPjYJMa0A0/qMDmYxzU/bi2Rwrkj64yOyfxDl11F+nVz9LHp+ivj9JDbubA+b9iLh6zuAQHo+cu8wbuMSzsFTqNoxwle3MSvfN8Fy4+TQd/oW7vHryIFhdDDN6sub6IU3iL4y+ROjIFVvZ1neh/KHUP4QAO6Ri0QzE0RvHyJKVdTAUdzGCPG7ya3OphXw59ko4dQ9dDCLKFXJn7yBKO4imnmATUJyh8+AUD3aXvt122kSTY+TzL1AuB5uYwS72sL8/ADKRVZqPWDHpXBujML5u8hyjXjuOViDrB4CIP210AV2H9g6M2mKDZcAsEkHdIxZ/oKs7EfkPUxzvgtXBjfHc+XR1bWbAqVAx9kSbdjGRr9B5ZClPZj2N8DiXXvcddYq7UbOpqDTTNksL27sI00w7a9ZtndcfwE4Q5nI69qxywAAAABJRU5ErkJggg==";
 
     var linkify = function(str, args) {
-        var re = /\(((?:[a-z]+:\/\/|%s)[^\)]*)\)\[([^\]]*)\]/g;
+        const re = /\(((?:[a-z]+:\/\/|%(?:[0-9]+\$)?s)[^\)]*)\)\[([^\]]*)\]/g;
         var m;
         var start = 0;
         var html = "";
         var outArgs = [];
 
         while ((m = re.exec(str)) !== null) {
-            var url = m[1];
-            var text = m[2];
-            var anchor = `<a href="${url}" target="_blank">%s</a>`;
+            const url = m[1];
+            const text = m[2];
+            const anchor = `<a href="${url}" target="_blank">${text}</a>`;
 
             html += str.substr(start, m.index - start) + anchor;
             start = m.index + m[0].length;
@@ -673,7 +673,7 @@
             $tagNode.toggleClass("has-tags", this.tags.length > 0);
             $tagNode.find(".gofr-action-text")
                 .text(this.tags.length > 0
-                    ? _l("%s", [ this.tags.join(", ") ])
+                    ? _l("%1$s", [ this.tags.join(", ") ])
                     : _l("Tag"));
         },
         "isExpanded": function() {
@@ -731,7 +731,7 @@
                                 .text(entry.title)))
                         .append($("<div />", { "class": "gofr-article-author" }))
                         .append($("<div />", { "class": "gofr-article-pubDate" })
-                            .text(_l("Published %s", [getPublishedDate(entry.published)])))
+                            .text(_l("Published %1$s", [getPublishedDate(entry.published)])))
                         .append($("<div />", { "class": "gofr-media-container" }))
                         .append($("<div />", { "class": "gofr-article-body" })
                             .append(entry.content)))
@@ -765,7 +765,7 @@
                                     $("<span />", { "class": "gofr-action-text" })
                                         .text(
                                             this.tags.length
-                                                ? _l("%s", [ this.tags.join(", ") ])
+                                                ? _l("%1$s", [ this.tags.join(", ") ])
                                                 : _l("Tag")
                                         )
                                 )
@@ -833,9 +833,9 @@
 
             var template;
             if (entry.author)
-                template = _l("From (%s)[%s] by %s", [subscription.link, subscription.title, entry.author]);
+                template = _l("From (%1$s)[%2$s] by %3$s", [subscription.link, subscription.title, entry.author]);
             else
-                template = _l("From (%s)[%s]", [subscription.link, subscription.title]);
+                template = _l("From (%1$s)[%2$s]", [subscription.link, subscription.title]);
 
             $content.find(".gofr-article-author").html(template);
             if (!subscription.link)
@@ -1335,27 +1335,31 @@
             // Update the "new items" caption in the dropdown to reflect
             // the unread count
 
-            var selectedSubscription = getSelectedSubscription();
+            const selectedSubscription = getSelectedSubscription();
             var caption;
 
-            if (!selectedSubscription || selectedSubscription.unread === null)
+            if (!selectedSubscription || selectedSubscription.unread === null) {
                 caption = _l("New items");
-            else if (selectedSubscription.unread == 0)
+            } else if (selectedSubscription.unread == 0) {
                 caption = _l("No new items");
-            else
+            } else {
                 caption = _l("%1$s new item(s)", [selectedSubscription.unread]);
+            }
 
             $(".menu-new-items").setTitle(caption);
 
             // Update the title bar
 
-            var root = subscriptionMap[""];
-            var title = "Grouch";
+            const selectionTitle = $(".subscription.selected")
+                .find(".subscription-title")
+                .first()
+                .text();
+            const unreadCount = subscriptionMap[""].unread;
+            const unreadCountText = unreadCount > 0
+                ? ` (${unreadCount})`
+                : "";
 
-            if (root.unread > 0)
-                title += ` (${root.unread})`;
-
-            document.title = title;
+            document.title = _l("%1$s — Grouch%2$s", [selectionTitle, unreadCountText]);
         },
         "highlightSubscription": function(which, scrollIntoView) {
             var $highlighted = $(".subscription.highlighted");
@@ -1483,7 +1487,7 @@
             }
         },
         "unsubscribe": function(subscription) {
-            if (confirm(_l("Unsubscribe from %s?", [subscription.title])))
+            if (confirm(_l("Unsubscribe from %1$s?", [subscription.title])))
                 subscription.unsubscribe();
         },
         "markAllAsRead": function() {
@@ -1495,20 +1499,20 @@
             }
 
             if (subscription.unread > 10 &&
-                !confirm(_l("Mark %s messages as read?", [subscription.unread]))) {
+                !confirm(_l("Mark %1$s messages as read?", [subscription.unread]))) {
                 return;
             }
 
             subscription.markAllAsRead();
         },
         "removeFolder": function(folder) {
-            if (!confirm(_l("You will be unsubscribed from all subscriptions in this folder. Delete %s?", [folder.title])))
+            if (!confirm(_l("You will be unsubscribed from all subscriptions in this folder. Delete %1$s?", [folder.title])))
                 return;
 
             folder.remove();
         },
         "deleteTag": function(tag) {
-            if (!confirm(_l("Tag \"%s\" will be removed from all matching articles. Continue?", [tag.title])))
+            if (!confirm(_l("Tag \"%1$s\" will be removed from all matching articles. Continue?", [tag.title])))
                 return;
 
             tag.remove();
