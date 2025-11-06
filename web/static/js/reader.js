@@ -88,6 +88,14 @@
         return dateTimeFormatter(date, sameDay);
     };
 
+    $(window).on('hashchange', function() {
+        const hash = window.location.hash.replace(/^#/, '') ?? "";
+        $("#subscriptions")
+            .find(`.subscription[data-sub-id="${hash}"]`)
+            .data("subscription")
+            .select();
+    });
+
     // Automatic pager
 
     $(".gofr-entries-container").scroll(function() {
@@ -195,9 +203,18 @@
             $("#gofr-entries").empty();
             this.loadEntries();
         },
+        "readableId": function() {
+            return this.isRoot() ? "" : btoa(this.id);
+        },
         "select": function(reloadItems /* = true */) {
             if (typeof reloadItems === "undefined")
                 reloadItems = true;
+
+            const url = new URL(location);
+            if (this.readableId() != url.hash.replace(/^#/, '')) {
+                url.hash = this.readableId();
+                history.pushState({}, "", url);
+            }
 
             $("#subscriptions").find(".subscription.selected").removeClass("selected");
             this.getDom().addClass("selected");
@@ -564,12 +581,11 @@
             return false;
         },
         "remove": function() {
-            var tag = this;
             $.ajax({
                 url: "removeTag",
                 type: "POST",
                 data: JSON.stringify({
-                    "tag": tag.title,
+                    "tag": this.title,
                 }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -578,6 +594,9 @@
                     resetSubscriptionDom(response.subscriptions, false);
                 }
             });
+        },
+        "readableId": function() {
+            return `tags/${encodeURI(this.title.toLowerCase())}`;
         },
     });
 
@@ -1679,7 +1698,7 @@
         });
 
         // Create a combined list of folders & subscriptions
-        $.each(userSubs.folders, function(index, folder) {
+        $.each(userSubs.folders, function(_, folder) {
             folder.domId = `sub-${idCounter++}`;
             folder.link = null;
             folder.unread = 0;
@@ -1710,7 +1729,7 @@
             return 0;
         });
 
-        $.each(userSubs.tags, function(index, tag) {
+        $.each(userSubs.tags, function(_, tag) {
             tag.id = tag.domId = `tag-${idCounter++}`;
 
             // Inject methods
@@ -1719,7 +1738,7 @@
         });
 
         var root = fmap[""];
-        $.each(userSubs.subscriptions, function(index, subscription) {
+        $.each(userSubs.subscriptions, function(_, subscription) {
             subscription.domId = `sub-${idCounter++}`;
 
             for (var name in subscriptionMethods)
@@ -1735,7 +1754,7 @@
             root.unread += subscription.unread;
         });
 
-        $.each(map, function(parentId, children) {
+        $.each(map, function(_, children) {
             // Sort the list of children by title
             children.sort(function(a, b) {
                 var aTitle = a.title.toLowerCase();
@@ -1761,31 +1780,38 @@
     };
 
     var resetSubscriptionDom = function(userSubscriptions, reloadItems) {
-        var selectedSubscription = getSelectedSubscription();
         var selectedSubscriptionId = null;
-
-        if (selectedSubscription != null)
+        const selectedSubscription = getSelectedSubscription();
+        if (selectedSubscription != null) {
             selectedSubscriptionId = selectedSubscription.id;
+        } else {
+            selectedSubscriptionId = window.location.hash.replace(/^#/, '') ?? "";
+        }
 
         // Special folders
         specialFolders = [{
             "id":     "sf-liked",
+            "readableId": function() { return "liked-items"; },
             "domId":  "sf-liked",
             "type":   "liked",
             "title":  _l("Liked items"),
             "filter": { "prop": "like" },
         }, {
             "id":    "sf-starred",
+            "readableId": function() { return "starred-items"; },
             "domId": "sf-starred",
             "type":  "starred",
             "title": _l("Starred items"),
             "filter": { "prop": "star" },
         }];
 
-        $.each(specialFolders, function(index, specialFolder) {
+        $.each(specialFolders, function(_, specialFolder) {
             // Inject methods
-            for (var name in specialFolderMethods)
-                specialFolder[name] = specialFolderMethods[name];
+            for (var name in specialFolderMethods) {
+                if (!(name in specialFolder)) {
+                    specialFolder[name] = specialFolderMethods[name];
+                }
+            }
         });
 
         var collapsedFolderIds = [];
@@ -1813,6 +1839,7 @@
                 favicon = url.toString();
             }
             var $subscription = $("<li />", { "class" : `subscription ${subscription.domId}` })
+                .attr("data-sub-id", subscription.readableId())
                 .data("subscription", subscription)
                 .append($("<div />", { "class" : "subscription-item" })
                     .append($("<span />", { "class" : "chevron" })
@@ -1964,13 +1991,6 @@
 
                 newSubscriptionMap[subscription.id] = subscription;
                 newSubscriptions.push(subscription);
-
-                if (selectedSubscriptionId == subscription.id)
-                    selectedSubscription = subscription;
-                else if (selectedSubscriptionId == null) {
-                    if (subscription.isFolder() && subscription.isRoot())
-                        selectedSubscription = subscription;
-                }
             });
         };
 
@@ -1981,6 +2001,7 @@
 
         $.each(specialFolders, function(_, specialFolder) {
             var $specialFolder = $("<li />", { "class" : `subscription special-folder ${specialFolder.domId} ${firstClass}` })
+                .attr("data-sub-id", specialFolder.readableId())
                 .data("subscription", specialFolder)
                 .append($("<div />", { "class" : "subscription-item" })
                     .append($("<img />", {
@@ -2003,6 +2024,7 @@
         firstClass = "first";
         $.each(userSubscriptions.tags, function(_, tag) {
             var $tag = $("<li />", { "class" : `subscription tag ${tag.domId} ${firstClass}` })
+                .attr("data-sub-id", tag.readableId())
                 .data("subscription", tag)
                 .append($("<div />", { "class" : "subscription-item" })
                     .append($("<span />", { "class" : "chevron" })
@@ -2026,7 +2048,8 @@
             $newSubscriptions.append($tag);
         });
 
-        $("#subscriptions").replaceWith($newSubscriptions)
+        $("#subscriptions")
+            .replaceWith($newSubscriptions);
 
         subscriptionMap = newSubscriptionMap;
 
@@ -2039,7 +2062,10 @@
         $("body").toggleClass("sidebar-hidden", false);
 
         ui.updateUnreadCount();
-        selectedSubscription.select(reloadItems);
+        $("#subscriptions")
+            .find(`.subscription[data-sub-id="${selectedSubscriptionId}"]`)
+            .data("subscription")
+            .select(reloadItems);
     };
 
     var refresh = function(reloadItems) {
