@@ -178,11 +178,6 @@
 
             const subscription = this;
             const filter = subscription.getFilter();
-            if (filter.prop === undefined) {
-                cookies.remove('filter');
-            } else {
-                cookies.set('filter', filter.prop);
-            }
             if (continueFrom) {
                 $.extend(filter, { "start": continueFrom });
             }
@@ -332,7 +327,6 @@
     var subscriptionMethods = $.extend({}, articleGroupingMethods, {
         "getFilter": function() {
             const selectedPropertyFilter = $(".group-filter.selected-menu-item").data("value");
-
             const filter = { "sub": this.id };
             if (selectedPropertyFilter) {
                 $.extend(filter, { "prop": selectedPropertyFilter });
@@ -506,14 +500,13 @@
 
     var folderMethods = $.extend({}, subscriptionMethods, {
         "getFilter": function() {
-            var selectedPropertyFilter = $(".group-filter.selected-menu-item").data("value");
-
-            const filter = {};
-            if (this.id) {
-                $.extend(filter, { "folder": this.id });
-            }
+            const selectedPropertyFilter = $(".group-filter.selected-menu-item").data("value");
+            const filter = { };
             if (selectedPropertyFilter) {
                 $.extend(filter, { "prop": selectedPropertyFilter });
+            }
+            if (this.id) {
+                $.extend(filter, { "folder": this.id });
             }
             return filter;
         },
@@ -936,9 +929,16 @@
     $$menu.click(function(e) {
         var $item = e.$item;
         if ($item.is(".menu-all-items, .menu-new-items")) {
-            var subscription = getSelectedSubscription();
-            if (subscription != null)
+            const filter = $item.data("value");
+            if (filter === undefined) {
+                cookies.remove('filter');
+            } else {
+                cookies.set('filter', filter);
+            }
+            const subscription = getSelectedSubscription();
+            if (subscription != null) {
                 subscription.refresh();
+            }
             ui.onScopeChanged();
         } else if ($item.is(".menu-show-sidebar")) {
             ui.toggleSidebar(e.isChecked);
