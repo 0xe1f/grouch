@@ -749,15 +749,11 @@
                             .append(entry.content)))
                     .append($("<div />", { "class": "gofr-entry-footer"})
                         .append($("<span />", { "class": "action-star" })
-                            .click(function(e) {
+                            .click(function(_) {
                                 entry.toggleStarred();
                             }))
                         .append(
                             $("<span />", { "class" : "action-unread gofr-entry-action"})
-                                .append(
-                                    $("<span />", { "class": "gofr-action-icon" })
-                                        .text("📩")
-                                )
                                 .append(
                                     $("<span />", { "class": "gofr-action-text" })
                                         .text(_l("Keep unread"))
@@ -770,10 +766,6 @@
                         .append(
                             $("<span />", { "class" : "action-tag gofr-entry-action" })
                                 .append(
-                                    $("<span />", { "class": "gofr-action-icon" })
-                                        .text("🏷️")
-                                )
-                                .append(
                                     $("<span />", { "class": "gofr-action-text" })
                                         .text(
                                             this.tags.length
@@ -781,16 +773,12 @@
                                                 : _l("Tag")
                                         )
                                 )
-                                .click(function(e) {
+                                .click(function(_) {
                                     ui.editTags(entry);
                                 })
                         )
                         .append(
                             $("<span />", { "class" : "action-like gofr-entry-action"})
-                                .append(
-                                    $("<span />", { "class": "gofr-action-icon" })
-                                        .text("👍")
-                                )
                                 .append(
                                     $("<span />", { "class": "gofr-action-text" })
                                         .text(_l("Like"))
@@ -800,7 +788,7 @@
                                         .text(_l("(%d)", [entry.extras.likeCount]))
                                         .toggleClass("unliked", this.extras.likeCount < 1)
                                 )
-                                .click(function(e) {
+                                .click(function(_) {
                                     entry.toggleLike();
                                 })
                         )
@@ -1783,7 +1771,7 @@
         var selectedSubscriptionId = null;
         const selectedSubscription = getSelectedSubscription();
         if (selectedSubscription != null) {
-            selectedSubscriptionId = selectedSubscription.id;
+            selectedSubscriptionId = selectedSubscription.readableId();
         } else {
             selectedSubscriptionId = window.location.hash.replace(/^#/, '') ?? "";
         }
@@ -1816,7 +1804,7 @@
 
         var collapsedFolderIds = [];
         $.each($("#subscriptions .folder-collapsed"), function() {
-            var $subscription = $(this).closest(".subscription");
+            var $subscription = $(this);
             var subscription = $subscription.data("subscription");
 
             collapsedFolderIds.push(subscription.id);
@@ -1827,7 +1815,7 @@
         var newSubscriptions = [];
         var markedFirstSub = false;
 
-        const faviconless = $.map($(".subscription-icon.no-favicon").closest(".subscription:not(.folder)"), function(e) {
+        const faviconless = $.map($(".subscription.no-favicon:not(.folder)"), function(e) {
             return $(e).data("subscription").id;
         });
         var subMap = generateSubscriptionMap(userSubscriptions);
@@ -1838,7 +1826,11 @@
                 url.pathname = "/favicon.ico";
                 favicon = url.toString();
             }
-            var $subscription = $("<li />", { "class" : `subscription ${subscription.domId}` })
+            var faviconClass = "";
+            if (!subscription.isFolder()) {
+                faviconClass = (favicon == transparentIcon) ? " no-favicon" : "";
+            }
+            var $subscription = $("<li />", { "class" : `subscription ${subscription.domId} ${faviconClass}` })
                 .attr("data-sub-id", subscription.readableId())
                 .data("subscription", subscription)
                 .append($("<div />", { "class" : "subscription-item" })
@@ -1850,12 +1842,13 @@
                         }))
                     .append(
                         $("<img />", {
-                            "class" : `subscription-icon${favicon == transparentIcon ? " no-favicon" : ""}`,
+                            "class" : "subscription-icon",
                             "src": favicon,
                         })
                         .one("error", function() {
                             $(this)
                                 .attr("src", transparentIcon)
+                                .closest(".subscription")
                                 .addClass("no-favicon");
                         })
                     )
@@ -1946,19 +1939,22 @@
                     });
             } else /* if (subscription.isFolder()) */ {
                 if (!subscription.isRoot()) {
-                    $subscription.find(".subscription-item")
+                    $subscription
+                        .toggleClass("folder-collapsed", $.inArray(subscription.id, collapsedFolderIds) > -1)
+                        .find(".subscription-item")
                         .append($("<span />", { "class" : "folder-toggle" })
-                            .click(function(e) {
+                            .click(function(_) {
                                 var $toggleIcon = $(this);
-                                $toggleIcon.toggleClass("folder-collapsed");
-                                if ($toggleIcon.hasClass("folder-collapsed"))
+                                $toggleIcon
+                                    .closest(".subscription")
+                                    .toggleClass("folder-collapsed");
+                                if ($toggleIcon.closest(".subscription").hasClass("folder-collapsed"))
                                     $subscription.find("ul").slideUp("fast");
                                 else
                                     $subscription.find("ul").slideDown("fast");
 
                                 return false;
-                            })
-                            .toggleClass("folder-collapsed", $.inArray(subscription.id, collapsedFolderIds) > -1));
+                            }));
                 }
             }
 
@@ -2004,10 +2000,6 @@
                 .attr("data-sub-id", specialFolder.readableId())
                 .data("subscription", specialFolder)
                 .append($("<div />", { "class" : "subscription-item" })
-                    .append($("<img />", {
-                        "class" : "subscription-icon",
-                        "src": transparentIcon,
-                    }))
                     .append($("<span />", { "class" : "subscription-title" })
                         .text(specialFolder.title))
                     .attr("title", specialFolder.title)
@@ -2033,10 +2025,6 @@
                             $menu.openMenu(e.pageX, e.pageY, tag.id);
                             e.stopPropagation();
                         }))
-                    .append($("<img />", {
-                        "class" : "subscription-icon",
-                        "src": transparentIcon,
-                    }))
                     .append($("<span />", { "class" : "subscription-title" })
                         .text(tag.title))
                     .attr("title", tag.title)
