@@ -467,13 +467,13 @@ ul#subscriptions,
 }
 
 .subscription-item .chevron {
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
     visibility: hidden;
-    background-image: url(sprites.png);
-    background-position: -90px -90px;
     position: absolute;
     right: 5px;
+    /* menu indicator icon */
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2220px%22%20fill%3D%22%231f1f1f%22%3E%3Cpath%20d%3D%22M0%200h24v24H0V0z%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M12%208c1.1%200%202-.9%202-2s-.9-2-2-2-2%20.9-2%202%20.9%202%202%202zm0%202c-1.1%200-2%20.9-2%202s.9%202%202%202%202-.9%202-2-.9-2-2-2zm0%206c-1.1%200-2%20.9-2%202s.9%202%202%202%202-.9%202-2-.9-2-2-2z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .subscription-item:hover .chevron {
@@ -481,11 +481,11 @@ ul#subscriptions,
 }
 
 .subscription-item .folder-toggle {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background-repeat: no-repeat;
     position: absolute;
-    left: 5px;
+    left: 0;
     /* expanded chevron icon */
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2220px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M0%200h24v24H0V0z%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M8.71%2011.71l2.59%202.59c.39.39%201.02.39%201.41%200l2.59-2.59c.63-.63.18-1.71-.71-1.71H9.41c-.89%200-1.33%201.08-.7%201.71z%22%2F%3E%3C%2Fsvg%3E");
 }
@@ -1172,8 +1172,6 @@ only screen and (-o-min-device-pixel-ratio: 2/1),
 only screen and (-webkit-min-device-pixel-ratio: 2), 
 only screen and (min-device-pixel-ratio: 2) {
     button.dropdown,
-
-    .subscription-item .chevron,
 
     .menu li.selected-menu-item span,
     .menu li.checked span,
