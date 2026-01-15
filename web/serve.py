@@ -526,9 +526,10 @@ def _submit(fn, *args, **kwargs):
     message = kwargs.pop("message", None)
     executor.submit(fn, _create_task_context(message), *args, **kwargs)
 
-if __name__ == '__main__':
+def init_app():
     logging.basicConfig(level=logging.DEBUG)
 
+    global stores
     conn = Connection()
     conn.connect(
         app.config["DATABASE_NAME"],
@@ -540,3 +541,5 @@ if __name__ == '__main__':
     stores = Database(conn.db)
 
     socketio.run(app, host='0.0.0.0', port='8080', debug=True)
+
+init_app()
