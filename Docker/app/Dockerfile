@@ -7,14 +7,12 @@ RUN apt update -y && \
         python-is-python3 \
         git
 
-ARG COUCHDB_HOST
-ARG COUCHDB_PORT
 ARG HTTP_PORT
 ARG GIT_REPO
 ARG GIT_BRANCH
 
 RUN git clone --branch $GIT_BRANCH $GIT_REPO /opt/grouch
-COPY config.toml /opt/grouch/config.toml
+COPY generated/config.toml /opt/grouch/config.toml
 COPY boot.sh /opt/grouch/boot.sh
 
 WORKDIR /opt/grouch
@@ -27,9 +25,6 @@ RUN chmod a+x boot.sh
 
 ENV FLASK_APP=web/serve.py
 ENV PRODUCTION=true
-
-ENV GROUCH_DATABASE_HOST=$COUCHDB_HOST
-ENV GROUCH_DATABASE_PORT=$COUCHDB_PORT
 ENV HTTP_PORT=$HTTP_PORT
 
 EXPOSE $HTTP_PORT

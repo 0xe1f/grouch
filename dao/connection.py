@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from urllib.parse import quote_plus
 import couchdb
 import logging
 
@@ -27,7 +28,7 @@ class Connection:
 
     def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None):
         self._db_name = db_name
-        self._server = couchdb.Server(f"http://{username}:{password}@{host}:{port or 5984}/")
+        self._server = couchdb.Server(f"http://{quote_plus(username)}:{quote_plus(password)}@{host}:{port or 5984}/")
         self.initialize()
 
     def destroy(self):

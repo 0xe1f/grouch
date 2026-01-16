@@ -3,7 +3,6 @@
 DATABASE_NAME = "reader"
 DATABASE_USERNAME = "admin"
 DATABASE_PASSWORD = "password"
-# PORT and HOST will be overridden for docker builds
 DATABASE_HOST = "localhost"
 DATABASE_PORT = "5984"
 
