@@ -1,11 +1,21 @@
 # Database
 
-DATABASE_NAME = "<couchdb database name>"
-DATABASE_USERNAME = "<couchdb database username>"
-DATABASE_PASSWORD = "<couchdb database password>"
-DATABASE_HOST = "<couchdb database hostname>"
-DATABASE_PORT = "<couchdb database port - defaults to 5984>"
+DATABASE_NAME = "reader"
+DATABASE_USERNAME = "admin"
+DATABASE_PASSWORD = "password"
+# PORT and HOST will be overridden for docker builds
+DATABASE_HOST = "localhost"
+DATABASE_PORT = "5984"
 
 # Security
 
-SECRET_KEY = "<CHANGE THIS VALUE!>"
+# Set SECRET_KEY to a random string
+# See: https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY
+# SECRET_KEY = "<CHANGE THIS VALUE!>"
+
+# Session lifetime in seconds; 31 by default
+PERMANENT_SESSION_LIFETIME = 2678400
+
+# Dependencies
+
+EXECUTOR_PROPAGATE_EXCEPTIONS = true

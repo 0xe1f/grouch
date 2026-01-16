@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+if os.environ['PRODUCTION']:
+    import eventlet
+    eventlet.monkey_patch()
+
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
 from entity import Article
@@ -44,8 +49,9 @@ import tomllib
 import web.ext_type.objects as ext_objs
 
 app = flask.Flask(__name__)
-app.config.from_file("../config_defaults.toml", load=tomllib.load, text=False)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
+app.config.from_prefixed_env("GROUCH")
+
 socketio = flask_socketio.SocketIO(app)
 executor = Executor(app)
 
@@ -540,6 +546,7 @@ def init_app():
     )
     stores = Database(conn.db)
 
-    socketio.run(app, host='0.0.0.0', port='8080', debug=True)
-
 init_app()
+
+if __name__ == "__main__":
+    socketio.run(app, host='0.0.0.0', port='8080', debug=True)

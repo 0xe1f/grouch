@@ -1,0 +1,8 @@
+FROM couchdb
+
+#COPY local.ini /opt/couchdb/etc/
+ARG COUCHDB_PORT
+
+ENV COUCHDB_PORT=$COUCHDB_PORT
+
+EXPOSE $COUCHDB_PORT
