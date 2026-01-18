@@ -120,7 +120,7 @@ def _freshen_stale_feed(
             bulk_q.enqueue(remote_entry)
             entries_changed += 1
 
-    logging.debug(f"{feeds_changed} feeds and {entries_changed} entries updated")
+    logging.info(f"{feeds_changed} feeds and {entries_changed} entries updated")
 
 def _fetch_feeds(
     *feed_urls: str,
@@ -142,6 +142,6 @@ def _fetch_feeds(
             except Exception as e:
                 logging.exception(f"Failed to load {url}", e)
 
-    logging.debug(f"Fetched {len(feed_urls)} in {"%.2f" % (time.time() - start)}s; {len(successful)} OK, {len(failed)} failed")
+    logging.info(f"Fetched {len(feed_urls)} in {"%.2f" % (time.time() - start)}s; {len(successful)} OK, {len(failed)} failed")
 
     return successful, failed

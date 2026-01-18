@@ -25,7 +25,7 @@ sed \
     -e "/^\s*$/d" \
     ../../config.toml.example > generated/config.toml
 
-echo "*/$REFRESH_INTERVAL_MIN * * * * ( PATH=\"/opt/venv/bin:\$PATH\" && /opt/grouch/refresh.py -f $REFRESH_INTERVAL_MIN ) > /var/log/cron.grouch 2>&1" > generated/cron.tab
+echo "*/$REFRESH_INTERVAL_MIN * * * * ( PATH=\"/opt/venv/bin:\$PATH\" && /opt/grouch/refresh.py -f $REFRESH_INTERVAL_MIN ) >> /proc/1/fd/1 2>&1" > generated/cron.tab
 
 docker build \
     --build-arg HTTP_PORT=$HTTP_PORT \
