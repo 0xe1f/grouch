@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Copyright (C) 2024 Akop Karapetyan
 #
@@ -481,8 +481,7 @@ def import_feeds():
 @socketio.on("connect")
 def socketio_connect():
     if not current_user.is_authenticated:
-        logging.warning("Unauthenticated user; disconnecting")
-        socketio.disconnect()
+        logging.warning("Unauthenticated user")
         return False
 
     flask_socketio.join_room(current_user.id)

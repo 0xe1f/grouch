@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Copyright (C) 2024 Akop Karapetyan
 #
@@ -15,6 +15,11 @@
 # limitations under the License.
 
 from argparse import ArgumentParser
+from datetime import datetime
+from os.path import abspath
+from os.path import dirname
+from os.path import exists
+from os.path import join
 from tasks.feeds import refresh_feeds
 from tasks.objects import Database
 from tasks.objects import TaskContext
@@ -22,39 +27,46 @@ import logging
 import dao
 import tomllib
 
-arg_parser = ArgumentParser()
-arg_parser.add_argument(
-    "-f",
-    "--fresh",
-    help="freshness duration, in minutes",
-    required=True,
-    type=int
-)
-
-args = arg_parser.parse_args()
-logging.basicConfig(level=logging.DEBUG)
-
-with open("config.toml", "rb") as file:
-    config = tomllib.load(file)
-
-conn = dao.Connection()
-conn.connect(
-    config["DATABASE_NAME"],
-    config["DATABASE_USERNAME"],
-    config["DATABASE_PASSWORD"],
-    config["DATABASE_HOST"],
-    config.get("DATABASE_PORT")
-)
-
-task_context = TaskContext(
-    Database(conn.db),
-    None,
-    None,
-    None,
-)
-
 def main():
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument(
+        "-f",
+        "--fresh",
+        help="freshness duration, in minutes",
+        required=True,
+        type=int
+    )
+
+    args = arg_parser.parse_args()
+    logging.basicConfig(level=logging.DEBUG)
+
+    config_path = "config.toml"
+    if not exists(config_path):
+        script_dir = dirname(abspath(__file__))
+        config_path = join(script_dir, "config.toml")
+
+    with open(config_path, "rb") as file:
+        config = tomllib.load(file)
+
+    conn = dao.Connection()
+    conn.connect(
+        config["DATABASE_NAME"],
+        config["DATABASE_USERNAME"],
+        config["DATABASE_PASSWORD"],
+        config["DATABASE_HOST"],
+        config.get("DATABASE_PORT")
+    )
+
+    task_context = TaskContext(
+        Database(conn.db),
+        None,
+        None,
+        None,
+    )
+
+    print(f"{datetime.now()}: updating feeds older than {args.fresh} minutes")
     freshness_seconds = args.fresh * 60
     refresh_feeds(task_context, freshness_seconds)
 
-main()
+if __name__ == "__main__":
+    main()

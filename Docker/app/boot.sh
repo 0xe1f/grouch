@@ -1,5 +1,6 @@
 #!/bin/bash
 
+service cron start
 exec gunicorn \
     -b :${HTTP_PORT} \
     --access-logfile - \
