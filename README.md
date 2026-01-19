@@ -20,7 +20,7 @@ Features
 * Mobile browser support
 * High-density screen support
 
-Installation
+Development
 ------------
 
 To run locally:
@@ -29,7 +29,7 @@ To run locally:
 * Install CouchDB
 
 ```
-git clone https://github.com/0xe1f/grouch.git`
+git clone https://github.com/0xe1f/grouch.git
 cd grouch
 ./setup.sh
 . venv/bin/activate
@@ -38,9 +38,21 @@ cd grouch
 ./serve.py   # Start server on port 8080
 ```
 
-To routinely update feeds, set up a `cron` job that calls `refresh.py`:
+To update feeds:
 
 ```
 . venv/bin/activate
 ./refresh.py -f 30 # Update feeds older than 30 minutes
+```
+
+Deployment
+----------
+
+Deploy to a host via Docker:
+
+```
+git clone https://github.com/0xe1f/grouch.git
+cd grouch/Docker
+./build.sh
+./run.sh
 ```
