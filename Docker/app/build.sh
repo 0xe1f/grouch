@@ -14,7 +14,7 @@ REFRESH_INTERVAL_MIN=${REFRESH_INTERVAL_MIN:-"10"}
 . ../couchdb/generated/set_creds.sh
 mkdir -p generated
 
-SECRET_KEY=`LC_ALL=C tr -dc 'A-Za-z0-9%_-+;:,.' </dev/urandom | head -c 64; echo`
+SECRET_KEY=`LC_ALL=C tr -dc 'A-Za-z0-9%_+;:,.-' </dev/urandom | head -c 64; echo`
 sed \
     -e "s/^# SECRET_KEY .*/SECRET_KEY = \"$SECRET_KEY\"/" \
     -e "s/^DATABASE_HOST .*/DATABASE_HOST = \"$COUCHDB_HOST\"/" \

@@ -11,7 +11,7 @@ mkdir -p generated
 
 # Generate random admin username and password
 ADMIN_USER=`LC_ALL=C tr -dc 'A-Za-z' </dev/urandom | head -c 8; echo`
-ADMIN_PASSWORD=`LC_ALL=C tr -dc 'A-Za-z0-9%_-+;:.' </dev/urandom | head -c 16; echo`
+ADMIN_PASSWORD=`LC_ALL=C tr -dc 'A-Za-z0-9%_+;:.-' </dev/urandom | head -c 16; echo`
 
 # Update local.ini with generated credentials and port
 sed \

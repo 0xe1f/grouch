@@ -1,4 +1,4 @@
-FROM couchdb
+FROM couchdb:3.5.1
 
 RUN apt update -y && \
     apt install -y jq
