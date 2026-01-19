@@ -1,6 +1,9 @@
 #!/bin/bash
 
-. set_creds.sh
+. creds.sh
+
+MAX_RETRIES=10
+RETRY_INTERVAL_SEC=1
 
 # Encode username/password
 USER_ENCODED=$(printf %s "$COUCHDB_ADMIN_USER" | jq -sRr @uri)
@@ -9,20 +12,16 @@ PASSWORD_ENCODED=$(printf %s "$COUCHDB_ADMIN_PASSWORD" | jq -sRr @uri)
 echo "Connecting..." >&2
 
 # Wait for CouchDB to become available
-CONNECTED=0
-for i in {1..10}; do
+for I in $(seq 1 $MAX_RETRIES); do
     if [ "$(curl -s -w "%{http_code}" http://$COUCHDB_HOST:$COUCHDB_PORT/_users)" != "000" ]; then
-        CONNECTED=1
         break
     fi
-    sleep 0.5
+    if [ $I -eq $MAX_RETRIES ]; then
+        echo "CouchDB unreachable within the timeout." >&2
+        exit 1
+    fi
+    sleep $RETRY_INTERVAL_SEC
 done
-
-# Check exit status
-if [ $CONNECTED -eq 0 ]; then
-    echo "CouchDB unreachable within the timeout." >&2
-    exit 1
-fi
 
 echo "Connected." >&2
 
@@ -43,7 +42,7 @@ fi
 echo "Cleaning up..." >&2
 
 # Clean up
-rm -f set_creds.sh
+rm -f creds.sh
 rm -f -- "$0"
 
 echo "CouchDB initialization complete." >&2

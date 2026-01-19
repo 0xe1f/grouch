@@ -1,0 +1,15 @@
+# Database
+DATABASE_NAME = "reader"
+#DATABASE_USERNAME = "XXX"
+#DATABASE_PASSWORD = "XXX"
+#DATABASE_HOST = "XXX"
+#DATABASE_PORT = "XXX"
+
+# Security
+#SECRET_KEY = "XXX"
+
+# Session lifetime in seconds; 31 days by default
+PERMANENT_SESSION_LIFETIME = 2678400
+
+# Dependencies
+EXECUTOR_PROPAGATE_EXCEPTIONS = true

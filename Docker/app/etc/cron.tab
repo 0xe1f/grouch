@@ -1,0 +1,1 @@
+*/10 * * * * ( PATH="/opt/venv/bin:$PATH" && /opt/grouch/refresh.py -f 10 ) >> /proc/1/fd/1 2>&1

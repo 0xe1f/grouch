@@ -13,6 +13,3 @@ docker run --name $NAME -d \
     --volume $VOLUME:/opt/couchdb/data \
     --rm \
     $IMAGE
-
-# Initialize the database
-docker exec $NAME ./init_db.sh
