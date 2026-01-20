@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os
-if os.environ['PRODUCTION']:
+if os.environ.get('PRODUCTION', False):
     import eventlet
     eventlet.monkey_patch()
 

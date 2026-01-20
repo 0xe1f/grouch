@@ -194,7 +194,7 @@ a {
 .gofr-entry-source {
     overflow: hidden;
     white-space: nowrap;
-    margin-left: 28px;
+    margin-left: 24px;
     width: 10em;
     display: block;
     position: absolute;
@@ -249,7 +249,7 @@ a {
     font-weight: bold;
     font-size: 12pt;
     display: inline;
-    margin: 0;
+    margin: 0 0 0 4px;
 }
 
 a.gofr-entry-title:hover {
@@ -503,11 +503,6 @@ ul#subscriptions,
     margin-top: 1em;
 }
 
-.subscription.root .subscription-icon {
-    background-image: url(sprites.png);
-    background-position: -165px -165px;
-}
-
 .subscription.root .subscription-title,
 .subscription.tag .subscription-title,
 .subscription.sf-liked .subscription-title,
@@ -664,8 +659,10 @@ button:hover {
 }
 
 button.dropdown {
-    background: url(sprites.png) no-repeat right #eee;
-    background-position: 100% -270px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%231f1f1f%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
+    background-position-x: right 2px;
+    background-position-y: center;
+    background-repeat: no-repeat;
     padding: 0.5em 30px 0.5em 20px;
 }
 
@@ -697,7 +694,6 @@ input[type=file] {
     box-shadow: none;
     padding: 3px 25px 0.25em 1em;
     background-color: transparent;
-    background-position: 100% -273px;
     cursor: pointer;
     font-weight: normal;
     font-size: 12pt;
@@ -712,11 +708,13 @@ input[type=file] {
 .navigate {
     width: 40px;
     display: none;
-    background: url(sprites.png) no-repeat -115px -240px #eee;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M200-120q-33%200-56.5-23.5T120-200v-560q0-33%2023.5-56.5T200-840h160q33%200%2056.5%2023.5T440-760v560q0%2033-23.5%2056.5T360-120H200Zm400%200q-33%200-56.5-23.5T520-200v-560q0-33%2023.5-56.5T600-840h160q33%200%2056.5%2023.5T840-760v560q0%2033-23.5%2056.5T760-120H600Zm160-640H600v560h160v-560Z%22%2F%3E%3C%2Fsvg%3E");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .navigate:hover {
-    background-position: -145px -240px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M200-120q-33%200-56.5-23.5T120-200v-560q0-33%2023.5-56.5T200-840h160q33%200%2056.5%2023.5T440-760v560q0%2033-23.5%2056.5T360-120H200Zm400%200q-33%200-56.5-23.5T520-200v-560q0-33%2023.5-56.5T600-840h160q33%200%2056.5%2023.5T840-760v560q0%2033-23.5%2056.5T760-120H600Zm160-640H600v560h160v-560Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .floated-sidebar .navigate {
@@ -725,6 +723,9 @@ input[type=file] {
 
 .select-article {
     width: 40px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
 }
 
 .select-article.up {
@@ -733,7 +734,7 @@ input[type=file] {
     border-right: none;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background: url(sprites.png) no-repeat -25px -240px #eee;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M480-528%20296-344l-56-56%20240-240%20240%20240-56%2056-184-184Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .select-article.down {
@@ -741,37 +742,42 @@ input[type=file] {
     box-shadow: 0 1px 1px #aaa;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    background: url(sprites.png) no-repeat 5px -240px #eee;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M480-344%20240-584l56-56%20184%20184%20184-184%2056%2056-240%20240Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .select-article.up:hover, 
 .select-article.up:active {
-    background-position: -85px -240px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M480-528%20296-344l-56-56%20240-240%20240%20240-56%2056-184-184Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .select-article.down:hover, 
 .select-article.down:active {
-    background-position: -55px -240px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M480-344%20240-584l56-56%20184%20184%20184-184%2056%2056-240%20240Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .refresh {
     width: 60px;
-    background: url(sprites.png) no-repeat 0 -270px #eee;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M480-160q-134%200-227-93t-93-227q0-134%2093-227t227-93q69%200%20132%2028.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100%200-170%2070t-70%20170q0%20100%2070%20170t170%2070q77%200%20139-44t87-116h84q-28%20106-114%20173t-196%2067Z%22%2F%3E%3C%2Fsvg%3E");
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .refresh:hover, 
 .refresh:active {
-    background-position: -60px -270px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M480-160q-134%200-227-93t-93-227q0-134%2093-227t227-93q69%200%20132%2028.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100%200-170%2070t-70%20170q0%20100%2070%20170t170%2070q77%200%20139-44t87-116h84q-28%20106-114%20173t-196%2067Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .settings.dropdown {
     width: 65px;
-    background: url(sprites.png) no-repeat 0 -210px #eee;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22m370-80-16-128q-13-5-24.5-12T307-235l-119%2050L78-375l103-78q-1-7-1-13.5v-27q0-6.5%201-13.5L78-585l110-190%20119%2050q11-8%2023-15t24-12l16-128h220l16%20128q13%205%2024.5%2012t22.5%2015l119-50%20110%20190-103%2078q1%207%201%2013.5v27q0%206.5-2%2013.5l103%2078-110%20190-118-50q-11%208-23%2015t-24%2012L590-80H370Zm70-80h79l14-106q31-8%2057.5-23.5T639-327l99%2041%2039-68-86-65q5-14%207-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99%2042q-22-23-48.5-38.5T533-694l-13-106h-79l-14%20106q-31%208-57.5%2023.5T321-633l-99-41-39%2068%2086%2064q-5%2015-7%2030t-2%2032q0%2016%202%2031t7%2030l-86%2065%2039%2068%2099-42q22%2023%2048.5%2038.5T427-266l13%20106Zm42-180q58%200%2099-41t41-99q0-58-41-99t-99-41q-59%200-99.5%2041T342-480q0%2058%2040.5%2099t99.5%2041Zm-2-140Z%22%2F%3E%3C%2Fsvg%3E");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .settings.dropdown:hover, 
 .settings.dropdown:active {
-    background-position: -60px -210px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22m370-80-16-128q-13-5-24.5-12T307-235l-119%2050L78-375l103-78q-1-7-1-13.5v-27q0-6.5%201-13.5L78-585l110-190%20119%2050q11-8%2023-15t24-12l16-128h220l16%20128q13%205%2024.5%2012t22.5%2015l119-50%20110%20190-103%2078q1%207%201%2013.5v27q0%206.5-2%2013.5l103%2078-110%20190-118-50q-11%208-23%2015t-24%2012L590-80H370Zm70-80h79l14-106q31-8%2057.5-23.5T639-327l99%2041%2039-68-86-65q5-14%207-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99%2042q-22-23-48.5-38.5T533-694l-13-106h-79l-14%20106q-31%208-57.5%2023.5T321-633l-99-41-39%2068%2086%2064q-5%2015-7%2030t-2%2032q0%2016%202%2031t7%2030l-86%2065%2039%2068%2099-42q22%2023%2048.5%2038.5T427-266l13%20106Zm42-180q58%200%2099-41t41-99q0-58-41-99t-99-41q-59%200-99.5%2041T342-480q0%2058%2040.5%2099t99.5%2041Zm-2-140Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 button.solid-color {
@@ -855,17 +861,17 @@ ul.menu {
     background-color: #ccc;
 }
 
-.menu li.selected-menu-item span {
-    background: url(sprites.png) no-repeat -225px -225px;
+.menu li.selected-menu-item span,
+.menu li.checked span {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M382-240%20154-468l57-57%20171%20171%20367-367%2057%2057-424%20424Z%22%2F%3E%3C%2Fsvg%3E");
+    background-position-x: left -4px;
+    background-position-y: center;
+    background-repeat: no-repeat;
 }
 
 .menu li span {
     padding-left: 20px;
     white-space: nowrap;
-}
-
-.menu li.checked span {
-    background: url(sprites.png) no-repeat -225px -225px;
 }
 
 .shortcuts {
@@ -1163,40 +1169,5 @@ ul.menu {
 
     .too-long {
         padding-right: 3.5em;
-    }
-}
-
-/** High dpi **/
-@media only screen and (min--moz-device-pixel-ratio: 2), 
-only screen and (-o-min-device-pixel-ratio: 2/1), 
-only screen and (-webkit-min-device-pixel-ratio: 2), 
-only screen and (min-device-pixel-ratio: 2) {
-    button.dropdown,
-
-    .menu li.selected-menu-item span,
-    .menu li.checked span,
-
-    .navigate,
-    .navigate:hover,
-
-    .subscription.root .subscription-icon,
-    .subscription.tag .subscription-icon,
-
-    .refresh,
-    .refresh:hover, 
-    .refresh:active,
-
-    .settings.dropdown,
-    .settings.dropdown:hover, 
-    .settings.dropdown:active,
-
-    .select-article.down,
-    .select-article.down:hover, 
-    .select-article.down:active,
-    .select-article.up,
-    .select-article.up:hover, 
-    .select-article.up:active {
-        background-image: url(sprites@2x.png);
-        background-size: 300px 300px;
     }
 }
