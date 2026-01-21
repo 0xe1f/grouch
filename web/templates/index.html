@@ -22,7 +22,9 @@
     <body>
         <div id="toast"><span></span></div>
         <div id="header">
-            <h1>Grouch</h1>
+            <button id="app-options" class="dropdown" data-dropdown="menu-app-options">
+                <h1>Grouch</h1>
+            </button>
             <div class="infobar">
                 <div class="right-aligned">
                     <button class="user-options dropdown" data-dropdown="menu-user-options" title="{{ current_user.email_address }}">{{ current_user.email_address }}</button>
@@ -51,11 +53,6 @@
                 <div class="gofr-entries-header"></div>
                 <div id="gofr-entries"></div>
             </div>
-        </div>
-        <div id="footer">
-            <a class="about _l" href="http://www.akop.org/">About</a>
-            &bull; <a class="license _l" href="https://raw.github.com/0xe1f/grouch/master/LICENSE">License</a>
-            &bull; <a class="source _l" href="https://github.com/0xe1f/grouch">Source</a>
         </div>
         <div class="modal-blocker"></div>
         <div id="import-subscriptions" class="modal">

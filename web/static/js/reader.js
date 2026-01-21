@@ -956,6 +956,10 @@
         } else if ($item.is(".menu-delete-tag")) {
             var tag = $(`.${e.context}`).data("subscription");
             ui.deleteTag(tag);
+        } else if ($item.is(".menu-open-url")) {
+            window.open($item.attr('data-url'), '_blank').focus();
+        } else if ($item.is(".menu-about")) {
+            ui.showAbout();
         }
     });
 
@@ -1086,7 +1090,13 @@
                     .append($("<li />", { "class": "menu-subscribe" }).text(_l("Subscribe…"))))
                 .append($("<ul />", { "id": "menu-leaf", "class": "menu" })
                     .append($("<li />", { "class": "menu-rename" }).text(_l("Rename…")))
-                    .append($("<li />", { "class": "menu-unsubscribe" }).text(_l("Unsubscribe…"))));
+                    .append($("<li />", { "class": "menu-unsubscribe" }).text(_l("Unsubscribe…"))))
+                .append($("<ul />", { "id": "menu-app-options", "class": "menu" })
+                    .append($("<li />", { "class": "menu-open-url", "data-url": "https://raw.github.com/0xe1f/grouch/master/LICENSE" }).text(_l("License")))
+                    .append($("<li />", { "class": "menu-open-url", "data-url": "https://github.com/0xe1f/grouch" }).text(_l("Source code")))
+                    .append($("<li />", { "class": "divider" }))
+                    .append($("<li />", { "class": "menu-about" }).text(_l("About"))))
+;
 
             $(".menu li").not(".divider").wrapInner("<span />");
         },

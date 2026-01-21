@@ -35,37 +35,30 @@ body {
     margin: 0.25em 0;
 }
 
+#app-options {
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 6px 24px 6px 0;
+}
+
+#app-options h1 {
+    margin: 0;
+}
+
 #reader {
     position: absolute;
     top: 105px;
-    bottom: 30px;
+    bottom: 0px;
     left: 0;
     right: 0;
     border-top: solid 1px #aaa;
 }
 
-#footer {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 22px;
-    font-size: 12pt;
-    padding-top: 7px;
-    border-top: solid 1px #ccc;
-    background-color: #eee;
-    text-align: center;
-}
-
 a {
     color: #0276FD;
     text-decoration: none;
-}
-
-#footer .bookmarklet {
-    display: none; /* not ready */
-    position: absolute;
-    left: 1em;
 }
 
 #sign-out {
@@ -659,11 +652,15 @@ button:hover {
 }
 
 button.dropdown {
-    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%231f1f1f%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
     background-position-x: right 2px;
     background-position-y: center;
     background-repeat: no-repeat;
     padding: 0.5em 30px 0.5em 20px;
+}
+
+button.dropdown:hover {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 input[type=file] {
