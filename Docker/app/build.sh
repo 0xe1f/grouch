@@ -6,7 +6,8 @@ NETWORK=${NETWORK:-"grouch"}
 NAME="app.$NETWORK"
 IMAGE="$NETWORK/app"
 
-HTTP_PORT=${HTTP_PORT:-8000}
+HTTP_PORT=${HTTP_PORT:-8080}
+HTTPS_PORT=${HTTPS_PORT:-8443}
 GIT_REPO=${GIT_REPO:-"https://github.com/0xe1f/grouch.git"}
 GIT_BRANCH=${GIT_BRANCH:-"master"}
 
@@ -35,8 +36,22 @@ else
         etc/config.toml.default > generated/config.toml
 fi
 
+if [ ! -f generated/key.pem ] || [ ! -f generated/cert.pem ]; then
+    echo "Generating new self-signed certificate and key..."
+    openssl req \
+        -x509 \
+        -newkey rsa:4096 \
+        -keyout generated/key.pem \
+        -out generated/cert.pem \
+        -sha256 \
+        -days 365 \
+        -nodes \
+        -subj "/C=??/ST=??/L=??/O=??/OU=??/CN=Grouch Self-signed"
+fi
+
 docker build \
     --build-arg HTTP_PORT=$HTTP_PORT \
+    --build-arg HTTPS_PORT=$HTTPS_PORT \
     --build-arg GIT_REPO=$GIT_REPO \
     --build-arg GIT_BRANCH=$GIT_BRANCH \
     -t $IMAGE .
