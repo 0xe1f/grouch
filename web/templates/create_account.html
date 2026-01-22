@@ -17,26 +17,29 @@
             <h1>Grouch</h1>
         </div>
         <div class="fields">
-            <form action="{{ url_for("create_account_post") }}" method="post">
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <ul>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <input type="text" name="username" placeholder="username" value="{{ arg.username if arg is defined else "" }}" />
-                    <input type="text" name="email_address" placeholder="email address" value="{{ arg.email_address if arg is defined else "" }}" />
-                    <input type="password" name="password" placeholder="password" />
-                    <div class="password-strength">
-                        <div class="gauge"></div>
-                    </div>
-                    <input type="password" name="confirm_password" placeholder="confirm password" />
-                    <a href="{{ url_for("login_get") }}">Log in</a>
-                    <input type="submit" value="Create" />
-                {% endwith %}
-            </form>
+            <div class="content">
+                <form action="{{ url_for("create_account_post") }}" method="post">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <input type="text" name="username" placeholder="username" value="{{ arg.username if arg is defined else "" }}" />
+                        <input type="text" name="email_address" placeholder="email address" value="{{ arg.email_address if arg is defined else "" }}" />
+                        <input type="password" name="password" placeholder="password" />
+                        <div class="password-strength">
+                            <div class="gauge"></div>
+                        </div>
+                        <input type="password" name="confirm_password" placeholder="confirm password" />
+                        <a href="{{ url_for("login_get") }}">Log in</a>
+                        <input type="submit" value="Create" />
+                    {% endwith %}
+                </form>
+                {% include 'users_footer.html' %}
+            </div>
         </div>
     </body>
 </html>

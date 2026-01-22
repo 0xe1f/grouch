@@ -15,21 +15,24 @@
             <h1>Grouch</h1>
         </div>
         <div class="fields">
-            <form action="{{ url_for("login_post") }}" method="post">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        <ul>
-                        {% for category, message in messages %}
-                            <li class="{{ category if category else "error" }}">{{ message }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <input type="text" name="username" placeholder="username" value="{{ arg.username if arg is defined else "" }}" />
-                    <input type="password" name="password" placeholder="password" />
-                    <a href="{{ url_for("create_account_get") }}">Create account</a>
-                    <input type="submit" value="Sign in" />
-                {% endwith %}
-            </form>
+            <div class="content">
+                <form action="{{ url_for("login_post") }}" method="post">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <ul>
+                            {% for category, message in messages %}
+                                <li class="{{ category if category else "error" }}">{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <input type="text" name="username" placeholder="username" value="{{ arg.username if arg is defined else "" }}" />
+                        <input type="password" name="password" placeholder="password" />
+                        <a href="{{ url_for("create_account_get") }}">Create account</a>
+                        <input type="submit" value="Sign in" />
+                    {% endwith %}
+                </form>
+                {% include 'users_footer.html' %}
+            </div>
         </div>
     </body>
 </html>
