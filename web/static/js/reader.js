@@ -1,5 +1,5 @@
 /*****************************************************************************
- ** Copyright (C) 2024-2025 Akop Karapetyan
+ ** Copyright (C) 2024 Akop Karapetyan
  **
  ** Licensed under the Apache License, Version 2.0 (the "License");
  ** you may not use this file except in compliance with the License.
@@ -1093,7 +1093,7 @@
                     .append($("<li />", { "class": "menu-unsubscribe" }).text(_l("Unsubscribe…"))))
                 .append($("<ul />", { "id": "menu-app-options", "class": "menu" })
                     .append($("<li />", { "class": "menu-open-url", "data-url": "https://raw.github.com/0xe1f/grouch/master/LICENSE" }).text(_l("License")))
-                    .append($("<li />", { "class": "menu-open-url", "data-url": "https://github.com/0xe1f/grouch" }).text(_l("Source code")))
+                    .append($("<li />", { "class": "menu-open-url", "data-url": "https://github.com/0xe1f/grouch" }).text(_l("Source")))
                     .append($("<li />", { "class": "divider" }))
                     .append($("<li />", { "class": "menu-about" }).text(_l("About"))))
 ;

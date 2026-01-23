@@ -12,4 +12,5 @@ docker run --name $NAME -d \
     --network $NETWORK \
     --volume $VOLUME:/opt/couchdb/data \
     --rm \
-    $IMAGE
+    $IMAGE \
+    $@

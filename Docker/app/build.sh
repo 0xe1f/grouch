@@ -54,4 +54,5 @@ docker build \
     --build-arg HTTPS_PORT=$HTTPS_PORT \
     --build-arg GIT_REPO=$GIT_REPO \
     --build-arg GIT_BRANCH=$GIT_BRANCH \
-    -t $IMAGE .
+    -t $IMAGE . \
+    $@

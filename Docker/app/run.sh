@@ -11,4 +11,5 @@ docker run --name $NAME -d \
     --publish 8443:$HTTPS_PORT \
     --network $NETWORK \
     --rm \
-    $IMAGE
+    $IMAGE \
+    $@
