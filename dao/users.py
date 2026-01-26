@@ -60,7 +60,7 @@ class UserDao(Dao):
             user.id = user.new_key()
         if user.id in self.db:
             return False
-        elif self._entity_count(self.__class__.BY_USERNAME, user.email_address) > 0:
+        elif self._entity_count(self.__class__.BY_USERNAME, user.username) > 0:
             return False
         elif self._entity_count(self.__class__.BY_EMAIL, user.email_address) > 0:
             return False
