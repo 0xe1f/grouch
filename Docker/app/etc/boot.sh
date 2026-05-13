@@ -8,7 +8,7 @@ gunicorn \
     -b :${HTTPS_PORT} \
     --access-logfile - \
     --error-logfile - \
-    --worker-class eventlet \
+    --worker-class gevent \
     --certfile $CERT_PATH/cert.pem \
     --keyfile $CERT_PATH/key.pem \
     -w 1 \
@@ -19,6 +19,6 @@ exec gunicorn \
     -b :${HTTP_PORT} \
     --access-logfile - \
     --error-logfile - \
-    --worker-class eventlet \
+    --worker-class gevent \
     -w 1 \
     web.serve:app

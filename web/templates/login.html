@@ -27,7 +27,9 @@
                         {% endif %}
                         <input type="text" name="username" placeholder="username" value="{{ arg.username if arg is defined else "" }}" />
                         <input type="password" name="password" placeholder="password" />
-                        <a href="{{ url_for("create_account_get") }}">Create account</a>
+                        {% if not block_new_accounts | default(false) %}
+                            <a href="{{ url_for("create_account_get") }}">Create account</a>
+                        {% endif %}
                         <input type="submit" value="Sign in" />
                     {% endwith %}
                 </form>

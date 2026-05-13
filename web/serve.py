@@ -15,10 +15,6 @@
 # limitations under the License.
 
 import os
-if os.environ.get('PRODUCTION', False):
-    import eventlet
-    eventlet.monkey_patch()
-
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
 from entity import Article
@@ -52,7 +48,7 @@ app = flask.Flask(__name__)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
 app.config.from_prefixed_env("GROUCH")
 
-socketio = flask_socketio.SocketIO(app)
+socketio = flask_socketio.SocketIO(app, async_mode='gevent')
 executor = Executor(app)
 
 login_manager = flask_login.LoginManager()
@@ -71,6 +67,7 @@ def load_user(user_id):
 def login_get():
     return flask.render_template(
         "login.html",
+        block_new_accounts=app.config.get("BLOCK_NEW_ACCOUNTS", False),
     )
 
 @app.post("/login")
@@ -99,6 +96,7 @@ def login_post():
         return flask.render_template(
             "login.html",
             arg=arg,
+            block_new_accounts=app.config.get("BLOCK_NEW_ACCOUNTS", False),
         )
 
     flask.session.permanent = True
@@ -119,12 +117,21 @@ def logout():
 
 @app.get("/create_account")
 def create_account_get():
+    if app.config.get("BLOCK_NEW_ACCOUNTS", False):
+        app.logger.error(f"Account creation is not available")
+        flask.flash("Account creation is not available")
+        return flask.redirect(flask.url_for("login_get"))
     return flask.render_template(
         "create_account.html",
     )
 
 @app.post("/create_account")
 def create_account_post():
+    if app.config.get("BLOCK_NEW_ACCOUNTS", False):
+        app.logger.error(f"Account creation is not available")
+        flask.flash("Account creation is not available")
+        return flask.redirect(flask.url_for("create_account_get"))
+
     arg = requests.CreateAccountRequest(flask.request.form)
 
     try:

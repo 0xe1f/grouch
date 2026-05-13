@@ -27,7 +27,7 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN pip install -r requirements.txt
-RUN pip install gunicorn eventlet
+RUN pip install gunicorn "gevent==26.4.0"
 RUN chmod a+x $ETC_PATH/boot.sh
 RUN crontab $ETC_PATH/cron.tab
 
