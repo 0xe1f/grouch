@@ -30,6 +30,8 @@ COUCHDB_PASSWORD=$COUCHDB_ADMIN_PASSWORD" \
     --add-volume "name=couchdb-data,type=cloud-storage,bucket=$GCS_BUCKET" \
     --add-volume-mount "volume=couchdb-data,mount-path=/opt/couchdb/data" \
     --vpc-connector "$VPC_CONNECTOR" \
+    --min-instances 1 \
+    --max-instances 1 \
     --ingress internal \
     --allow-unauthenticated \
     "$@"

@@ -2,7 +2,40 @@
 
 set -e
 
-export PROJECT_ID=${PROJECT_ID:?"PROJECT_ID is required"}
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Options:
+  --redeploy-couchdb    Force rebuild and redeploy of the CouchDB service
+  -h, --help            Show this help message
+
+Environment variables:
+  PROJECT_ID            GCP project ID (required)
+  REGION                Deployment region (default: us-central1)
+  AR_REPO               Artifact Registry repository name (default: grouch)
+  GCS_BUCKET            GCS bucket for CouchDB data (default: grouch-couchdb-PROJECT_ID)
+  VPC_CONNECTOR         Serverless VPC connector name (default: grouch-connector)
+EOF
+}
+
+if [ -z "$PROJECT_ID" ]; then
+    echo "Error: PROJECT_ID environment variable is required."
+    echo
+    usage
+    exit 1
+fi
+
+REDEPLOY_COUCHDB=false
+for arg in "$@"; do
+    case $arg in
+        --redeploy-couchdb) REDEPLOY_COUCHDB=true ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "Unknown option: $arg"; usage; exit 1 ;;
+    esac
+done
+
+export PROJECT_ID
 export REGION=${REGION:-"us-central1"}
 export AR_REPO=${AR_REPO:-"grouch"}
 export GCS_BUCKET=${GCS_BUCKET:-"grouch-couchdb-$PROJECT_ID"}
@@ -50,13 +83,6 @@ gcloud compute routers nats create grouch-nat \
     --nat-all-subnet-ip-ranges \
     --region "$REGION" \
     --project "$PROJECT_ID"
-
-REDEPLOY_COUCHDB=false
-for arg in "$@"; do
-    case $arg in
-        --redeploy-couchdb) REDEPLOY_COUCHDB=true ;;
-    esac
-done
 
 # Check if CouchDB has already been deployed (URL known)
 COUCHDB_HOST=""
