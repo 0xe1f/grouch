@@ -41,9 +41,6 @@ else
         ../../Docker/app/etc/config.toml.default > generated/config.toml
 fi
 
-# Copy shared etc files that are unchanged from the Docker layout
-cp ../../Docker/app/etc/cron.tab etc/cron.tab
-
 docker build \
     --build-arg HTTP_PORT=$HTTP_PORT \
     --build-arg GIT_REPO=$GIT_REPO \

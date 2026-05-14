@@ -3,7 +3,6 @@ FROM python:3.12-slim
 RUN apt update -y && \
     apt install -y \
         git \
-        cron \
         tini
 
 ARG HTTP_PORT=8080
@@ -13,7 +12,6 @@ ARG ETC_PATH=/etc/grouch
 
 RUN git clone --branch $GIT_BRANCH $GIT_REPO /opt/grouch
 
-COPY etc/cron.tab $ETC_PATH/cron.tab
 COPY etc/boot.sh $ETC_PATH/boot.sh
 
 WORKDIR /opt/grouch
@@ -25,7 +23,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install -r requirements.txt
 RUN pip install gunicorn "gevent==26.4.0"
 RUN chmod a+x $ETC_PATH/boot.sh
-RUN crontab $ETC_PATH/cron.tab
 
 ENV FLASK_APP=web/serve.py
 ENV PRODUCTION=true

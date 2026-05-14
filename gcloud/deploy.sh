@@ -101,3 +101,39 @@ fi
 echo "==> Building and deploying app..."
 (cd app && ./build.sh)
 (cd app && ./run.sh)
+
+echo "==> Provisioning refresh job and scheduler..."
+IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/app"
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format 'value(projectNumber)')
+SCHEDULER_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+# Enable Cloud Scheduler API
+gcloud services enable cloudscheduler.googleapis.com --project "$PROJECT_ID"
+
+# Grant compute SA permission to invoke Cloud Run jobs
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member "serviceAccount:$SCHEDULER_SA" \
+    --role "roles/run.invoker"
+
+# Create refresh-feeds Cloud Run Job if it doesn't exist
+gcloud run jobs describe refresh-feeds \
+    --region "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1 || \
+gcloud run jobs create refresh-feeds \
+    --image "$IMAGE" \
+    --command "python3" \
+    --args "refresh.py,-f,10" \
+    --vpc-connector "$VPC_CONNECTOR" \
+    --vpc-egress all-traffic \
+    --region "$REGION" \
+    --project "$PROJECT_ID"
+
+# Create Cloud Scheduler job if it doesn't exist
+gcloud scheduler jobs describe refresh-feeds-scheduler \
+    --location "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1 || \
+gcloud scheduler jobs create http refresh-feeds-scheduler \
+    --location "$REGION" \
+    --schedule "*/10 * * * *" \
+    --uri "https://run.googleapis.com/v2/projects/$PROJECT_ID/locations/$REGION/jobs/refresh-feeds:run" \
+    --message-body "{}" \
+    --oauth-service-account-email "$SCHEDULER_SA" \
+    --project "$PROJECT_ID"

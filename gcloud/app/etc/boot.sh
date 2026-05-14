@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Start cron service for periodic refreshes
-service cron start
-
 # Start HTTP server (TLS is terminated by Cloud Run)
 exec gunicorn \
     -b :${PORT:-8080} \
