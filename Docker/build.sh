@@ -7,3 +7,4 @@ export NETWORK
 
 cd couchdb; ./build.sh
 cd ../app; ./build.sh
+cd ../nginx; ./build.sh

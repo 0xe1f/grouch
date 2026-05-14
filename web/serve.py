@@ -48,7 +48,8 @@ app = flask.Flask(__name__)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
 app.config.from_prefixed_env("GROUCH")
 
-socketio = flask_socketio.SocketIO(app, async_mode='gevent')
+socketio = flask_socketio.SocketIO(app, async_mode='gevent',
+    cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'))
 executor = Executor(app)
 
 login_manager = flask_login.LoginManager()

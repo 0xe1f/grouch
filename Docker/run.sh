@@ -10,3 +10,4 @@ docker network inspect $NETWORK >/dev/null 2>&1 || \
 
 cd couchdb; ./run.sh
 cd ../app; ./run.sh
+cd ../nginx; ./run.sh

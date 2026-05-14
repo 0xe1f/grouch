@@ -3,20 +3,9 @@
 # Start cron service for periodic refreshes
 service cron start
 
-# Start HTTPS server in the background
-gunicorn \
-    -b :${HTTPS_PORT} \
-    --access-logfile - \
-    --error-logfile - \
-    --worker-class gevent \
-    --certfile $CERT_PATH/cert.pem \
-    --keyfile $CERT_PATH/key.pem \
-    -w 1 \
-    web.serve:app &
-
-# Start HTTP server in the foreground
+# Start HTTP server (TLS is terminated by nginx)
 exec gunicorn \
-    -b :${HTTP_PORT} \
+    -b :${HTTP_PORT:-8080} \
     --access-logfile - \
     --error-logfile - \
     --worker-class gevent \
