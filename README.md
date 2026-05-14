@@ -3,7 +3,7 @@ Grouch
 
 ![Tests](https://github.com/0xe1f/grouch/actions/workflows/testflow.yml/badge.svg)
 
-**Grouch** is a Feed Reader (Google Reader clone). Its aging UI is based on my earlier work on [Gofr](https://github.com/0xe1f/Gofr/) - a Reader clone I wrote for App Engine in 2013. It's written in Python, with a [CouchDB](https://couchdb.apache.org/) data backend.
+**Grouch** is a Feed Reader (Google Reader clone). Its aging UI is based on my earlier work on [Gofr](https://github.com/0xe1f/Gofr/) - a Reader clone I wrote for App Engine in 2013. It's written in Python, with a [CouchDB](https://couchdb.apache.org/) data backend. Deployment is supported via [Docker](Docker/README.md) for local and self-hosted setups, or [Google Cloud Run](gcloud/README.md) for managed cloud hosting.
 
 Project is currently under active development.
 
@@ -20,39 +20,8 @@ Features
 * Mobile browser support
 * High-density screen support
 
-Development
-------------
-
-To run locally:
-
-* Ensure that Python 3 interpreter is version 3.12
-* Install CouchDB
-
-```
-git clone https://github.com/0xe1f/grouch.git
-cd grouch
-./setup.sh
-. venv/bin/activate
-
-# Create a config.toml file, using config.toml.example as a template
-./serve.py   # Start server on port 8080
-```
-
-To update feeds:
-
-```
-. venv/bin/activate
-./refresh.py -f 30 # Update feeds older than 30 minutes
-```
-
 Deployment
 ----------
 
-Deploy to a host via Docker:
-
-```
-git clone https://github.com/0xe1f/grouch.git
-cd grouch/Docker
-./build.sh
-./run.sh
-```
+* [Docker](Docker/README.md)
+* [Google Cloud Run](gcloud/README.md)
