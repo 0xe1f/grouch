@@ -42,6 +42,7 @@ else
 fi
 
 docker build \
+    --platform linux/amd64 \
     --build-arg HTTP_PORT=$HTTP_PORT \
     --build-arg GIT_REPO=$GIT_REPO \
     --build-arg GIT_BRANCH=$GIT_BRANCH \

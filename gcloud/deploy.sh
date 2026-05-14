@@ -137,3 +137,30 @@ gcloud scheduler jobs create http refresh-feeds-scheduler \
     --message-body "{}" \
     --oauth-service-account-email "$SCHEDULER_SA" \
     --project "$PROJECT_ID"
+
+echo "==> Provisioning compact-db job and scheduler..."
+
+# Create compact-db Cloud Run Job if it doesn't exist
+gcloud run jobs describe compact-db \
+    --region "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1 || \
+gcloud run jobs create compact-db \
+    --image "$IMAGE" \
+    --command "python3" \
+    --args "gcloud/compact/compact.py" \
+    --vpc-connector "$VPC_CONNECTOR" \
+    --vpc-egress all-traffic \
+    --task-timeout 30m \
+    --region "$REGION" \
+    --project "$PROJECT_ID"
+
+# Create compact-db Cloud Scheduler job if it doesn't exist
+gcloud scheduler jobs describe compact-db-scheduler \
+    --location "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1 || \
+gcloud scheduler jobs create http compact-db-scheduler \
+    --location "$REGION" \
+    --schedule "0 3 * * *" \
+    --time-zone "America/Los_Angeles" \
+    --uri "https://run.googleapis.com/v2/projects/$PROJECT_ID/locations/$REGION/jobs/compact-db:run" \
+    --message-body "{}" \
+    --oauth-service-account-email "$SCHEDULER_SA" \
+    --project "$PROJECT_ID"

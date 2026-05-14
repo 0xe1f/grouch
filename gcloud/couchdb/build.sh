@@ -35,6 +35,13 @@ sed \
     -e "s/^;port = .*/port = $COUCHDB_PORT/" \
     ../../Docker/couchdb/etc/local.ini.default > generated/local.ini
 
+# Disable auto-compaction (incompatible with gcsfuse staged writes)
+cat >> generated/local.ini << 'EOF'
+
+[compaction_daemon]
+check_interval = 999999999
+EOF
+
 # Generate creds.sh for init_db.sh (uses localhost since it runs inside the container)
 echo "#!/bin/bash" > generated/creds.sh
 echo "COUCHDB_HOST=\"localhost\"" >> generated/creds.sh
@@ -43,6 +50,7 @@ echo "COUCHDB_ADMIN_USER=\"$COUCHDB_ADMIN_USER\"" >> generated/creds.sh
 echo "COUCHDB_ADMIN_PASSWORD=\"$COUCHDB_ADMIN_PASSWORD\"" >> generated/creds.sh
 
 docker build \
+    --platform linux/amd64 \
     --build-arg COUCHDB_PORT=$COUCHDB_PORT \
     -t $IMAGE \
     . \
