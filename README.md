@@ -3,7 +3,7 @@ Grouch
 
 ![Tests](https://github.com/0xe1f/grouch/actions/workflows/testflow.yml/badge.svg)
 
-**Grouch** is a Feed Reader (Google Reader clone). Its aging UI is based on my earlier work on [Gofr](https://github.com/0xe1f/Gofr/) - a Reader clone I wrote for App Engine in 2013. It's written in Python, with a [CouchDB](https://couchdb.apache.org/) data backend. Deployment is supported via [Docker](Docker/README.md) for local and self-hosted setups, or [Google Cloud Run](gcloud/README.md) for managed cloud hosting.
+**Grouch** is a Feed Reader (Google Reader clone). Its aging UI is based on my earlier work on [Gofr](https://github.com/0xe1f/Gofr/) - a Reader clone I wrote for App Engine in 2013. It's written in Python, with a [CouchDB](https://couchdb.apache.org/) data backend. Deployment is supported via [Docker](Docker/README.md) for local and self-hosted setups, or [Google Compute Engine](gce/README.md) for cloud hosting.
 
 Project is currently under active development.
 
@@ -24,4 +24,4 @@ Deployment
 ----------
 
 * [Docker](Docker/README.md)
-* [Google Cloud Run](gcloud/README.md)
+* [Google Compute Engine](gce/README.md)
