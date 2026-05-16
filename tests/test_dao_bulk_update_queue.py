@@ -101,7 +101,7 @@ class TestDaoBulkUpdateQueue(TestDao):
 
     def test_id_tracking_disabled(self):
         tests = self.new_tests(15)
-        with BulkUpdateQueue(self.connection.db, track_ids=True) as bulk_q:
+        with BulkUpdateQueue(self.connection.db, track_ids=False) as bulk_q:
             bulk_q.enqueue(*tests)
 
-        self.assertEqual(len(bulk_q.pop_written_ids()), len(tests))
+        self.assertEqual(len(bulk_q.pop_written_ids()), 0)

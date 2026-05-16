@@ -55,19 +55,22 @@ class TestDao(unittest.TestCase):
     TEST_DB_NAME = "test__test"
 
     def setUp(self):
-        self._conn = Connection()
+        try:
+            self._conn = Connection()
 
-        with open("config.toml", "rb") as file:
-            config = tomllib.load(file)
+            with open("config.toml", "rb") as file:
+                config = tomllib.load(file)
 
-        self._conn.connect(
-            __class__.TEST_DB_NAME,
-            config["DATABASE_USERNAME"],
-            config["DATABASE_PASSWORD"],
-            config["DATABASE_HOST"],
-            config.get("DATABASE_PORT"),
-        )
-        self._dao = Database(self._conn.db)
+            self._conn.connect(
+                __class__.TEST_DB_NAME,
+                config["DATABASE_USERNAME"],
+                config["DATABASE_PASSWORD"],
+                config["DATABASE_HOST"],
+                config.get("DATABASE_PORT"),
+            )
+            self._dao = Database(self._conn.db)
+        except Exception:
+            self.skipTest("CouchDB not available")
 
     def tearDown(self):
         self._conn.destroy()

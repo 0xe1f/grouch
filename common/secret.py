@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import base64
+import binascii
 import hashlib
 import hmac
 import json
@@ -37,8 +38,11 @@ def deobfuscate_json(obfusc: str) -> object:
         return None
 
     payload_b64, mac_b64 = split[:2]
-    payload_bytes = base64.b64decode(payload_b64)
-    supplied_mac = base64.b64decode(mac_b64)
+    try:
+        payload_bytes = base64.b64decode(payload_b64)
+        supplied_mac = base64.b64decode(mac_b64)
+    except binascii.Error:
+        return None
 
     m = hmac.new(key, digestmod=hashlib.blake2b)
     m.update(payload_bytes)
