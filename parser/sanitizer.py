@@ -35,7 +35,6 @@ _SANITIZER = Cleaner(
         "ul",
         "li",
         "dl",
-        "lh",
         "dt",
         "dd",
         "p",

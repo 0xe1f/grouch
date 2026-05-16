@@ -75,7 +75,11 @@ class UserDao(Dao):
         except ResourceConflict:
             return False
 
-        # Ensure we didn't end up writing multiple addresses
+        # Ensure we didn't end up writing multiple addresses.
+        # TODO: This post-save check is a mitigation for a TOCTOU race: CouchDB has no
+        # unique indexes, so concurrent registrations can slip through the pre-save checks
+        # above. The duplicate is deleted here, but a narrow window remains under high
+        # concurrency. Revisit if CouchDB gains native unique-index support.
         is_email_dupe = self._entity_count(self.__class__.BY_EMAIL, user.email_address) > 1
         is_username_dupe = self._entity_count(self.__class__.BY_USERNAME, user.username) > 1
 

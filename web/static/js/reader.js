@@ -746,7 +746,7 @@
                             .text(_l("Published %1$s", [getPublishedDate(entry.published)])))
                         .append($("<div />", { "class": "gofr-media-container" }))
                         .append($("<div />", { "class": "gofr-article-body" })
-                            .append(entry.content)))
+                            .append(DOMPurify.sanitize(entry.content))))
                     .append($("<div />", { "class": "gofr-entry-footer"})
                         .append($("<span />", { "class": "action-star" })
                             .click(function(_) {

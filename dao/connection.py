@@ -26,10 +26,10 @@ class Connection:
     def __init__(self):
         pass
 
-    def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None):
+    def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None, use_tls: bool=False):
         self._db_name = db_name
         _port = int(port) if port else 5984
-        _scheme = "https" if _port == 443 else "http"
+        _scheme = "https" if use_tls else "http"
         self._server = couchdb.Server(f"{_scheme}://{quote_plus(username)}:{quote_plus(password)}@{host}:{_port}/")
         self.initialize()
 

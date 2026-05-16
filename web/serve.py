@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import ipaddress
 import os
+import socket
+import urllib.parse
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
 from entity import Article
@@ -59,6 +62,25 @@ login_manager.init_app(app)
 FEED_SYNC_TIMEOUT_SECS = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
 REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
+
+def _is_safe_url(url: str) -> bool:
+    """Return True only if the URL uses http/https and resolves to a public IP address."""
+    try:
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return False
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+        for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
+            addr = ipaddress.ip_address(sockaddr[0])
+            if (addr.is_loopback or addr.is_private
+                    or addr.is_link_local or addr.is_multicast
+                    or addr.is_reserved or addr.is_unspecified):
+                return False
+        return True
+    except Exception:
+        return False
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -185,9 +207,15 @@ def articles():
         start = deobfuscate_json(arg.start)
 
     if arg.folder:
+        if (owner_id := Folder.extract_owner_id(arg.folder)) != current_user.id:
+            app.logger.error(f"Unauthorized folder ({owner_id}!={current_user.id})")
+            return ext_objs.Error("Unauthorized").as_dict(), 403
         unread_only = arg.prop == Article.PROP_UNREAD
         articles, next_start = stores.articles.get_page_by_folder(arg.folder, start, unread_only=unread_only)
     elif arg.sub:
+        if (owner_id := Subscription.extract_owner_id(arg.sub)) != current_user.id:
+            app.logger.error(f"Unauthorized sub ({owner_id}!={current_user.id})")
+            return ext_objs.Error("Unauthorized").as_dict(), 403
         unread_only = arg.prop == Article.PROP_UNREAD
         articles, next_start = stores.articles.get_page_by_sub(arg.sub, start, unread_only=unread_only)
     elif arg.prop:
@@ -234,8 +262,9 @@ def subscribe():
     elif not arg.url:
         app.logger.error(f"Missing URL")
         return ext_objs.Error("FIXME!!").as_dict()
-
-    # FIXME: validate url
+    elif not _is_safe_url(arg.url):
+        app.logger.error(f"Rejected unsafe URL: {arg.url}")
+        return ext_objs.Error("Invalid URL").as_dict()
 
     # Kick off a task
     _submit(async_tasks.subs_subscribe_url, arg.url, message=Message("refresh"))
@@ -542,6 +571,12 @@ def _submit(fn, *args, **kwargs):
 def init_app():
     logging.basicConfig(level=logging.DEBUG)
 
+    if not app.config.get('CORS_ALLOWED_ORIGINS'):
+        logging.warning(
+            "CORS_ALLOWED_ORIGINS is not set; defaulting to '*'. "
+            "Set CORS_ALLOWED_ORIGINS in config.toml for production."
+        )
+
     global stores
     conn = Connection()
     conn.connect(
@@ -550,10 +585,12 @@ def init_app():
         app.config["DATABASE_PASSWORD"],
         app.config["DATABASE_HOST"],
         app.config["DATABASE_PORT"],
+        use_tls=app.config.get("DATABASE_USE_TLS", False),
     )
     stores = Database(conn.db)
 
 init_app()
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port='8080', debug=True)
+    socketio.run(app, host='0.0.0.0', port='8080',
+                 debug=os.environ.get('FLASK_DEBUG', '0') == '1')

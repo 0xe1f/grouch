@@ -5,6 +5,8 @@ DATABASE_USERNAME = "admin"
 DATABASE_PASSWORD = "password"
 DATABASE_HOST = "localhost"
 DATABASE_PORT = "5984"
+# Set to true if CouchDB is served over HTTPS (recommended in production)
+# DATABASE_USE_TLS = false
 
 # Security
 

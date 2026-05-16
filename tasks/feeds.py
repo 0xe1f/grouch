@@ -139,8 +139,8 @@ def _fetch_feeds(
                     successful.append(result)
                 else:
                     failed.append(result)
-            except Exception as e:
-                logging.exception(f"Failed to load {url}", e)
+            except Exception:
+                logging.exception(f"Failed to load {url}")
 
     logging.info(f"Fetched {len(feed_urls)} in {"%.2f" % (time.time() - start)}s; {len(successful)} OK, {len(failed)} failed")
 

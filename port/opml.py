@@ -18,6 +18,30 @@ from port.objects import Source
 from opml import OpmlDocument
 from opml.outlinable import Outlinable
 from uuid import uuid4
+import io
+
+def _strip_xml_doctype(data: bytes) -> bytes:
+    """Strip DOCTYPE declarations (including internal subsets) to prevent XXE attacks."""
+    result = bytearray()
+    i = 0
+    while i < len(data):
+        if data[i:i+9].upper() == b'<!DOCTYPE':
+            depth = 0
+            i += 9
+            while i < len(data):
+                ch = data[i:i+1]
+                if ch == b'[':
+                    depth += 1
+                elif ch == b']':
+                    depth -= 1
+                elif ch == b'>' and depth == 0:
+                    i += 1
+                    break
+                i += 1
+        else:
+            result.append(data[i])
+            i += 1
+    return bytes(result)
 
 def write_opml(doc: PortDoc, title: str) -> str:
     opml = OpmlDocument()
@@ -33,7 +57,8 @@ def write_opml(doc: PortDoc, title: str) -> str:
     return opml.dumps(pretty=True)
 
 def read_opml(file) -> PortDoc:
-    if opml := OpmlDocument.load(file):
+    raw = _strip_xml_doctype(file.read())
+    if opml := OpmlDocument.load(io.BytesIO(raw)):
         doc = PortDoc()
         _read_outlinable(opml, doc)
         return doc

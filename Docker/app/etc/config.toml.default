@@ -4,6 +4,8 @@ DATABASE_NAME = "reader"
 #DATABASE_PASSWORD = "XXX"
 #DATABASE_HOST = "XXX"
 #DATABASE_PORT = "XXX"
+# Set to true if CouchDB is served over HTTPS
+#DATABASE_USE_TLS = false
 
 # Security
 #SECRET_KEY = "XXX"
