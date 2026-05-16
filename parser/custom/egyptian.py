@@ -21,17 +21,18 @@ from parser import sanitizer
 from datetime import datetime
 from dateutil.parser import isoparse
 from html import escape
-from json import dumps
 from json import loads
 from urllib.parse import urljoin
 from urllib.request import urlopen
 import re
 
-home_url = "https://www.egyptiantheatre.com/"
-titles_url = f"{home_url}special-engagements"
+# This is a heuristic to avoid trash in the summary and unnecessary writes
+MIN_SYNOPSIS_LEN = 5
+HOME_URL = "https://www.egyptiantheatre.com/"
+TITLES_URL = f"{HOME_URL}special-engagements"
 
-image_url_prefix = "https://cms.ntflxthtrs.com/"
-detail_url_prefix = f"{home_url}film/"
+IMAGE_URL_PREFIX = "https://cms.ntflxthtrs.com/"
+DETAIL_URL_PREFIX = f"{HOME_URL}film/"
 
 def fetch_document(url):
     with urlopen(url) as f:
@@ -73,11 +74,11 @@ def extract_poster(title_blob):
     formats_blob = title_blob["Poster"]["data"]["attributes"]["formats"]
     for format in [ "medium", "small", "thumbnail" ]:
         if format in formats_blob:
-            return urljoin(image_url_prefix, formats_blob[format]["url"])
+            return urljoin(IMAGE_URL_PREFIX, formats_blob[format]["url"])
     return ""
 
 def extract_detail_url(title_blob):
-    return urljoin(detail_url_prefix, title_blob["Slug"])
+    return urljoin(DETAIL_URL_PREFIX, title_blob["Slug"])
 
 def extract_cast(title_blob):
     return re.sub(r'\s+', " ", title_blob["Cast"] or "")
@@ -101,7 +102,8 @@ def generate_html_body(title_blob):
     if cast := extract_cast(title_blob):
         items.append(f"""<p>Cast: {escape(cast)}</p>""")
     if synopsis := extract_text(title_blob, "Synopsis"):
-        items.append(f"""<p>{escape(synopsis)}</p>""")
+        if len(synopsis.strip()) >= MIN_SYNOPSIS_LEN:
+            items.append(f"""<p>{escape(synopsis.strip())}</p>""")
     if url := extract_poster(title_blob):
         items.append(f"""<img src="{url}" />""")
 
@@ -114,7 +116,7 @@ def _create_feed(url, metadata_map, ref_time) -> Feed:
     content.feed_url = url
     content.title = metadata_map["og:title"]
     content.description = metadata_map["og:description"]
-    content.site_url = home_url
+    content.site_url = HOME_URL
     content.published = ref_time.timestamp()
     content.digest = content.computed_digest()
 
@@ -138,19 +140,23 @@ def _create_entry(title_blob) -> Entry:
     content.link = extract_detail_url(title_blob)
     content.text_body = sanitizer.sanitize_html(body)
     content.published = extract_updated(title_blob).timestamp()
-    content.text_summary = sanitizer.extract_text(extract_text(title_blob, "Synopsis"), max_len=consts.MAX_SUMMARY_LEN)
+    synopsis = extract_text(title_blob, "Synopsis")
+    if len(synopsis.strip()) >= MIN_SYNOPSIS_LEN:
+        content.text_summary = sanitizer.extract_text(synopsis, max_len=consts.MAX_SUMMARY_LEN)
+    else:
+        content.text_summary = ""
     content.digest = content.computed_digest()
 
     return content
 
 def matcher(url):
-    return url.startswith(home_url)
+    return url.startswith(HOME_URL)
 
 def parser(url):
     if not matcher(url):
         raise ValueError("URL not matching pattern")
 
-    return parse(url, titles_url, datetime.now())
+    return parse(url, TITLES_URL, datetime.now())
 
 def parse(request_url, feed_url, ref_time):
     document = fetch_document(feed_url)
