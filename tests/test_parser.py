@@ -64,7 +64,7 @@ class TestAtomParsing(unittest.TestCase):
         for ix, entry in enumerate(entries):
             entry_proto = entries_proto[ix]
             for k, v in entry_proto.items():
-                self.assertEqual(v, getattr(entry, k), f"Check failed, entry index #{ix}")
+                self.assertEqual(v, getattr(entry, k), f'Check failed, entry (index:{ix},key:{k})')
 
             self.assertTrue(entry.digest)
             self.assertEqual(entry.digest, entry.computed_digest())

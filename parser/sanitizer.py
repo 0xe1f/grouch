@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lxml.html import clean
+from lxml_html_clean import Cleaner
+from lxml.html import fromstring
 import html
 import re
 
-_SANITIZER = clean.Cleaner(
+_SANITIZER = Cleaner(
     allow_tags=[
         "a",
         "address",
@@ -58,9 +59,6 @@ _SANITIZER = clean.Cleaner(
     ],
     safe_attrs_only=True,
 )
-_CLEANER = clean.Cleaner(
-    allow_tags=[''],
-)
 REGEX_WHITESPACE = r"\s+"
 
 def sanitize_html(content: str) -> str:
@@ -72,26 +70,14 @@ def extract_text(content: str, max_len: int=None) -> str:
     if not content:
         return content
 
-    # Strip out HTML
-    content = _CLEANER.clean_html(content)
-    content = _strip_bookend_tags(content)
+    text = fromstring(content).text_content()
 
-    # Trim to necessary length
-    if max_len and len(content) > max_len:
-        content = content[:max_len]
+    # Unescape HTML entities before truncating to avoid cutting mid-entity
+    text = html.unescape(text)
 
-    # Trim whitespace
-    content = re.sub(REGEX_WHITESPACE, " ", content).strip()
-
-    # Unescape HTML entities and trim.
+    # Trim to necessary length.
     # This might result in shorter text than expected, but that's OK
-    return html.unescape(content).strip()
+    if max_len and len(text) > max_len:
+        text = text[:max_len]
 
-def _strip_bookend_tags(content: str) -> str:
-    # Remove the div tags Cleaner inserts
-    if content.startswith("<div>"):
-        content = content[5:]
-    if content.endswith("</div>"):
-        content = content[:-6]
-
-    return content
+    return re.sub(REGEX_WHITESPACE, " ", text).strip()
