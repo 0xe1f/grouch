@@ -1,14 +1,14 @@
 #!/bin/bash
 
 NETWORK=${NETWORK:-"grouch"}
-NAME="app.$NETWORK"
+NAME="worker.$NETWORK"
 IMAGE="$NETWORK/app"
-HTTP_PORT=${HTTP_PORT:-8080}
 
 (docker rm -f $NAME >/dev/null 2>&1 || true) && \
     (docker run --name $NAME -d \
         --network $NETWORK \
         --rm \
-        -e GROUCH_CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-"*"} \
+        --entrypoint tini \
         $IMAGE \
+        -- /etc/grouch/worker.sh \
         $@)

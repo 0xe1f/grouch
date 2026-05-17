@@ -50,7 +50,7 @@ gcloud compute scp --recurse --compress \
 # ---------------------------------------------------------------------------
 echo "==> Stopping containers"
 _ssh "
-    for name in nginx.$NETWORK app.$NETWORK couchdb.$NETWORK; do
+    for name in nginx.$NETWORK worker.$NETWORK app.$NETWORK couchdb.$NETWORK redis.$NETWORK; do
         docker stop \$name 2>/dev/null && echo \"    Stopped \$name\" || true
     done
 "

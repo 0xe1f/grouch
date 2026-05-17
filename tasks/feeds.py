@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .objects import TaskContext
 from concurrent.futures import as_completed
 from concurrent.futures import ThreadPoolExecutor
 from entity import Feed
 from parser import ParseResult
 from parser import parse_feed
 from dao import BulkUpdateQueue
+from dao import Database
 import datetime
 import logging
 import time
@@ -56,7 +56,7 @@ def import_feed_results(
             bulk_q.enqueue(entry)
 
 def refresh_feeds(
-    tc: TaskContext,
+    dao: Database,
     freshness_seconds: int,
 ):
     now = datetime.datetime.now()
@@ -65,20 +65,20 @@ def refresh_feeds(
     pending_fetch = []
     fetch_batch_max = 40
 
-    with tc.dao.new_q() as bulk_q:
+    with dao.new_q() as bulk_q:
         # TODO: probably good to set some sort of max limit
-        for feed in tc.dao.feeds.iter_updated_before(stale_start=stale_start.timestamp()):
+        for feed in dao.feeds.iter_updated_before(stale_start=stale_start.timestamp()):
             pending_fetch.append(feed)
             if len(pending_fetch) >= fetch_batch_max:
-                _freshen_stale_feed(tc, bulk_q, *pending_fetch)
+                _freshen_stale_feed(dao, bulk_q, *pending_fetch)
                 pending_fetch.clear()
 
         if pending_fetch:
-            _freshen_stale_feed(tc, bulk_q, *pending_fetch)
+            _freshen_stale_feed(dao, bulk_q, *pending_fetch)
             pending_fetch.clear()
 
 def _freshen_stale_feed(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
     *feeds: Feed,
 ):
@@ -100,7 +100,7 @@ def _freshen_stale_feed(
             bulk_q.enqueue(remote_feed)
 
         remote_entry_map = { entry.entry_uid:entry for entry in result.entries }
-        for local_entry in tc.dao.entries.iter_by_uid(local_feed.id, *remote_entry_map.keys()):
+        for local_entry in dao.entries.iter_by_uid(local_feed.id, *remote_entry_map.keys()):
             remote_entry = remote_entry_map[local_entry.entry_uid]
             if remote_entry.digest != local_entry.digest:
                 remote_entry.feed_id = local_feed.id

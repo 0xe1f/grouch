@@ -19,6 +19,7 @@ RUN sed -i \
 
 COPY Docker/app/generated/cron.tab $ETC_PATH/cron.tab
 COPY Docker/app/etc/boot.sh $ETC_PATH/boot.sh
+COPY Docker/app/etc/worker.sh $ETC_PATH/worker.sh
 
 WORKDIR /opt/grouch
 COPY Docker/app/generated/config.toml config.toml
@@ -28,7 +29,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN pip install -r requirements.txt
 RUN pip install gunicorn "gevent==26.4.0"
-RUN chmod a+x $ETC_PATH/boot.sh
+RUN chmod a+x $ETC_PATH/boot.sh $ETC_PATH/worker.sh
 RUN crontab $ETC_PATH/cron.tab
 
 ENV FLASK_APP=web/serve.py

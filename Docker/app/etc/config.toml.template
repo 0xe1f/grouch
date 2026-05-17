@@ -13,8 +13,8 @@ DATABASE_NAME = "reader"
 # Session lifetime in seconds; 31 days by default
 PERMANENT_SESSION_LIFETIME = 2678400
 
-# Dependencies
-EXECUTOR_PROPAGATE_EXCEPTIONS = true
+# Redis — broker and result backend for Celery; message queue for Socket.IO
+#REDIS_URL = "XXX"
 
 # Socket.IO allowed origins; '*' permits all (appropriate for self-hosted)
 #CORS_ALLOWED_ORIGINS = "*"

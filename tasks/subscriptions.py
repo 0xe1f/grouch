@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .celery_app import celery_app
+from .celery_app import get_dao
+from .celery_app import per_user
 from .feeds import import_feeds
 from .feeds import import_feed_results
-from .objects import TaskContext
 from common import first_or_none
+from dao import BulkUpdateQueue
+from dao import Database
 from entity import Article
 from entity import Folder
 from entity import Subscription
@@ -24,13 +28,14 @@ from itertools import batched
 from parser import ParseResult
 from port import PortDoc
 from port import Source
-from dao import BulkUpdateQueue
+from port.objects import Group
 from time import time
 import logging
 import parser
 
+
 def sync_subs(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
     user_id: str,
     feed_ids: set[str]|None=None,
@@ -39,7 +44,7 @@ def sync_subs(
     bulk_q.flush()
 
     # FIXME: migrate to iterview
-    for sub_id, feed_id, folder_id, synced in tc.dao.subs.find_metadata_by_user_by_synced(user_id):
+    for sub_id, feed_id, folder_id, synced in dao.subs.find_metadata_by_user_by_synced(user_id):
         if feed_ids and feed_id not in feed_ids:
             continue
 
@@ -49,14 +54,14 @@ def sync_subs(
         # Fetch entries that have updated
         marked_unread = 0
         updated_article_count = 0
-        for entry_batch in batched(tc.dao.entries.iter_updated_since(feed_id, synced), read_batch_size):
+        for entry_batch in batched(dao.entries.iter_updated_since(feed_id, synced), read_batch_size):
             entry_map = {}
             for entry in entry_batch:
                 entry_map[entry.id] = entry
                 max_synced = max(max_synced, entry.updated or "")
 
             # Batch existing articles
-            for article in tc.dao.articles.iter_by_user_by_entry(user_id, *entry_map.keys()):
+            for article in dao.articles.iter_by_user_by_entry(user_id, *entry_map.keys()):
                 entry = entry_map.pop(article.entry_id)
                 if article.synced == entry.updated:
                     # Nothing's changed
@@ -84,18 +89,19 @@ def sync_subs(
 
         # Update sub, if there were changes
         if updated_article_count:
-            sub = first_or_none(tc.dao.subs.find_by_id(sub_id))
+            sub = first_or_none(dao.subs.find_by_id(sub_id))
             sub.last_synced = max_synced
             bulk_q.enqueue(sub)
 
+
 def subscribe_user_unknown_url(
-    tc: TaskContext,
+    dao: Database,
     user_id: str,
     url: str,
 ):
-    with tc.dao.new_q() as bulk_q:
+    with dao.new_q() as bulk_q:
         # TODO: account for possibility of multiple feeds per URL
-        if not _subscribe_local_feeds(tc, bulk_q, user_id, Source(feed_url=url)):
+        if not _subscribe_local_feeds(dao, bulk_q, user_id, Source(feed_url=url)):
             # Subscribed to available feed
             return
 
@@ -106,24 +112,25 @@ def subscribe_user_unknown_url(
 
         if result.feed:
             # URL successfully parsed as feed
-            _subscribe_user_parsed(tc, bulk_q, user_id, result)
+            _subscribe_user_parsed(dao, bulk_q, user_id, result)
         elif alts := result.alternatives:
             # Not a feed, but alternatives are available. Use first available
             # TODO: allow selection from multiple feeds
-            _subscribe_user(tc, bulk_q, user_id, Source(feed_url=alts[0]))
+            _subscribe_user(dao, bulk_q, user_id, Source(feed_url=alts[0]))
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} objects written")
 
+
 def import_user_subs(
-    tc: TaskContext,
+    dao: Database,
     user_id: str,
     doc: PortDoc,
 ):
-    existing_folders = tc.dao.folders.find_by_user(user_id)
+    existing_folders = dao.folders.find_by_user(user_id)
     folder_name_map = { folder.title:folder.id for folder in existing_folders }
     folder_group_id_map = {}
 
-    with tc.dao.new_q() as bulk_q:
+    with dao.new_q() as bulk_q:
         for group in doc.groups:
             if group.title not in folder_name_map:
                 folder = Folder()
@@ -145,29 +152,31 @@ def import_user_subs(
                 )
             )
 
-        _subscribe_user(tc, bulk_q, user_id, *sources)
+        _subscribe_user(dao, bulk_q, user_id, *sources)
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} objects written; {bulk_q.commit_count} commits")
 
+
 def unsubscribe(
-    tc: TaskContext,
-    *sub_ids: int,
+    dao: Database,
+    *sub_ids: str,
 ):
     start_time = time()
 
-    with tc.dao.new_q() as bulk_q:
-        remove_subscriptions(tc, bulk_q, *sub_ids)
+    with dao.new_q() as bulk_q:
+        remove_subscriptions(dao, bulk_q, *sub_ids)
 
     logging.info(f"Unsub {len(sub_ids)} subs: {bulk_q.written_count}/{bulk_q.enqueued_count} objects written ({time() - start_time:.2}s)")
 
+
 def _subscribe_user(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
     user_id: str,
     *sub_sources: Source,
 ):
     # Subscribe to all available feeds, get list of remaining
-    remaining_sources = _subscribe_local_feeds(tc, bulk_q, user_id, *sub_sources)
+    remaining_sources = _subscribe_local_feeds(dao, bulk_q, user_id, *sub_sources)
 
     # Remainder needs to be fetched
     new_feed_urls = [source.feed_url for source in remaining_sources]
@@ -179,21 +188,23 @@ def _subscribe_user(
 
         # Attempt resubscribing again
         if remaining_sources:
-            _subscribe_local_feeds(tc, bulk_q, user_id, *remaining_sources)
+            _subscribe_local_feeds(dao, bulk_q, user_id, *remaining_sources)
+
 
 def _subscribe_user_parsed(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
     user_id: str,
     *results: ParseResult,
 ):
     successful = [result for result in results if result.feed]
     import_feed_results(bulk_q, *successful)
-    _subscribe_local_feeds(tc, bulk_q, user_id, *[Source(feed_url=result.url) for result in successful])
+    _subscribe_local_feeds(dao, bulk_q, user_id, *[Source(feed_url=result.url) for result in successful])
+
 
 # Returns subs that could not be subscribed to (no matching feed)
 def _subscribe_local_feeds(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
     user_id: str,
     *sources: Source,
@@ -205,7 +216,7 @@ def _subscribe_local_feeds(
     remaining_sources = set(source_dict.values())
     subbed_feed_ids = set()
 
-    if not (existing_feeds_by_url := tc.dao.feeds.map_metadata_by_url(*source_dict.keys())):
+    if not (existing_feeds_by_url := dao.feeds.map_metadata_by_url(*source_dict.keys())):
         return remaining_sources
 
     for url, (feed_id, title) in existing_feeds_by_url.items():
@@ -222,14 +233,15 @@ def _subscribe_local_feeds(
         subbed_feed_ids.add(feed_id)
         remaining_sources.remove(sub_source)
 
-    sync_subs(tc, bulk_q, user_id, subbed_feed_ids)
+    sync_subs(dao, bulk_q, user_id, subbed_feed_ids)
 
     return remaining_sources
 
+
 def remove_subscriptions(
-    tc: TaskContext,
+    dao: Database,
     bulk_q: BulkUpdateQueue,
-    *sub_ids: int,
+    *sub_ids: str,
 ) -> bool:
     pending_count = bulk_q.pending_count
     written_count = bulk_q.written_count
@@ -240,14 +252,14 @@ def remove_subscriptions(
         written_count = bulk_q.written_count
         enqueued_count = bulk_q.enqueued_count
 
-        tc.dao.articles.delete_by_sub(bulk_q, sub_id)
+        dao.articles.delete_by_sub(bulk_q, sub_id)
         bulk_q.flush()
 
         written_count = bulk_q.written_count - written_count - pending_count
         enqueued_count = bulk_q.enqueued_count - enqueued_count
 
         if written_count == enqueued_count:
-            sub = first_or_none(tc.dao.subs.find_by_id(sub_id))
+            sub = first_or_none(dao.subs.find_by_id(sub_id))
             sub.mark_deleted()
             bulk_q.enqueue(sub)
 
@@ -259,3 +271,47 @@ def remove_subscriptions(
     # If all_articles_removed, but enqueued_count != written_count,
     # then at least one subscription failed to write
     return enqueued_count == written_count
+
+
+# ---------------------------------------------------------------------------
+# Celery task entry points
+# ---------------------------------------------------------------------------
+
+@celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
+@per_user
+def subs_sync(self, user_id: str, notify: bool = False):
+    dao = get_dao()
+    with dao.new_q() as bulk_q:
+        sync_subs(dao, bulk_q, user_id)
+
+    logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} records written; {bulk_q.commit_count} commits")
+
+    if notify:
+        from tasks.worker_notify import notify as send_notification
+        send_notification(user_id, "refresh")
+
+
+@celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
+@per_user
+def subs_subscribe_url(self, user_id: str, url: str, notify: bool = False):
+    subscribe_user_unknown_url(get_dao(), user_id, url)
+
+    if notify:
+        from tasks.worker_notify import notify as send_notification
+        send_notification(user_id, "refresh")
+
+
+@celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
+@per_user
+def subs_import(self, user_id: str, doc_dict: dict, notify: bool = False):
+    import_user_subs(get_dao(), user_id, PortDoc.from_dict(doc_dict))
+
+    if notify:
+        from tasks.worker_notify import notify as send_notification
+        send_notification(user_id, "refresh")
+
+
+@celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
+@per_user
+def subs_unsubscribe(self, user_id: str, sub_ids: list[str]):
+    unsubscribe(get_dao(), *sub_ids)

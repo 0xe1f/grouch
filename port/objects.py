@@ -31,6 +31,16 @@ class Group(Base):
     def id(self) -> str:
         return self._id
 
+    def to_dict(self) -> dict:
+        return {
+            'id': self._id,
+            'title': self._title,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> 'Group':
+        return cls(id=d.get('id'), title=d.get('title'))
+
 class Source(Base):
 
     def __init__(self, title: str|None=None, feed_url: str|None=None, parent_id: str|None=None):
@@ -54,6 +64,24 @@ class Source(Base):
     @html_url.setter
     def html_url(self, val: str):
         self._html_url = val
+
+    def to_dict(self) -> dict:
+        return {
+            'title': self._title,
+            'feed_url': self._feed_url,
+            'parent_id': self._parent_id,
+            'html_url': self._html_url,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> 'Source':
+        s = cls(
+            title=d.get('title'),
+            feed_url=d.get('feed_url'),
+            parent_id=d.get('parent_id'),
+        )
+        s._html_url = d.get('html_url')
+        return s
 
 class PortDoc:
 
@@ -86,3 +114,18 @@ class PortDoc:
         # Sources with no parents are acceptable for map
         sources = self._source_map.setdefault(source.parent_id, [])
         sources.append(source)
+
+    def to_dict(self) -> dict:
+        return {
+            'groups': [g.to_dict() for g in self._groups],
+            'sources': [s.to_dict() for s in self._sources],
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> 'PortDoc':
+        doc = cls()
+        for g in d.get('groups', []):
+            doc.append_group(Group.from_dict(g))
+        for s in d.get('sources', []):
+            doc.append_source(Source.from_dict(s))
+        return doc

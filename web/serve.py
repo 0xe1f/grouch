@@ -24,14 +24,17 @@ from entity import Article
 from entity import Folder
 from entity import Subscription
 from datetime import datetime
-from flask_executor import Executor
 from flask_login import current_user
 from io import BytesIO
 from dao import Connection
 from dao import Database
-from tasks.objects import Message
-from tasks.objects import TaskContext
-from tasks.objects import TaskException
+from tasks.actions import ActionError
+from tasks.articles import articles_remove_tag
+from tasks.articles import subs_mark_read_by_folder
+from tasks.articles import subs_mark_read_by_sub
+from tasks.articles import subs_mark_read_by_user
+from tasks.subscriptions import subs_import
+from tasks.subscriptions import subs_subscribe_url
 from web.ext_type import requests
 from web.ext_type import responses
 import flask
@@ -41,8 +44,7 @@ import logging
 import os.path
 import port
 import re
-import tasks.async_tasks as async_tasks
-import tasks.sync_tasks as sync_tasks
+import tasks.actions as actions
 import tempfile
 import tomllib
 import version
@@ -55,8 +57,8 @@ app.config.from_prefixed_env("GROUCH")
 app.jinja_env.globals["app_version"] = version.VERSION_FULL
 
 socketio = flask_socketio.SocketIO(app, async_mode='gevent',
-    cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'))
-executor = Executor(app)
+    cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'),
+    message_queue=app.config['REDIS_URL'])
 
 login_manager = flask_login.LoginManager()
 login_manager.login_view = "/login"
@@ -111,12 +113,13 @@ def login_post():
         )
 
     try:
-        user = sync_tasks.users_authenticate(
-            _create_task_context(),
+        user = actions.users_authenticate(
+            stores,
+            current_user.get_id(),
             arg.username,
             arg.password
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         flask.flash("Username or password incorrect")
         return flask.render_template(
@@ -171,13 +174,14 @@ def create_account_post():
         )
 
     try:
-        user = sync_tasks.users_create_user(
-            _create_task_context(),
+        user = actions.users_create_user(
+            stores,
+            None,
             arg.username,
             arg.email_address,
             arg.password,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         flask.flash("Duplicate username or email address")
         return flask.render_template(
@@ -269,8 +273,7 @@ def subscribe():
         app.logger.error(f"Rejected unsafe URL: {arg.url}")
         return ext_objs.Error("Invalid URL").as_dict()
 
-    # Kick off a task
-    _submit(async_tasks.subs_subscribe_url, arg.url, message=Message("refresh"))
+    subs_subscribe_url.delay(current_user.id, arg.url, notify=True)
 
     return responses.SubscribeResponse().as_dict()
 
@@ -282,13 +285,14 @@ def set_property():
         return ext_objs.Error("FIXME!!").as_dict()
 
     try:
-        article = sync_tasks.articles_set_property(
-            _create_task_context(),
+        article = actions.articles_set_property(
+            stores,
+            current_user.id,
             arg.article_id,
             arg.prop_name,
             arg.is_set,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         return ext_objs.Error("FIXME!!").as_dict()
 
@@ -302,12 +306,13 @@ def rename():
         return ext_objs.Error("FIXME!!").as_dict()
 
     try:
-        sync_tasks.objects_rename(
-            _create_task_context(),
+        actions.objects_rename(
+            stores,
+            current_user.id,
             arg.id,
             arg.title,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         return ext_objs.Error("FIXME!!").as_dict()
 
@@ -323,12 +328,13 @@ def set_tags():
         return ext_objs.Error("FIXME!!").as_dict()
 
     try:
-        article = sync_tasks.articles_set_tags(
-            _create_task_context(),
+        article = actions.articles_set_tags(
+            stores,
+            current_user.id,
             arg.article_id,
             arg.tags,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         return ext_objs.Error("FIXME!!").as_dict()
 
@@ -345,11 +351,12 @@ def create_folder():
         return ext_objs.Error("FIXME!!").as_dict()
 
     try:
-        sync_tasks.folders_create(
-            _create_task_context(),
+        actions.folders_create(
+            stores,
+            current_user.id,
             arg.title,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         return ext_objs.Error("FIXME!!").as_dict()
 
@@ -364,8 +371,9 @@ def move_sub():
         app.logger.error(f"Empty request")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    sync_tasks.subs_move(
-        _create_task_context(),
+    actions.subs_move(
+        stores,
+        current_user.id,
         arg.id,
         arg.destination,
     )
@@ -385,8 +393,7 @@ def remove_tag():
         app.logger.error(f"Missing tag")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    # Remove tags asynchronously
-    _submit(async_tasks.articles_remove_tag, arg.tag)
+    articles_remove_tag.delay(current_user.id, arg.tag)
 
     # Remove it from the list manually
     toc = _fetch_table_of_contents()
@@ -401,8 +408,9 @@ def unsubscribe():
         app.logger.error(f"Empty request")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    sync_tasks.subs_unsubscribe(
-        _create_task_context(),
+    actions.subs_unsubscribe(
+        stores,
+        current_user.id,
         arg.id,
     )
 
@@ -419,8 +427,9 @@ def delete_folder():
         app.logger.error(f"Empty request")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    sync_tasks.folders_delete(
-        _create_task_context(),
+    actions.folders_delete(
+        stores,
+        current_user.id,
         arg.id,
     )
 
@@ -439,7 +448,7 @@ def mark_all_as_read():
 
     match arg.scope:
         case requests.MarkAllAsReadRequest.SCOPE_ALL:
-            _submit(async_tasks.subs_mark_read_by_user)
+            subs_mark_read_by_user.delay(current_user.id)
         case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
             if not arg.id:
                 app.logger.error(f"Missing id")
@@ -448,7 +457,7 @@ def mark_all_as_read():
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
-            _submit(async_tasks.subs_mark_read_by_folder, arg.id)
+            subs_mark_read_by_folder.delay(current_user.id, arg.id)
         case requests.MarkAllAsReadRequest.SCOPE_SUB:
             if not arg.id:
                 app.logger.error(f"Missing id")
@@ -457,7 +466,7 @@ def mark_all_as_read():
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
                 return ext_objs.Error("FIXME!!").as_dict()
 
-            _submit(async_tasks.subs_mark_read_by_sub, arg.id)
+            subs_mark_read_by_sub.delay(current_user.id, arg.id)
 
     toc = _fetch_table_of_contents()
     match arg.scope:
@@ -474,12 +483,13 @@ def mark_all_as_read():
 @flask_login.login_required
 def sync_feeds():
     try:
-        next_sync = sync_tasks.subs_sync(
-            _create_task_context(message=Message("refresh")),
+        next_sync = actions.subs_sync(
+            stores,
+            current_user.id,
             datetime.now(),
             FEED_SYNC_TIMEOUT_SECS,
         )
-    except TaskException as e:
+    except ActionError as e:
         app.logger.error(e.message)
         return ext_objs.Error("FIXME!!").as_dict()
 
@@ -514,7 +524,7 @@ def import_feeds():
         app.logger.error(f"Unable to import document")
         return ext_objs.Error("FIXME!!").as_dict()
 
-    _submit(async_tasks.subs_import, doc, message=Message("refresh"))
+    subs_import.delay(current_user.id, doc.to_dict(), notify=True)
 
     return responses.ImportFeedsResponse().as_dict()
 
@@ -531,17 +541,6 @@ def socketio_connect():
 def socketio_disconnect():
     flask_socketio.leave_room(current_user.id)
     app.logger.debug("Disconnected")
-
-def _create_task_context(
-    message: Message|None=None,
-) -> TaskContext:
-    return TaskContext(
-        stores,
-        current_user.id if current_user.is_authenticated else None,
-        executor.submit,
-        _send_message,
-        message,
-    )
 
 def _fetch_table_of_contents() -> ext_objs.TableOfContents:
     subs = stores.subs.find_by_user(current_user.id)
@@ -560,16 +559,6 @@ def _fetch_table_of_contents() -> ext_objs.TableOfContents:
         folders=[ext_objs.Folder(folder) for folder in folders],
         tags=[ext_objs.Tag(tag) for tag in tags],
     )
-
-def _send_message(message_name: str, payload):
-    if current_user.is_authenticated:
-        socketio.emit(message_name, payload, to=current_user.id)
-    else:
-        app.logger.warning(f"Cannot send {message_name}; user not authenticated")
-
-def _submit(fn, *args, **kwargs):
-    message = kwargs.pop("message", None)
-    executor.submit(fn, _create_task_context(message), *args, **kwargs)
 
 def init_app():
     logging.basicConfig(level=logging.DEBUG)

@@ -14,15 +14,21 @@ BUILD_DATE=$(date -u +%Y-%m-%d)
 mkdir -p generated
 
 if [ -f generated/config.toml ]; then
-    # Update CouchDB settings in existing config.toml
+    # Update CouchDB and Redis settings in existing config.toml
     cp generated/config.toml /tmp/config.toml
     sed \
         -e "s/^DATABASE_HOST .*/DATABASE_HOST = \"$COUCHDB_HOST\"/" \
         -e "s/^DATABASE_PORT .*/DATABASE_PORT = \"$COUCHDB_PORT\"/" \
         -e "s/^DATABASE_USERNAME .*/DATABASE_USERNAME = \"$COUCHDB_ADMIN_USER\"/" \
         -e "s/^DATABASE_PASSWORD .*/DATABASE_PASSWORD = \"$COUCHDB_ADMIN_PASSWORD\"/" \
+        -e "s|^REDIS_URL .*|REDIS_URL = \"redis://redis.$NETWORK:6379/0\"|" \
+        -e "/^EXECUTOR_PROPAGATE_EXCEPTIONS/d" \
         /tmp/config.toml > generated/config.toml
     rm -f /tmp/config.toml
+    # Add REDIS_URL if not present (first upgrade from pre-Redis config)
+    if ! grep -q "^REDIS_URL" generated/config.toml; then
+        echo "REDIS_URL = \"redis://redis.$NETWORK:6379/0\"" >> generated/config.toml
+    fi
 else
     # Create new config.toml from defaults
     SECRET_KEY=`LC_ALL=C tr -dc 'A-Za-z0-9%_+;:,.-' </dev/urandom | head -c 64; echo`
@@ -32,6 +38,7 @@ else
         -e "s/^#DATABASE_PORT .*/DATABASE_PORT = \"$COUCHDB_PORT\"/" \
         -e "s/^#DATABASE_USERNAME .*/DATABASE_USERNAME = \"$COUCHDB_ADMIN_USER\"/" \
         -e "s/^#DATABASE_PASSWORD .*/DATABASE_PASSWORD = \"$COUCHDB_ADMIN_PASSWORD\"/" \
+        -e "s|^#REDIS_URL .*|REDIS_URL = \"redis://redis.$NETWORK:6379/0\"|" \
         etc/config.toml.template > generated/config.toml
 fi
 

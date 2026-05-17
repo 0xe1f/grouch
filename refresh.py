@@ -20,9 +20,8 @@ from os.path import abspath
 from os.path import dirname
 from os.path import exists
 from os.path import join
+from dao import Database
 from tasks.feeds import refresh_feeds
-from tasks.objects import Database
-from tasks.objects import TaskContext
 import logging
 import dao
 import tomllib
@@ -57,17 +56,12 @@ def main():
         config.get("DATABASE_PORT")
     )
 
-    task_context = TaskContext(
-        Database(conn.db),
-        None,
-        None,
-        None,
-    )
+    db = Database(conn.db)
 
     fresh_minutes = args.fresh if args.fresh is not None else config["REFRESH_INTERVAL_MINUTES"]
     print(f"{datetime.now()}: updating feeds older than {fresh_minutes} minutes")
     freshness_seconds = fresh_minutes * 60
-    refresh_feeds(task_context, freshness_seconds)
+    refresh_feeds(db, freshness_seconds)
 
 if __name__ == "__main__":
     main()
