@@ -32,8 +32,13 @@ else
         -e "s/^#DATABASE_PORT .*/DATABASE_PORT = \"$COUCHDB_PORT\"/" \
         -e "s/^#DATABASE_USERNAME .*/DATABASE_USERNAME = \"$COUCHDB_ADMIN_USER\"/" \
         -e "s/^#DATABASE_PASSWORD .*/DATABASE_PASSWORD = \"$COUCHDB_ADMIN_PASSWORD\"/" \
-        etc/config.toml.default > generated/config.toml
+        etc/config.toml.template > generated/config.toml
 fi
+
+REFRESH_INTERVAL_MINUTES=$(grep '^REFRESH_INTERVAL_MINUTES' generated/config.toml | sed 's/.*= *//' | tr -d '"')
+REFRESH_INTERVAL_MINUTES=${REFRESH_INTERVAL_MINUTES:-20}
+sed "s|\${REFRESH_INTERVAL_MINUTES}|$REFRESH_INTERVAL_MINUTES|g" \
+    etc/cron.tab.template > generated/cron.tab
 
 docker build \
     --build-arg HTTP_PORT=$HTTP_PORT \

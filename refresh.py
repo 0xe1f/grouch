@@ -32,8 +32,8 @@ def main():
     arg_parser.add_argument(
         "-f",
         "--fresh",
-        help="freshness duration, in minutes",
-        required=True,
+        help="freshness duration, in minutes (default: REFRESH_INTERVAL_MINUTES from config)",
+        required=False,
         type=int
     )
 
@@ -64,8 +64,9 @@ def main():
         None,
     )
 
-    print(f"{datetime.now()}: updating feeds older than {args.fresh} minutes")
-    freshness_seconds = args.fresh * 60
+    fresh_minutes = args.fresh if args.fresh is not None else config["REFRESH_INTERVAL_MINUTES"]
+    print(f"{datetime.now()}: updating feeds older than {fresh_minutes} minutes")
+    freshness_seconds = fresh_minutes * 60
     refresh_feeds(task_context, freshness_seconds)
 
 if __name__ == "__main__":

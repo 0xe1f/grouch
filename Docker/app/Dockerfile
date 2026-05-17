@@ -17,7 +17,7 @@ RUN sed -i \
     -e "s/^BUILD_DATE = .*/BUILD_DATE = \"$BUILD_DATE\"/" \
     /opt/grouch/version.py
 
-COPY Docker/app/etc/cron.tab $ETC_PATH/cron.tab
+COPY Docker/app/generated/cron.tab $ETC_PATH/cron.tab
 COPY Docker/app/etc/boot.sh $ETC_PATH/boot.sh
 
 WORKDIR /opt/grouch

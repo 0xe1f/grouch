@@ -24,3 +24,6 @@ EXECUTOR_PROPAGATE_EXCEPTIONS = true
 # Options
 
 BLOCK_NEW_ACCOUNTS = true
+
+# Feed refresh interval in minutes; must match the cron schedule in Docker/app/etc/cron.tab.template
+REFRESH_INTERVAL_MINUTES = 20
