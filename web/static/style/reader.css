@@ -1004,6 +1004,12 @@ ul.menu {
     line-height: 1.5;
 }
 
+#about p.version {
+    font-size: 10pt;
+    color: #888;
+    margin-top: 1.5em;
+}
+
 /*** Desktop ****/
 
 .unavailable {

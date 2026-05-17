@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+config.toml
+*.code-workspace
+.DS_Store
+Docker/
+!Docker/app/etc/
+!Docker/app/generated/
+gce/
+docs/

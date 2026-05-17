@@ -15,7 +15,10 @@ VM_NAME=${VM_NAME:-"grouch-server"}
 NETWORK=${NETWORK:-"grouch"}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$SCRIPT_DIR/.."
 DOCKER_DIR="$SCRIPT_DIR/../Docker"
+
+GIT_HASH=$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo "dev")
 
 _ssh() {
     gcloud compute ssh "$VM_NAME" \
@@ -26,6 +29,18 @@ _ssh() {
 
 # ---------------------------------------------------------------------------
 REMOTE_HOME=$(_ssh "echo \$HOME" | tr -d '\r')
+
+echo "==> Syncing source to VM ($REMOTE_HOME/grouch/)"
+tar -czf - \
+    --exclude='./.git' \
+    --exclude='./venv' \
+    --exclude='./__pycache__' \
+    --exclude='./config.toml' \
+    --exclude='*.pyc' \
+    -C "$REPO_ROOT" . | \
+gcloud compute ssh "$VM_NAME" \
+    --zone "$ZONE" --project "$PROJECT_ID" \
+    --command "mkdir -p $REMOTE_HOME/grouch && tar -xzf - -C $REMOTE_HOME/grouch"
 
 echo "==> Syncing Docker/ to VM ($REMOTE_HOME/grouch/Docker/)"
 gcloud compute scp --recurse --compress \
@@ -45,7 +60,7 @@ echo "==> Rebuilding Docker images"
 _ssh "
     set -e
     cd $REMOTE_HOME/grouch/Docker
-    NETWORK=$NETWORK ./build.sh
+    GIT_HASH=$GIT_HASH NETWORK=$NETWORK ./build.sh
 "
 
 # ---------------------------------------------------------------------------

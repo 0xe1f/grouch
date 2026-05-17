@@ -7,8 +7,8 @@ NAME="app.$NETWORK"
 IMAGE="$NETWORK/app"
 
 HTTP_PORT=${HTTP_PORT:-8080}
-GIT_REPO=${GIT_REPO:-"https://github.com/0xe1f/grouch.git"}
-GIT_BRANCH=${GIT_BRANCH:-"master"}
+GIT_HASH=${GIT_HASH:-$(git -C ../.. rev-parse --short HEAD 2>/dev/null || echo "dev")}
+BUILD_DATE=$(date -u +%Y-%m-%d)
 
 . ../couchdb/generated/creds.sh
 mkdir -p generated
@@ -37,7 +37,9 @@ fi
 
 docker build \
     --build-arg HTTP_PORT=$HTTP_PORT \
-    --build-arg GIT_REPO=$GIT_REPO \
-    --build-arg GIT_BRANCH=$GIT_BRANCH \
-    -t $IMAGE . \
+    --build-arg GIT_HASH=$GIT_HASH \
+    --build-arg BUILD_DATE=$BUILD_DATE \
+    -f Dockerfile \
+    -t $IMAGE \
+    ../.. \
     $@

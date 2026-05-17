@@ -45,11 +45,14 @@ import tasks.async_tasks as async_tasks
 import tasks.sync_tasks as sync_tasks
 import tempfile
 import tomllib
+import version
 import web.ext_type.objects as ext_objs
 
 app = flask.Flask(__name__)
 app.config.from_file("../config.toml", load=tomllib.load, text=False)
 app.config.from_prefixed_env("GROUCH")
+
+app.jinja_env.globals["app_version"] = version.VERSION_FULL
 
 socketio = flask_socketio.SocketIO(app, async_mode='gevent',
     cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'))

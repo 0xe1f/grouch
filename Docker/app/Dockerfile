@@ -2,22 +2,26 @@ FROM python:3.12-slim
 
 RUN apt update -y && \
     apt install -y \
-        git \
         cron \
         tini
 
 ARG HTTP_PORT
-ARG GIT_REPO
-ARG GIT_BRANCH
+ARG GIT_HASH=dev
+ARG BUILD_DATE=dev
 ARG ETC_PATH=/etc/grouch
 
-RUN git clone --branch $GIT_BRANCH $GIT_REPO /opt/grouch
+COPY . /opt/grouch
 
-COPY etc/cron.tab $ETC_PATH/cron.tab
-COPY etc/boot.sh $ETC_PATH/boot.sh
+RUN sed -i \
+    -e "s/^HASH       = .*/HASH       = \"$GIT_HASH\"/" \
+    -e "s/^BUILD_DATE = .*/BUILD_DATE = \"$BUILD_DATE\"/" \
+    /opt/grouch/version.py
+
+COPY Docker/app/etc/cron.tab $ETC_PATH/cron.tab
+COPY Docker/app/etc/boot.sh $ETC_PATH/boot.sh
 
 WORKDIR /opt/grouch
-COPY generated/config.toml config.toml
+COPY Docker/app/generated/config.toml config.toml
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
