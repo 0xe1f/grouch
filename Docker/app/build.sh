@@ -37,7 +37,11 @@ fi
 
 REFRESH_INTERVAL_MINUTES=$(grep '^REFRESH_INTERVAL_MINUTES' generated/config.toml | sed 's/.*= *//' | tr -d '"')
 REFRESH_INTERVAL_MINUTES=${REFRESH_INTERVAL_MINUTES:-20}
-sed "s|\${REFRESH_INTERVAL_MINUTES}|$REFRESH_INTERVAL_MINUTES|g" \
+CRON_SCHEDULE=$(awk -v m="$REFRESH_INTERVAL_MINUTES" 'BEGIN {
+    if (m < 60)  { print "*/" m " * * * *" }
+    else         { h = int(m / 60); if (h == 1) print "0 * * * *"; else print "0 */" h " * * * *" }
+}')
+sed "s|\${CRON_SCHEDULE}|$CRON_SCHEDULE|g" \
     etc/cron.tab.template > generated/cron.tab
 
 docker build \

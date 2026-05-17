@@ -40,7 +40,7 @@ tar -czf - \
     -C "$REPO_ROOT" . | \
 gcloud compute ssh "$VM_NAME" \
     --zone "$ZONE" --project "$PROJECT_ID" \
-    --command "mkdir -p $REMOTE_HOME/grouch && tar -xzf - -C $REMOTE_HOME/grouch"
+    --command "mkdir -p $REMOTE_HOME/grouch && tar -xzf - -C $REMOTE_HOME/grouch --warning=no-unknown-keyword"
 
 echo "==> Syncing Docker/ to VM ($REMOTE_HOME/grouch/Docker/)"
 gcloud compute scp --recurse --compress \

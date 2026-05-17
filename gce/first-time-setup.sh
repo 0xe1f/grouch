@@ -23,7 +23,6 @@ DISK_DEVICE="couchdb-data"
 STATIC_IP_NAME=${STATIC_IP_NAME:-"grouch-ip"}
 NETWORK_TAG="grouch-server"
 NETWORK=${NETWORK:-"grouch"}
-REFRESH_INTERVAL_MINUTES=${REFRESH_INTERVAL_MINUTES:-20}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR/.."
@@ -193,16 +192,6 @@ _ssh "
     set -e
     cd $REMOTE_HOME/grouch/Docker
     NETWORK=$NETWORK ./run.sh
-"
-
-# ---------------------------------------------------------------------------
-# refresh-feeds runs as a Docker one-shot using the app image. The interval
-# matches REFRESH_INTERVAL_MINUTES in config.toml (baked into the image).
-echo "==> Setting up cron: refresh-feeds (every $REFRESH_INTERVAL_MINUTES minutes)"
-_ssh "
-    CRON_CMD=\"*/$REFRESH_INTERVAL_MINUTES * * * * docker run --rm --network $NETWORK $NETWORK/app python3 refresh.py >> /var/log/grouch-refresh.log 2>&1\"
-    ( crontab -l 2>/dev/null | grep -v 'refresh.py'; echo \"\$CRON_CMD\" ) | crontab -
-    echo '    Cron job set'
 "
 
 # ---------------------------------------------------------------------------

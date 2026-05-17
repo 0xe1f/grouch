@@ -1,1 +1,1 @@
-*/${REFRESH_INTERVAL_MINUTES} * * * * ( PATH="/opt/venv/bin:$PATH" && /opt/grouch/refresh.py ) >> /proc/1/fd/1 2>&1
+${CRON_SCHEDULE} ( PATH="/opt/venv/bin:$PATH" && /opt/grouch/refresh.py ) >> /proc/1/fd/1 2>&1
