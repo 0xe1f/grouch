@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import http
 import ipaddress
 import os
 import socket
@@ -67,6 +68,19 @@ login_manager.init_app(app)
 FEED_SYNC_TIMEOUT_SECS = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
 REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
+
+def _action_error_response(e: ActionError):
+    app.logger.error(e.message)
+    match e.code:
+        case ActionError.UNAUTHORIZED:
+            return ext_objs.Error("Unauthorized", http.HTTPStatus.FORBIDDEN).as_dict()
+        case ActionError.NOT_FOUND:
+            return ext_objs.Error("Not found", http.HTTPStatus.NOT_FOUND).as_dict()
+        case ActionError.SERVER_ERROR:
+            return ext_objs.Error("An error occurred", http.HTTPStatus.INTERNAL_SERVER_ERROR).as_dict()
+        case _:
+            return ext_objs.Error(e.message, http.HTTPStatus.BAD_REQUEST).as_dict()
+
 
 def _is_safe_url(url: str) -> bool:
     """Return True only if the URL uses http/https and resolves to a public IP address."""
@@ -265,10 +279,10 @@ def export_opml():
 def subscribe():
     if not (arg := requests.SubscribeRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
     elif not arg.url:
         app.logger.error(f"Missing URL")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Missing URL").as_dict()
     elif not _is_safe_url(arg.url):
         app.logger.error(f"Rejected unsafe URL: {arg.url}")
         return ext_objs.Error("Invalid URL").as_dict()
@@ -282,7 +296,7 @@ def subscribe():
 def set_property():
     if not (arg := requests.SetPropertyRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     try:
         article = actions.articles_set_property(
@@ -293,8 +307,7 @@ def set_property():
             arg.is_set,
         )
     except ActionError as e:
-        app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        return _action_error_response(e)
 
     return article.props
 
@@ -303,7 +316,7 @@ def set_property():
 def rename():
     if not (arg := requests.RenameRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     try:
         actions.objects_rename(
@@ -313,8 +326,7 @@ def rename():
             arg.title,
         )
     except ActionError as e:
-        app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        return _action_error_response(e)
 
     return responses.RenameResponse(
         toc=_fetch_table_of_contents(),
@@ -325,7 +337,7 @@ def rename():
 def set_tags():
     if not (arg := requests.SetTagsRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     try:
         article = actions.articles_set_tags(
@@ -335,8 +347,7 @@ def set_tags():
             arg.tags,
         )
     except ActionError as e:
-        app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        return _action_error_response(e)
 
     return responses.SetTagsResponse(
         toc=_fetch_table_of_contents(),
@@ -348,7 +359,7 @@ def set_tags():
 def create_folder():
     if not (arg := requests.CreateFolderRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     try:
         actions.folders_create(
@@ -357,8 +368,7 @@ def create_folder():
             arg.title,
         )
     except ActionError as e:
-        app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        return _action_error_response(e)
 
     return responses.CreateFolderResponse(
         toc=_fetch_table_of_contents(),
@@ -369,14 +379,17 @@ def create_folder():
 def move_sub():
     if not (arg := requests.MoveSubRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
-    actions.subs_move(
-        stores,
-        current_user.id,
-        arg.id,
-        arg.destination,
-    )
+    try:
+        actions.subs_move(
+            stores,
+            current_user.id,
+            arg.id,
+            arg.destination,
+        )
+    except ActionError as e:
+        return _action_error_response(e)
 
     return responses.MoveSubResponse(
         toc=_fetch_table_of_contents(),
@@ -388,10 +401,10 @@ def remove_tag():
     arg = requests.RemoveTagRequest(flask.request.json)
     if not arg:
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
     elif not arg.tag:
         app.logger.error(f"Missing tag")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Missing tag").as_dict()
 
     articles_remove_tag.delay(current_user.id, arg.tag)
 
@@ -406,13 +419,16 @@ def remove_tag():
 def unsubscribe():
     if not (arg := requests.UnsubscribeRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
-    actions.subs_unsubscribe(
-        stores,
-        current_user.id,
-        arg.id,
-    )
+    try:
+        actions.subs_unsubscribe(
+            stores,
+            current_user.id,
+            arg.id,
+        )
+    except ActionError as e:
+        return _action_error_response(e)
 
     # Actual deletion will happen asynchronously
     toc = _fetch_table_of_contents()
@@ -425,13 +441,16 @@ def unsubscribe():
 def delete_folder():
     if not (arg := requests.DeleteFolderRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
-    actions.folders_delete(
-        stores,
-        current_user.id,
-        arg.id,
-    )
+    try:
+        actions.folders_delete(
+            stores,
+            current_user.id,
+            arg.id,
+        )
+    except ActionError as e:
+        return _action_error_response(e)
 
     # Actual deletion will happen asynchronously
     toc = _fetch_table_of_contents()
@@ -444,7 +463,7 @@ def delete_folder():
 def mark_all_as_read():
     if not (arg := requests.MarkAllAsReadRequest(flask.request.json)):
         app.logger.error(f"Empty request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     match arg.scope:
         case requests.MarkAllAsReadRequest.SCOPE_ALL:
@@ -452,19 +471,19 @@ def mark_all_as_read():
         case requests.MarkAllAsReadRequest.SCOPE_FOLDER:
             if not arg.id:
                 app.logger.error(f"Missing id")
-                return ext_objs.Error("FIXME!!").as_dict()
+                return ext_objs.Error("Missing id").as_dict()
             elif (owner_id := Folder.extract_owner_id(arg.id)) != current_user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
-                return ext_objs.Error("FIXME!!").as_dict()
+                return ext_objs.Error("Unauthorized", http.HTTPStatus.FORBIDDEN).as_dict()
 
             subs_mark_read_by_folder.delay(current_user.id, arg.id)
         case requests.MarkAllAsReadRequest.SCOPE_SUB:
             if not arg.id:
                 app.logger.error(f"Missing id")
-                return ext_objs.Error("FIXME!!").as_dict()
+                return ext_objs.Error("Missing id").as_dict()
             elif (owner_id := Subscription.extract_owner_id(arg.id)) != current_user.id:
                 app.logger.error(f"Unauthorized object ({owner_id}!={current_user.id})")
-                return ext_objs.Error("FIXME!!").as_dict()
+                return ext_objs.Error("Unauthorized", http.HTTPStatus.FORBIDDEN).as_dict()
 
             subs_mark_read_by_sub.delay(current_user.id, arg.id)
 
@@ -490,8 +509,7 @@ def sync_feeds():
             FEED_SYNC_TIMEOUT_SECS,
         )
     except ActionError as e:
-        app.logger.error(e.message)
-        return ext_objs.Error("FIXME!!").as_dict()
+        return _action_error_response(e)
 
     return responses.SyncFeedsResponse(
         next_sync=next_sync.isoformat(),
@@ -503,16 +521,16 @@ def import_feeds():
     # Check individual files
     if "file" not in flask.request.files:
         app.logger.error(f"No file in request")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("No file provided").as_dict()
 
     if not (file := flask.request.files["file"]) or file.filename == "":
         app.logger.error(f"No filename in file")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Invalid request").as_dict()
 
     _, ext = os.path.splitext(file.filename)
     if ext not in UPLOAD_ALLOWED_TYPES:
         app.logger.error(f"Unsupported file type: '{ext}'")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("Unsupported file type").as_dict()
 
     with tempfile.TemporaryFile() as tmp:
         file.save(tmp)
@@ -522,7 +540,7 @@ def import_feeds():
 
     if not doc:
         app.logger.error(f"Unable to import document")
-        return ext_objs.Error("FIXME!!").as_dict()
+        return ext_objs.Error("An error occurred", http.HTTPStatus.INTERNAL_SERVER_ERROR).as_dict()
 
     subs_import.delay(current_user.id, doc.to_dict(), notify=True)
 

@@ -13,3 +13,5 @@
 # limitations under the License.
 
 MAX_SUMMARY_LEN = 400
+MAX_TITLE_LEN = 128
+MAX_FEED_DESCRIPTION_LEN = 1024

@@ -97,16 +97,17 @@ class Article(JsonObject):
 
 class Error(JsonObject):
 
-    def __init__(self, message: str):
+    def __init__(self, message: str, status: http.HTTPStatus = http.HTTPStatus.BAD_REQUEST):
         super().__init__({})
         self.set_prop("message", message)
+        self._status = status
 
     @property
     def message(self) -> str:
         return self.get_prop("message")
 
     def as_dict(self):
-        return super().as_dict(), http.HTTPStatus.BAD_REQUEST
+        return super().as_dict(), self._status
 
 class Folder(JsonObject):
 

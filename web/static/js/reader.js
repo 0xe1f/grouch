@@ -188,6 +188,11 @@
                 success: function(response) {
                     continueFrom = response.continue;
                     subscription.addPage(response.articles, response.continue);
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -424,6 +429,11 @@
                 dataType: "json",
                 success: function(response) {
                     resetSubscriptionDom(response.subscriptions, false);
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -441,6 +451,11 @@
                     success: function(response) {
                         resetSubscriptionDom(response.subscriptions, false);
                         ui.pruneDeadEntries();
+                    },
+                    error: function(jqXHR) {
+                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                            ? jqXHR.responseJSON.message : "An error occurred";
+                        ui.showToast(msg, true);
                     }
                 });
             }
@@ -477,6 +492,11 @@
                             entry.syncView();
                         }
                     });
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -493,6 +513,11 @@
                 dataType: "json",
                 success: function(response) {
                     resetSubscriptionDom(response.subscriptions, false);
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -527,6 +552,11 @@
                 success: function(response) {
                     // Meh
                     // resetSubscriptionDom(response.subscriptions, false);
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -555,6 +585,11 @@
                 success: function(response) {
                     resetSubscriptionDom(response.subscriptions, false);
                     ui.pruneDeadEntries();
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -574,17 +609,29 @@
             return false;
         },
         "remove": function() {
+            const tagTitle = this.title;
             $.ajax({
                 url: "removeTag",
                 type: "POST",
                 data: JSON.stringify({
-                    "tag": this.title,
+                    "tag": tagTitle,
                 }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    // FIXME: remove all matching tags from existing entries
                     resetSubscriptionDom(response.subscriptions, false);
+                    $("#gofr-entries .gofr-entry").each(function() {
+                        var entry = $(this).data("entry");
+                        if (entry && entry.tags) {
+                            entry.tags = entry.tags.filter(t => t !== tagTitle);
+                            entry.syncView();
+                        }
+                    });
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -655,6 +702,11 @@
                     }
 
                     entry.syncView();
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             });
         },
@@ -1052,11 +1104,17 @@
                     cache: false,
                     contentType: false,
                     processData: false,
+                    dataType: "json",
                     data: new FormData($form[0]),
                     success: function(){
                         // resetSubscriptionDom(response.subscriptions, false);
                         $modal.showModal(false);
                         // ui.showToast(response.message, false);
+                    },
+                    error: function(jqXHR) {
+                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                            ? jqXHR.responseJSON.message : "An error occurred";
+                        ui.showToast(msg, true);
                     }
                 });
             });
@@ -1499,6 +1557,11 @@
                     dataType: "json",
                     success: function(response) {
                         resetSubscriptionDom(response.subscriptions, false);
+                    },
+                    error: function(jqXHR) {
+                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                            ? jqXHR.responseJSON.message : "An error occurred";
+                        ui.showToast(msg, true);
                     }
                 });
             }
@@ -1653,6 +1716,11 @@
                         resetSubscriptionDom(response.subscriptions, false);
                         entry.tags = response.tags;
                         entry.syncView();
+                    },
+                    error: function(jqXHR) {
+                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                            ? jqXHR.responseJSON.message : "An error occurred";
+                        ui.showToast(msg, true);
                     }
                 });
             }
@@ -2073,6 +2141,11 @@
             dataType: "json",
             success: function(response) {
                 resetSubscriptionDom(response, reloadItems);
+            },
+            error: function(jqXHR) {
+                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                    ? jqXHR.responseJSON.message : "An error occurred";
+                ui.showToast(msg, true);
             }
         });
     };
@@ -2106,6 +2179,11 @@
                     if (console && console.debug) {
                         console.debug(`Next sync: ${response.nextSync}`);
                     }
+                },
+                error: function(jqXHR) {
+                    var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message)
+                        ? jqXHR.responseJSON.message : "An error occurred";
+                    ui.showToast(msg, true);
                 }
             })
             .always(function() {

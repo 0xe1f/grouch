@@ -25,17 +25,39 @@ from tasks.subscriptions import subs_sync as _subs_sync_task
 from tasks.subscriptions import subs_unsubscribe as _subs_unsubscribe_task
 import bcrypt
 import datetime
+import enum
+from parser.consts import MAX_TITLE_LEN
+
+
+MAX_TAG_LEN = 32
+MAX_TAG_COUNT = 8
 
 
 class ActionError(Exception):
 
-    def __init__(self, message: str, *args: object) -> None:
+    class Code(enum.Enum):
+        BAD_REQUEST = "bad_request"
+        UNAUTHORIZED = "unauthorized"
+        NOT_FOUND = "not_found"
+        SERVER_ERROR = "server_error"
+
+    BAD_REQUEST = Code.BAD_REQUEST
+    UNAUTHORIZED = Code.UNAUTHORIZED
+    NOT_FOUND = Code.NOT_FOUND
+    SERVER_ERROR = Code.SERVER_ERROR
+
+    def __init__(self, message: str, code: Code = Code.BAD_REQUEST, *args: object) -> None:
         super().__init__(message, *args)
         self._message = message
+        self._code = code
 
     @property
     def message(self) -> str | None:
         return self._message
+
+    @property
+    def code(self) -> Code:
+        return self._code
 
 
 # ---------------------------------------------------------------------------
@@ -50,33 +72,34 @@ def objects_rename(
 ):
     if not object_id:
         raise ActionError(f"Missing object id")
-    elif not title:
+    title = (title or "").strip()
+    if not title:
         raise ActionError(f"Missing title")
-
-    # FIXME!! validate title
+    if len(title) > MAX_TITLE_LEN:
+        raise ActionError(f"Title exceeds maximum length ({MAX_TITLE_LEN} characters)")
 
     doc_type = Entity.extract_doc_type(object_id)
     with dao.new_q() as bulk_q:
         if doc_type == Subscription.DOC_TYPE:
             owner_id = Subscription.extract_owner_id(object_id)
             if owner_id != user_id:
-                raise ActionError(f"Unauthorized sub ({owner_id}!={user_id})")
+                raise ActionError(f"Unauthorized sub ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
             obj = first_or_none(dao.subs.find_by_id(object_id))
             if not obj:
-                raise ActionError(f"No subscription with id {object_id}")
+                raise ActionError(f"No subscription with id {object_id}", ActionError.NOT_FOUND)
             obj.title = title
             bulk_q.enqueue(obj)
         elif doc_type == Folder.DOC_TYPE:
             owner_id = Folder.extract_owner_id(object_id)
             if owner_id != user_id:
-                raise ActionError(f"Unauthorized folder ({owner_id}!={user_id})")
+                raise ActionError(f"Unauthorized folder ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
             obj = first_or_none(dao.folders.find_by_id(object_id))
             if not obj:
-                raise ActionError(f"No folder with id {object_id}")
+                raise ActionError(f"No folder with id {object_id}", ActionError.NOT_FOUND)
             obj.title = title
             bulk_q.enqueue(obj)
         else:
-            raise ActionError(f"Unrecognized doc_type: {doc_type}")
+            raise ActionError(f"Unrecognized doc_type: {doc_type}", ActionError.SERVER_ERROR)
 
 
 # ---------------------------------------------------------------------------
@@ -95,11 +118,11 @@ def articles_set_property(
 
     owner_id = Article.extract_owner_id(article_id)
     if owner_id != user_id:
-        raise ActionError(f"Unauthorized article ({owner_id}!={user_id})")
+        raise ActionError(f"Unauthorized article ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
     article = first_or_none(dao.articles.find_by_id(article_id))
     if not article:
-        raise ActionError(f"No article with id {article_id}")
+        raise ActionError(f"No article with id {article_id}", ActionError.NOT_FOUND)
 
     if is_set != (prop_name in article.props):
         with dao.new_q() as bulk_q:
@@ -118,22 +141,23 @@ def articles_set_tags(
     if not article_id:
         raise ActionError(f"Missing article id")
 
-    # FIXME!! check each for length
-
     new_tags = []
     if tags:
         # Extract unique tags, after trimming each for spaces
         new_tags = list(set([tag.strip() for tag in tags]))
-        if len(new_tags) > 5:
-            raise ActionError(f"Too many tags ({len(new_tags)})")
+        if len(new_tags) > MAX_TAG_COUNT:
+            raise ActionError(f"Too many tags (max {MAX_TAG_COUNT})")
+        for tag in new_tags:
+            if len(tag) > MAX_TAG_LEN:
+                raise ActionError(f"Tag exceeds maximum length ({MAX_TAG_LEN} characters)")
 
     owner_id = Article.extract_owner_id(article_id)
     if owner_id != user_id:
-        raise ActionError(f"Unauthorized article ({owner_id}!={user_id})")
+        raise ActionError(f"Unauthorized article ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
     article = first_or_none(dao.articles.find_by_id(article_id))
     if not article:
-        raise ActionError(f"Article not found ({article_id})")
+        raise ActionError(f"Article not found ({article_id})", ActionError.NOT_FOUND)
 
     with dao.new_q() as bulk_q:
         article.tags = new_tags
@@ -153,8 +177,11 @@ def folders_create(
 ):
     if not title:
         raise ActionError(f"Missing title")
-
-    # FIXME: validate for length
+    title = title.strip()
+    if not title:
+        raise ActionError(f"Missing title")
+    if len(title) > MAX_TITLE_LEN:
+        raise ActionError(f"Title exceeds maximum length ({MAX_TITLE_LEN} characters)")
 
     with dao.new_q() as bulk_q:
         folder = Folder()
@@ -172,7 +199,7 @@ def folders_delete(
         raise ActionError(f"Missing id")
 
     if (owner_id := Folder.extract_owner_id(folder_id)) != user_id:
-        raise ActionError(f"Unauthorized object ({owner_id}!={user_id})")
+        raise ActionError(f"Unauthorized object ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
     _folders_delete_task.delay(user_id, folder_id)
 
@@ -190,16 +217,16 @@ def subs_move(
     if not sub_id:
         raise ActionError(f"Missing id")
     elif (sub_owner_id := Subscription.extract_owner_id(sub_id)) != user_id:
-        raise ActionError(f"Unauthorized source ({sub_owner_id}!={user_id})")
+        raise ActionError(f"Unauthorized source ({sub_owner_id}!={user_id})", ActionError.UNAUTHORIZED)
     elif not (sub := first_or_none(dao.subs.find_by_id(sub_id))):
-        raise ActionError(f"Sub ({sub_id}) does not exist")
+        raise ActionError(f"Sub ({sub_id}) does not exist", ActionError.NOT_FOUND)
 
     if dest_id:
         if (dest_owner_id := Folder.extract_owner_id(dest_id)) != user_id:
-            raise ActionError(f"Unauthorized destination ({dest_owner_id}!={user_id})")
+            raise ActionError(f"Unauthorized destination ({dest_owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
         if not first_or_none(dao.folders.find_by_id(dest_id)):
-            raise ActionError(f"Destination ({dest_id}) does not exist")
+            raise ActionError(f"Destination ({dest_id}) does not exist", ActionError.NOT_FOUND)
 
     # Move the subscription
     with dao.new_q() as bulk_q:
@@ -220,7 +247,7 @@ def subs_unsubscribe(
         raise ActionError(f"Missing id")
 
     if (owner_id := Subscription.extract_owner_id(sub_id)) != user_id:
-        raise ActionError(f"Unauthorized sub_id ({owner_id}!={user_id})")
+        raise ActionError(f"Unauthorized sub_id ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
     _subs_unsubscribe_task.delay(user_id, [sub_id])
 
@@ -232,7 +259,7 @@ def subs_sync(
     timeout_secs: int,
 ) -> datetime.datetime:
     if not (user := dao.users.find_by_id(user_id)):
-        raise ActionError("User not found")
+        raise ActionError("User not found", ActionError.SERVER_ERROR)
 
     if last_sync := user.last_sync:
         last_sync_dt = datetime.datetime.fromtimestamp(last_sync)
@@ -263,9 +290,9 @@ def users_authenticate(
     password: str,
 ) -> User:
     if not (user := dao.users.find_by_username(username)):
-        raise ActionError("User not found")
+        raise ActionError("User not found", ActionError.UNAUTHORIZED)
     elif not user.plaintext_matching_stored(password):
-        raise ActionError("Password mismatch")
+        raise ActionError("Password mismatch", ActionError.UNAUTHORIZED)
 
     return user
 

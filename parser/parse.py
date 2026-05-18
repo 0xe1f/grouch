@@ -103,11 +103,14 @@ def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
 def _create_feed(url: str, feed: feedparser.FeedParserDict) -> Feed:
     content = Feed()
     content.feed_url = url
-    content.title = feed.title
+    content.title = (feed.title or "")[:consts.MAX_TITLE_LEN]
+    description = None
     if "subtitle" in feed:
-        content.description = feed.subtitle
+        description = feed.subtitle
     elif "description" in feed:
-        content.description = feed.description
+        description = feed.description
+    if description:
+        content.description = description[:consts.MAX_FEED_DESCRIPTION_LEN]
     # TODO content.favicon_url = None
     content.site_url = feed.link
     if "updated" in feed:

@@ -25,7 +25,9 @@ jobs:
         python -m pip install --upgrade pip
     - name: Set up
       run: |
-        ./setup.sh
+        python -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
         echo -e "# Database
           DATABASE_USERNAME = \"admin\"
           DATABASE_PASSWORD = \"password\"
