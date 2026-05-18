@@ -1,0 +1,15 @@
+# Session lifetime in seconds; 31 days by default
+PERMANENT_SESSION_LIFETIME = 2678400
+
+# Feed refresh interval in minutes
+REFRESH_INTERVAL_MINUTES = 20
+
+# Block new user account registrations
+BLOCK_NEW_ACCOUNTS = true
+
+# Socket.IO allowed origins; '*' permits all (appropriate for self-hosted)
+# CORS_ALLOWED_ORIGINS = "*"
+
+# Uncomment to persist sessions across rebuilds.
+# If omitted, a new key is generated on each build (all users are logged out).
+# SECRET_KEY = "<generate a strong random string>"

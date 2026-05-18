@@ -79,8 +79,7 @@ def init_worker(**kwargs):
         _config['DATABASE_NAME'],
         _config['DATABASE_USERNAME'],
         _config['DATABASE_PASSWORD'],
-        _config['DATABASE_HOST'],
+        _config['DATABASE_HOSTNAME'],
         _config.get('DATABASE_PORT'),
-        use_tls=_config.get('DATABASE_USE_TLS', False),
     )
     _dao = dao.Database(conn.db)

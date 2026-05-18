@@ -581,10 +581,10 @@ def _fetch_table_of_contents() -> ext_objs.TableOfContents:
 def init_app():
     logging.basicConfig(level=logging.DEBUG)
 
-    if not app.config.get('CORS_ALLOWED_ORIGINS'):
+    if app.config.get('CORS_ALLOWED_ORIGINS') == '*':
         logging.warning(
-            "CORS_ALLOWED_ORIGINS is not set; defaulting to '*'. "
-            "Set CORS_ALLOWED_ORIGINS in config.toml for production."
+            "CORS_ALLOWED_ORIGINS is set to '*' (all origins allowed). "
+            "Set CORS_ALLOWED_ORIGINS in settings.toml to restrict access in production."
         )
 
     global stores
@@ -593,9 +593,8 @@ def init_app():
         app.config["DATABASE_NAME"],
         app.config["DATABASE_USERNAME"],
         app.config["DATABASE_PASSWORD"],
-        app.config["DATABASE_HOST"],
+        app.config["DATABASE_HOSTNAME"],
         app.config["DATABASE_PORT"],
-        use_tls=app.config.get("DATABASE_USE_TLS", False),
     )
     stores = Database(conn.db)
 

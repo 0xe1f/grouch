@@ -1,37 +1,21 @@
 #!/bin/bash
 
+set -e
+
 NETWORK=${NETWORK:-"grouch"}
-NAME="couchdb.$NETWORK"
 IMAGE="$NETWORK/couchdb"
 
+# Parse credentials and port from local.ini — single source of truth
+ADMIN_LINE=$(grep -A50 '^\[admins\]' etc/local.ini | grep -m1 '^[^;[ ]')
+COUCHDB_ADMIN_USER=$(echo "$ADMIN_LINE" | cut -d= -f1 | tr -d ' ')
+COUCHDB_ADMIN_PASSWORD=$(echo "$ADMIN_LINE" | cut -d= -f2- | tr -d ' ')
+
+COUCHDB_PORT=$(grep -A20 '^\[chttpd\]' etc/local.ini | grep -m1 '^port' | cut -d= -f2 | tr -d ' ')
 COUCHDB_PORT=${COUCHDB_PORT:-5984}
 
-mkdir -p generated
-
-if [ ! -f generated/creds.sh ]; then
-    # Generate random admin username and password
-    COUCHDB_ADMIN_USER=`LC_ALL=C tr -dc 'A-Za-z' </dev/urandom | head -c 8; echo`
-    COUCHDB_ADMIN_PASSWORD=`LC_ALL=C tr -dc 'A-Za-z0-9%_+;:.-' </dev/urandom | head -c 16; echo`
-
-    # Create creds.sh script to set credentials
-    echo "#!/bin/bash" > generated/creds.sh
-
-    echo "COUCHDB_HOST=\"$NAME\"" >> generated/creds.sh
-    echo "COUCHDB_PORT=\"$COUCHDB_PORT\"" >> generated/creds.sh
-    echo "COUCHDB_ADMIN_USER=\"$COUCHDB_ADMIN_USER\"" >> generated/creds.sh
-    echo "COUCHDB_ADMIN_PASSWORD=\"$COUCHDB_ADMIN_PASSWORD\"" >> generated/creds.sh
-else
-    . generated/creds.sh
-fi
-
-# Update local.ini with credentials and port
-sed \
-    -e "s/^;admin = .*/$COUCHDB_ADMIN_USER = $COUCHDB_ADMIN_PASSWORD/" \
-    -e "s/^;port = .*/port = $COUCHDB_PORT/" \
-    etc/local.ini.default > generated/local.ini
-
-# Execute docker build
 docker build \
-    --build-arg COUCHDB_PORT=$COUCHDB_PORT \
-    -t $IMAGE . \
-    $@
+    --build-arg COUCHDB_ADMIN_USER="$COUCHDB_ADMIN_USER" \
+    --build-arg COUCHDB_ADMIN_PASSWORD="$COUCHDB_ADMIN_PASSWORD" \
+    --build-arg COUCHDB_PORT="$COUCHDB_PORT" \
+    -t "$IMAGE" . \
+    "$@"

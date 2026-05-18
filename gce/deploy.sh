@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Redeploy the grouch stack on an existing GCE VM.
-# Syncs Docker/ from local, rebuilds images, and restarts containers.
-# Generated files (credentials, TLS certs) are preserved via the sync.
+# Syncs source and Docker/ from local, rebuilds images, and restarts containers.
+# Generated files (TLS certs) are preserved via the Docker/ sync.
 #
 # Usage (from repo root or gce/):
 #   PROJECT_ID=my-project ./gce/deploy.sh

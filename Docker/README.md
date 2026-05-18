@@ -5,7 +5,7 @@ Local development and self-hosted deployment using Docker.
 ## Components
 
 - **app** — Python/Flask web application served by gunicorn over HTTP (internal only)
-- **couchdb** — CouchDB 3.5.1 database with auto-generated admin credentials
+- **couchdb** — CouchDB 3.5.1 database, accessible only within the Docker network
 - **nginx** — Reverse proxy handling TLS termination, HTTP→HTTPS redirect, and WebSocket proxying
 
 nginx is the only component that publishes ports to the host (80 and 443). The app container is internal to the Docker network.
@@ -19,12 +19,30 @@ nginx is the only component that publishes ports to the host (80 and 443). The a
 ## Quick Start
 
 ```bash
+# From the repo root: create settings.toml from the example
+cp settings.toml.example settings.toml
+# Edit settings.toml as needed, then:
+
 # From Docker/
 ./build.sh   # builds couchdb, app, then nginx
 ./run.sh     # creates docker network, starts couchdb, app, nginx
 ```
 
 The app is available at `https://localhost`. HTTP requests on port 80 are redirected to HTTPS.
+
+## Configuration
+
+User-configurable settings live in `settings.toml` at the repo root (copy from `settings.toml.example`). The build scripts generate everything else automatically.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `PERMANENT_SESSION_LIFETIME` | `2678400` | Session lifetime in seconds (31 days) |
+| `REFRESH_INTERVAL_MINUTES` | `20` | Feed refresh interval in minutes |
+| `BLOCK_NEW_ACCOUNTS` | `true` | Block new user registrations |
+| `CORS_ALLOWED_ORIGINS` | `*` | Socket.IO allowed origins |
+| `SECRET_KEY` | _(generated)_ | Flask secret key; set to persist sessions across rebuilds |
+
+CouchDB credentials (`admin`/`password`) are defined in `couchdb/etc/local.ini`. To change them, edit that file and rebuild.
 
 ## Step-by-Step
 
@@ -34,7 +52,7 @@ The app is available at `https://localhost`. HTTP requests on port 80 are redire
 cd couchdb && ./build.sh
 ```
 
-Generates random admin credentials into `couchdb/generated/creds.sh` (preserved across rebuilds) and produces `couchdb/generated/local.ini` with credentials and port baked in.
+Reads credentials and port from `couchdb/etc/local.ini` and builds the CouchDB image.
 
 ### 2. Build app
 
@@ -42,7 +60,7 @@ Generates random admin credentials into `couchdb/generated/creds.sh` (preserved 
 cd app && ./build.sh
 ```
 
-Reads CouchDB credentials from `couchdb/generated/creds.sh`, generates a self-signed TLS certificate if one doesn't exist, and produces `app/generated/config.toml`. Builds the Docker image by cloning the source repository.
+Reads CouchDB credentials from `couchdb/etc/local.ini` and user settings from `settings.toml`, generates `app/generated/config.toml`, and builds the app image.
 
 ### 3. Build nginx
 
@@ -83,9 +101,6 @@ Starts the nginx container, publishing ports 80 (HTTP redirect) and 443 (HTTPS p
 | `NETWORK` | `grouch` | Docker network name; also used as image and container name prefix |
 | `HTTP_PORT` | `8080` | App internal HTTP port (not published to host) |
 | `APP_PORT` | `8080` | Port nginx proxies to on the app container (should match `HTTP_PORT`) |
-| `GIT_REPO` | `https://github.com/0xe1f/grouch.git` | Source repository cloned into the app image |
-| `GIT_BRANCH` | `master` | Branch or tag to clone |
-| `COUCHDB_PORT` | `5984` | CouchDB listening port |
 
 ## Generated Files
 
@@ -93,9 +108,8 @@ These files are created by the build scripts and are not committed to the reposi
 
 | File | Description |
 |------|-------------|
-| `couchdb/generated/creds.sh` | Random admin credentials; preserved across rebuilds |
-| `couchdb/generated/local.ini` | CouchDB config with credentials and port baked in |
-| `app/generated/config.toml` | App config with database connection details and secret key |
+| `app/generated/config.toml` | Full app config merged from `settings.toml` and `couchdb/etc/local.ini` |
+| `app/generated/cron.tab` | Cron schedule derived from `REFRESH_INTERVAL_MINUTES` |
 | `nginx/generated/cert.pem` | Self-signed TLS certificate; preserved across rebuilds |
 | `nginx/generated/key.pem` | TLS private key; preserved across rebuilds |
 | `nginx/generated/nginx.conf` | nginx config with network name and app port substituted |

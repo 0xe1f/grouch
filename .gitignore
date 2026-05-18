@@ -2,6 +2,7 @@
 /venv
 __pycache__/
 config.toml
+settings.toml
 *.pyc
 *.code-workspace
 generated/

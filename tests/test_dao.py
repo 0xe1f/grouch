@@ -65,7 +65,7 @@ class TestDao(unittest.TestCase):
                 __class__.TEST_DB_NAME,
                 config["DATABASE_USERNAME"],
                 config["DATABASE_PASSWORD"],
-                config["DATABASE_HOST"],
+                config["DATABASE_HOSTNAME"],
                 config.get("DATABASE_PORT"),
             )
             self._dao = Database(self._conn.db)

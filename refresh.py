@@ -52,7 +52,7 @@ def main():
         config["DATABASE_NAME"],
         config["DATABASE_USERNAME"],
         config["DATABASE_PASSWORD"],
-        config["DATABASE_HOST"],
+        config["DATABASE_HOSTNAME"],
         config.get("DATABASE_PORT")
     )
 

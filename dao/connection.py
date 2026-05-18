@@ -26,11 +26,10 @@ class Connection:
     def __init__(self):
         pass
 
-    def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None, use_tls: bool=False):
+    def connect(self, db_name: str, username: str, password: str, host: str, port: int|None=None):
         self._db_name = db_name
         _port = int(port) if port else 5984
-        _scheme = "https" if use_tls else "http"
-        self._server = couchdb.Server(f"{_scheme}://{quote_plus(username)}:{quote_plus(password)}@{host}:{_port}/")
+        self._server = couchdb.Server(f"http://{quote_plus(username)}:{quote_plus(password)}@{host}:{_port}/")
         self.initialize()
 
     def destroy(self):
