@@ -13,9 +13,12 @@ COUCHDB_ADMIN_PASSWORD=$(echo "$ADMIN_LINE" | cut -d= -f2- | tr -d ' ')
 COUCHDB_PORT=$(grep -A20 '^\[chttpd\]' etc/local.ini | grep -m1 '^port' | cut -d= -f2 | tr -d ' ')
 COUCHDB_PORT=${COUCHDB_PORT:-5984}
 
+COUCHDB_CONFIG_PLACEHOLDER="COUCHDB_ADMIN_USER=$COUCHDB_ADMIN_USER\\
+COUCHDB_ADMIN_PASSWORD=$COUCHDB_ADMIN_PASSWORD\\
+COUCHDB_PORT=$COUCHDB_PORT"
+
+sed -e "s|#COUCHDB_CONFIG_PLACEHOLDER|$COUCHDB_CONFIG_PLACEHOLDER|" etc/init_db.sh > generated/init_db.sh
+
 docker build \
-    --build-arg COUCHDB_ADMIN_USER="$COUCHDB_ADMIN_USER" \
-    --build-arg COUCHDB_ADMIN_PASSWORD="$COUCHDB_ADMIN_PASSWORD" \
-    --build-arg COUCHDB_PORT="$COUCHDB_PORT" \
     -t "$IMAGE" . \
     "$@"

@@ -3,6 +3,8 @@
 MAX_RETRIES=10
 RETRY_INTERVAL_SEC=1
 
+#COUCHDB_CONFIG_PLACEHOLDER
+
 # Encode username/password
 USER_ENCODED=$(printf %s "$COUCHDB_ADMIN_USER" | jq -sRr @uri)
 PASSWORD_ENCODED=$(printf %s "$COUCHDB_ADMIN_PASSWORD" | jq -sRr @uri)
