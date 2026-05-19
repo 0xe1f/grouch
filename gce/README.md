@@ -22,11 +22,14 @@ CouchDB auto-compaction works correctly on a Persistent Disk — no `compact-db`
 ## First Deploy
 
 ```bash
-# From the repo root or gce/ directory
-PROJECT_ID=my-project ./gce/first-time-setup.sh
+# From the gce/ directory: create settings.toml from the example
+cp ../settings.toml.example settings.toml
+# Edit settings.toml as needed, then:
+
+PROJECT_ID=my-project ./first-time-setup.sh
 
 # Override region/zone (default: us-central1-a)
-PROJECT_ID=my-project ZONE=us-west1-b ./gce/first-time-setup.sh
+PROJECT_ID=my-project ZONE=us-west1-b ./first-time-setup.sh
 ```
 
 `first-time-setup.sh` is fully idempotent — safe to re-run. It creates the following GCP resources if they do not already exist:
@@ -41,7 +44,7 @@ After provisioning, it syncs `Docker/` to the VM, builds images, starts containe
 ## Subsequent Deploys
 
 ```bash
-PROJECT_ID=my-project ./gce/deploy.sh
+PROJECT_ID=my-project ./deploy.sh
 ```
 
 Syncs `Docker/` to the VM (preserving generated credentials and certs), rebuilds images, and restarts containers. CouchDB data on the Persistent Disk is never touched.
@@ -68,7 +71,9 @@ Syncs `Docker/` to the VM (preserving generated credentials and certs), rebuilds
 
 ## TLS Certificate
 
-On first deploy, nginx uses a self-signed certificate. To use a real Let's Encrypt certificate, set `DOMAIN` (and optionally `LETSENCRYPT_EMAIL`) in `settings.toml` before deploying:
+On first deploy, nginx uses a self-signed certificate. To supply your own certificate instead of using Let's Encrypt, place `cert.pem` and `key.pem` in `gce/` — they will be copied to the VM automatically and certbot will not be invoked.
+
+To use a real Let's Encrypt certificate, set `DOMAIN` (and optionally `LETSENCRYPT_EMAIL`) in `gce/settings.toml` before deploying:
 
 ```toml
 DOMAIN = "your.domain.com"
@@ -77,7 +82,7 @@ LETSENCRYPT_EMAIL = "admin@your.domain.com"
 
 With `DOMAIN` set:
 
-- `first-time-setup.sh` reserves a static IP address. Point your domain's DNS A record at that IP before or after the initial deploy.
+- `gce/first-time-setup.sh` reserves a static IP address. Point your domain's DNS A record at that IP before or after the initial deploy.
 - The nginx container runs certbot automatically at startup using the ACME webroot challenge. If DNS is already propagated when the container first starts, the certificate is issued immediately.
 - If the certificate cannot be obtained yet (DNS not propagated, port 80 not reachable), nginx falls back to the self-signed certificate and logs a warning. Once the issue is resolved, restart nginx to retry:
 
@@ -88,7 +93,7 @@ With `DOMAIN` set:
 
 - Certificates are stored in a Docker volume (`letsencrypt`) on the VM and survive image rebuilds — no re-issuance happens on every deploy.
 
-- `first-time-setup.sh` installs a weekly renewal cron job on the VM (`0 3 * * 1`). Renewal runs inside the nginx container via `docker exec` with no downtime.
+- `gce/first-time-setup.sh` installs a weekly renewal cron job on the VM (`0 3 * * 1`). Renewal runs inside the nginx container via `docker exec` with no downtime.
 
 ## SSH Access
 

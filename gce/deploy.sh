@@ -18,6 +18,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR/.."
 DOCKER_DIR="$SCRIPT_DIR/../Docker"
 
+if [ ! -f "$SCRIPT_DIR/settings.toml" ]; then
+    echo "ERROR: gce/settings.toml not found. Copy settings.toml.example to gce/settings.toml and configure." >&2
+    exit 1
+fi
+
 GIT_HASH=$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo "dev")
 
 _ssh() {
@@ -46,6 +51,11 @@ echo "==> Syncing Docker/ to VM ($REMOTE_HOME/grouch/Docker/)"
 gcloud compute scp --recurse --compress \
     "$DOCKER_DIR" "$VM_NAME:$REMOTE_HOME/grouch/" \
     --zone "$ZONE" --project "$PROJECT_ID"
+
+echo "==> Copying gce/settings.toml to Docker/ on VM"
+_ssh "cp $REMOTE_HOME/grouch/gce/settings.toml $REMOTE_HOME/grouch/Docker/settings.toml"
+_ssh "[ -f $REMOTE_HOME/grouch/gce/cert.pem ] && cp $REMOTE_HOME/grouch/gce/cert.pem $REMOTE_HOME/grouch/Docker/cert.pem || true"
+_ssh "[ -f $REMOTE_HOME/grouch/gce/key.pem ]  && cp $REMOTE_HOME/grouch/gce/key.pem  $REMOTE_HOME/grouch/Docker/key.pem  || true"
 
 # ---------------------------------------------------------------------------
 echo "==> Stopping containers"

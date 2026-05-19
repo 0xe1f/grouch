@@ -3,6 +3,8 @@
 __pycache__/
 config.toml
 settings.toml
+cert.pem
+key.pem
 *.pyc
 *.code-workspace
 generated/

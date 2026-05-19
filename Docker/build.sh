@@ -3,10 +3,10 @@
 set -e
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-SETTINGS="$SCRIPT_DIR/../settings.toml"
+SETTINGS="$SCRIPT_DIR/settings.toml"
 
 if [ ! -f "$SETTINGS" ]; then
-    echo "ERROR: settings.toml not found. Copy settings.toml.example to settings.toml and configure." >&2
+    echo "ERROR: settings.toml not found. Copy settings.toml.example to Docker/settings.toml and configure." >&2
     exit 1
 fi
 

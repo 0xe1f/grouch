@@ -9,7 +9,7 @@ BLOCK_NEW_ACCOUNTS = true
 
 # Domain name. When set:
 #   - nginx obtains a Let's Encrypt certificate for this domain automatically
-#     (unless cert.pem/key.pem are present at the repo root)
+#     (unless cert.pem/key.pem are present in the deployment directory)
 #   - CORS is restricted to https://<domain>
 # Without DOMAIN, nginx uses a self-signed certificate and CORS is unrestricted.
 # DOMAIN = "your.domain.com"

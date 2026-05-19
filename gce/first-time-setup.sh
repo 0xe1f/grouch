@@ -28,6 +28,39 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR/.."
 DOCKER_DIR="$SCRIPT_DIR/../Docker"
 
+if [ ! -f "$SCRIPT_DIR/settings.toml" ]; then
+    echo "ERROR: gce/settings.toml not found. Copy settings.toml.example to gce/settings.toml and configure." >&2
+    exit 1
+fi
+
+cat <<EOF
+
+========================================================
+ This script will create the following GCP resources:
+
+   Project      : $PROJECT_ID
+   Zone         : $ZONE
+   Static IP    : $STATIC_IP_NAME
+   Disk         : $DISK_NAME ($DISK_SIZE, pd-standard)
+   Firewall rule: allow-grouch-http (ports 80, 443)
+   VM           : $VM_NAME ($MACHINE_TYPE, debian-12)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!  THESE RESOURCES WILL INCUR ONGOING CHARGES ON   !!
+!!  YOUR GCP ACCOUNT.                               !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+========================================================
+
+EOF
+
+read -r -p "Continue? [y/N] " _confirm
+[ "$_confirm" = "y" ] || { echo "Aborted."; exit 1; }
+
+read -r -p "Are you sure? [y/N] " _confirm2
+[ "$_confirm2" = "y" ] || { echo "Aborted."; exit 1; }
+
+echo ""
+
 _ssh() {
     gcloud compute ssh "$VM_NAME" \
         --zone "$ZONE" \
@@ -159,6 +192,11 @@ gcloud compute scp --recurse --compress \
     "$DOCKER_DIR" "$VM_NAME:$REMOTE_HOME/grouch/" \
     --zone "$ZONE" --project "$PROJECT_ID"
 
+echo "==> Copying gce/settings.toml to Docker/ on VM"
+_ssh "cp $REMOTE_HOME/grouch/gce/settings.toml $REMOTE_HOME/grouch/Docker/settings.toml"
+_ssh "[ -f $REMOTE_HOME/grouch/gce/cert.pem ] && cp $REMOTE_HOME/grouch/gce/cert.pem $REMOTE_HOME/grouch/Docker/cert.pem || true"
+_ssh "[ -f $REMOTE_HOME/grouch/gce/key.pem ]  && cp $REMOTE_HOME/grouch/gce/key.pem  $REMOTE_HOME/grouch/Docker/key.pem  || true"
+
 # ---------------------------------------------------------------------------
 echo "==> Building Docker images on VM"
 _ssh "
@@ -195,7 +233,7 @@ _ssh "
 "
 
 # ---------------------------------------------------------------------------
-DOMAIN=$(grep '^DOMAIN' "$REPO_ROOT/settings.toml" 2>/dev/null | cut -d= -f2- | tr -d ' "' | head -1)
+DOMAIN=$(grep '^DOMAIN' "$SCRIPT_DIR/settings.toml" 2>/dev/null | cut -d= -f2- | tr -d ' "' | head -1)
 
 if [ -n "$DOMAIN" ]; then
     echo "==> Setting up Let's Encrypt renewal cron"
