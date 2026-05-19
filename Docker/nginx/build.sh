@@ -8,8 +8,16 @@ IMAGE="$NETWORK/nginx"
 
 mkdir -p generated
 
-# Generate self-signed TLS certificate if not already present
-if [ ! -f generated/key.pem ] || [ ! -f generated/cert.pem ]; then
+# Select the baked-in fallback certificate (used when DOMAIN is not set,
+# or as the startup cert while certbot runs its ACME challenge).
+# Priority: existing generated/ certs → repo-root cert.pem/key.pem → autogenerate self-signed.
+if [ -f generated/cert.pem ] && [ -f generated/key.pem ]; then
+    echo "Using existing certificate in generated/."
+elif [ -f "../../cert.pem" ] && [ -f "../../key.pem" ]; then
+    echo "Copying certificate from repo root..."
+    cp ../../cert.pem generated/cert.pem
+    cp ../../key.pem  generated/key.pem
+else
     echo "Generating new self-signed certificate and key..."
     openssl req \
         -x509 \

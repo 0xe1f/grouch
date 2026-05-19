@@ -195,13 +195,35 @@ _ssh "
 "
 
 # ---------------------------------------------------------------------------
+DOMAIN=$(grep '^DOMAIN' "$REPO_ROOT/settings.toml" 2>/dev/null | cut -d= -f2- | tr -d ' "' | head -1)
+
+if [ -n "$DOMAIN" ]; then
+    echo "==> Setting up Let's Encrypt renewal cron"
+    CRON_CMD="docker exec nginx.$NETWORK /usr/local/bin/certbot-renew.sh >> /var/log/grouch-certbot.log 2>&1"
+    _ssh "crontab -l 2>/dev/null | grep -qF '$CRON_CMD' || { crontab -l 2>/dev/null; echo '0 3 * * 1 $CRON_CMD'; } | crontab -"
+fi
+
+# ---------------------------------------------------------------------------
 echo ""
 echo "========================================================"
 echo " Deployment complete!"
 echo "  External IP : $EXTERNAL_IP"
+if [ -n "$DOMAIN" ]; then
+echo "  Domain      : $DOMAIN"
+echo ""
+echo " Let's Encrypt certificate will be obtained automatically"
+echo " once your DNS A record for $DOMAIN points to $EXTERNAL_IP."
+echo " nginx is running now (with a self-signed cert until DNS"
+echo " propagates). Once DNS is live, restart nginx to issue the"
+echo " certificate:"
+echo "   gcloud compute ssh $VM_NAME --zone $ZONE --project $PROJECT_ID \\"
+echo "     --command 'cd ~/grouch/Docker/nginx && ./run.sh'"
+else
 echo "  App URL     : https://$EXTERNAL_IP"
 echo ""
 echo " The app uses a self-signed TLS certificate."
 echo " Browser security warnings are expected until you install"
-echo " a real certificate. See gce/README.md for Certbot setup."
+echo " a real certificate."
+echo " To use Let's Encrypt, set DOMAIN in settings.toml and redeploy."
+fi
 echo "========================================================"

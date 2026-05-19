@@ -2,7 +2,7 @@
 
 # Redeploy the grouch stack on an existing GCE VM.
 # Syncs source and Docker/ from local, rebuilds images, and restarts containers.
-# Generated files (TLS certs) are preserved via the Docker/ sync.
+# TLS certificates are preserved in the letsencrypt Docker volume on the VM.
 #
 # Usage (from repo root or gce/):
 #   PROJECT_ID=my-project ./gce/deploy.sh

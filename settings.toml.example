@@ -7,8 +7,15 @@ REFRESH_INTERVAL_MINUTES = 20
 # Block new user account registrations
 BLOCK_NEW_ACCOUNTS = true
 
-# Socket.IO allowed origins; '*' permits all (appropriate for self-hosted)
-# CORS_ALLOWED_ORIGINS = "*"
+# Domain name. When set:
+#   - nginx obtains a Let's Encrypt certificate for this domain automatically
+#     (unless cert.pem/key.pem are present at the repo root)
+#   - CORS is restricted to https://<domain>
+# Without DOMAIN, nginx uses a self-signed certificate and CORS is unrestricted.
+# DOMAIN = "your.domain.com"
+
+# Let's Encrypt registration email. When specified, will receive expiry notices.
+# LETSENCRYPT_EMAIL = "admin@your.domain.com"
 
 # Uncomment to persist sessions across rebuilds.
 # If omitted, a new key is generated on each build (all users are logged out).
