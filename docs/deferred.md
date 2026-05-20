@@ -134,21 +134,6 @@ Both endpoints enqueue async tasks without any per-user throttle. A user could s
 
 ---
 
-## E. Malware URL checking at subscribe time
-
-Check submitted URLs against a known-bad-URL service before enqueueing the subscribe task.
-
-**Integration point:** Inside `_is_safe_url()` in `web/serve.py`, applied before the task is enqueued. Should degrade gracefully (skip check) if no API key is configured.
-
-**Options:**
-- **Google Safe Browsing API** — covers phishing + malware; free for non-commercial use; requires a Google Cloud API key; hash-prefix mode available for privacy.
-- **URLhaus (abuse.ch)** — malware-only; free community API; requires a free Auth-Key registration.
-
-**Open questions:**
-- Which service — Safe Browsing, URLhaus, or both?
-- Commercial use considerations for each?
-
----
 
 ## F. Feed fetch atomicity — concurrent subscribe + refresh conflicts
 

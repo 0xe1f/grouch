@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .celery_app import _config
 from .celery_app import celery_app
 from .celery_app import get_dao
 from .celery_app import per_user
 from .feeds import import_feeds
 from .feeds import import_feed_results
 from common import first_or_none
+from common.url_safety import check_url_remote
+from common.url_safety import is_safe_url
 from dao import BulkUpdateQueue
 from dao import Database
 from entity import Article
@@ -304,10 +307,27 @@ def subs_subscribe_url(self, user_id: str, url: str, notify: bool = False):
 @celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
 @per_user
 def subs_import(self, user_id: str, doc_dict: dict, notify: bool = False):
-    import_user_subs(get_dao(), user_id, PortDoc.from_dict(doc_dict))
+    doc = PortDoc.from_dict(doc_dict)
+    filtered_doc = PortDoc()
+    for group in doc.groups:
+        filtered_doc.append_group(group)
+
+    rejected_count = 0
+    for source in doc.sources:
+        if not is_safe_url(source.feed_url):
+            logging.warning(f"Rejected unsafe OPML URL: {source.feed_url}")
+            rejected_count += 1
+        elif not check_url_remote(source.feed_url, _config):
+            rejected_count += 1
+        else:
+            filtered_doc.append_source(source)
+
+    import_user_subs(get_dao(), user_id, filtered_doc)
 
     if notify:
         from tasks.worker_notify import notify as send_notification
+        if rejected_count > 0:
+            send_notification(user_id, "warning", f"{rejected_count} feed(s) were rejected during import due to a security check and were not added.")
         send_notification(user_id, "refresh")
 
 

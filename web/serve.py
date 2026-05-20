@@ -15,12 +15,11 @@
 # limitations under the License.
 
 import http
-import ipaddress
 import os
-import socket
-import urllib.parse
 from common.secret import deobfuscate_json
 from common.secret import obfuscate_json
+from common.url_safety import check_url_remote
+from common.url_safety import is_safe_url
 from entity import Article
 from entity import Folder
 from entity import Subscription
@@ -82,24 +81,6 @@ def _action_error_response(e: ActionError):
             return ext_objs.Error(e.message, http.HTTPStatus.BAD_REQUEST).as_dict()
 
 
-def _is_safe_url(url: str) -> bool:
-    """Return True only if the URL uses http/https and resolves to a public IP address."""
-    try:
-        parsed = urllib.parse.urlparse(url)
-        if parsed.scheme not in ("http", "https"):
-            return False
-        hostname = parsed.hostname
-        if not hostname:
-            return False
-        for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
-            addr = ipaddress.ip_address(sockaddr[0])
-            if (addr.is_loopback or addr.is_private
-                    or addr.is_link_local or addr.is_multicast
-                    or addr.is_reserved or addr.is_unspecified):
-                return False
-        return True
-    except Exception:
-        return False
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -283,8 +264,11 @@ def subscribe():
     elif not arg.url:
         app.logger.error(f"Missing URL")
         return ext_objs.Error("Missing URL").as_dict()
-    elif not _is_safe_url(arg.url):
+    elif not is_safe_url(arg.url):
         app.logger.error(f"Rejected unsafe URL: {arg.url}")
+        return ext_objs.Error("Invalid URL").as_dict()
+    elif not check_url_remote(arg.url, app.config):
+        app.logger.warning(f"Remote check rejected URL: {arg.url}")
         return ext_objs.Error("Invalid URL").as_dict()
 
     subs_subscribe_url.delay(current_user.id, arg.url, notify=True)

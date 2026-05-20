@@ -2200,6 +2200,10 @@
         .on("refresh", function(response) {
             console.debug(`Refresh received: ${response}`);
             refresh(response != null && response.includes("articles"));
+        })
+        .on("warning", function(data) {
+            console.debug(`Warning received: ${data}`);
+            if (data) ui.showToast(data, true);
         });
 
     ui.init();

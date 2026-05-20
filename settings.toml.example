@@ -20,3 +20,10 @@ BLOCK_NEW_ACCOUNTS = true
 # Uncomment to persist sessions across rebuilds.
 # If omitted, a new key is generated on each build (all users are logged out).
 # SECRET_KEY = "<generate a strong random string>"
+
+# URLhaus (abuse.ch) Auth-Key for malware URL checking at subscribe time.
+# Obtain a free key at https://urlhaus-api.abuse.ch/ (fair use; free for non-commercial use).
+# When set, every subscribed URL is checked against the URLhaus database before the
+# subscribe task is enqueued. OPML imports are checked inside the background task.
+# If omitted, the check is skipped and a warning is logged per attempt.
+# URLHAUS_API_KEY = "your-auth-key-here"
