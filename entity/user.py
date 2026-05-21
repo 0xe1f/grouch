@@ -75,6 +75,14 @@ class User(Entity):
     def created(self, val: int):
         self.set_prop("created", val)
 
+    @property
+    def roles(self) -> list[str]:
+        return self._doc.get("roles", [])
+
+    @roles.setter
+    def roles(self, val: list[str]):
+        self.set_prop("roles", val)
+
     def set_hashed_password(self, plaintext: str, salt: bytes):
         self.hashed_password = bcrypt.hashpw(plaintext.encode(), salt).hex()
 

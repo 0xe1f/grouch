@@ -56,6 +56,9 @@ app.config.from_prefixed_env("GROUCH")
 
 app.jinja_env.globals["app_version"] = version.VERSION_FULL
 
+from web.admin import bp as admin_bp
+app.register_blueprint(admin_bp)
+
 socketio = flask_socketio.SocketIO(app, async_mode='gevent',
     cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'),
     message_queue=app.config['REDIS_URL'])

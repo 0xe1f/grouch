@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Test Access{% endblock %}
+
+{% block toolbar %}
+<button id="admin-exit" onclick="location.href='/'"></button>
+{% endblock %}
+
+{% block content %}
+<h2>Test Access</h2>
+<p>Fetch a URL and inspect the raw response and parsed feed details.</p>
+
+<form method="post" action="{{ url_for('admin.test_access_post') }}">
+    <div class="field-row">
+        <input type="url" name="url" id="url" placeholder="https://example.com/feed.xml"
+            value="{{ url or '' }}" autocomplete="off" spellcheck="false" />
+        <button type="submit">Fetch</button>
+    </div>
+</form>
+
+{% if url %}
+<div class="results">
+    <div class="result-panel">
+        <h3>Raw Response</h3>
+        <pre class="result-pre">{{ raw_text or '(no response)' }}</pre>
+    </div>
+    <div class="result-panel">
+        <h3>Feed Details</h3>
+        <pre class="result-pre">{{ feed_details or '(no details)' }}</pre>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

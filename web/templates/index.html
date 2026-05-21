@@ -85,5 +85,8 @@
                 <button class="modal-cancel _l">Close</button>
             </div>
         </div>
+        {% if current_user.has_role("admin") %}
+        <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+        {% endif %}
     </body>
 </html>

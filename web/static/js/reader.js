@@ -1691,7 +1691,6 @@
         "unfloatAll": function() {
             $(".shortcuts").hide();
             ui.toggleNavBar(false);
-            $$menu.hideAll();
         },
         "editTags": function(entry) {
             const currentTags = entry.tags.join(", ");

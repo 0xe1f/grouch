@@ -247,6 +247,7 @@ class User(JsonObject):
             self.set_prop("id", user.id)
             self.set_prop("username", user.username)
             self.set_prop("email_address", user.email_address)
+            self.set_prop("roles", user.roles or [])
 
     @property
     def id(self) -> str:
@@ -259,6 +260,13 @@ class User(JsonObject):
     @property
     def email_address(self) -> str:
         return self._doc.get("email_address")
+
+    @property
+    def roles(self) -> list[str]:
+        return self._doc.get("roles", [])
+
+    def has_role(self, role: str) -> bool:
+        return role in self.roles
 
     @property
     def is_authenticated(self) -> str:

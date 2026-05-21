@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head profile="http://www.w3.org/2005/10/profile">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+        <link href="{{ url_for('static', filename='style/admin.css') }}" type="text/css" rel="stylesheet"/>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+        <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='js/menus.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='js/admin.js') }}" type="text/javascript"></script>
+        <title>{% block title %}Admin{% endblock %} — Grouch</title>
+    </head>
+    <body>
+        <div id="header">
+            <a class="app-title" href="/"><h1>Grouch</h1></a>
+            <div class="infobar">
+                <div class="right-aligned">
+                    <button class="user-options dropdown" data-dropdown="menu-user-options"
+                        title="{{ current_user.email_address }}">{{ current_user.email_address }}</button>
+                    <a id="sign-out" href="{{ url_for('logout') }}">sign out</a>
+                </div>
+            </div>
+        </div>
+        <div id="admin-toolbar">
+            {% block toolbar %}
+            <button id="admin-save" class="solid-color">Save</button>
+            <button id="admin-exit" onclick="location.href='/'"></button>
+            {% endblock %}
+        </div>
+        <div id="admin-body">
+            <div id="admin-nav" class="destinations">
+                <ul>
+                    {% for item in menu_items %}
+                    <li{% if active_endpoint == item.endpoint %} class="active"{% endif %}>
+                        <a href="{{ url_for(item.endpoint) }}" class="{{ item.class_name }}">
+                            {{ item.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="admin-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

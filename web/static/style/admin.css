@@ -1,0 +1,312 @@
+/*****************************************************************************
+ ** Copyright (C) 2024 Akop Karapetyan
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at
+ **
+ **     http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License.
+ ******************************************************************************
+ */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 12pt;
+    color: #444;
+    margin: 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: #0276FD;
+    text-decoration: none;
+}
+
+/* ---- Header ---- */
+
+#header {
+    border-bottom: solid 1px #ccc;
+    background-color: #eee;
+    padding: 0.5em 1em;
+}
+
+#header h1 {
+    font-size: 24px;
+    text-shadow: 1px 1px 0 #ccc;
+    margin: 0.25em 0;
+}
+
+#header a.app-title {
+    color: #444;
+    text-decoration: none;
+}
+
+.infobar .right-aligned {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    padding: 0 0 0.25em 0;
+}
+
+.infobar a {
+    font-size: 12pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.infobar .dropdown {
+    border: none;
+    box-shadow: none;
+    padding: 3px 25px 0.25em 1em;
+    background-color: transparent;
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 12pt;
+    height: auto;
+    color: #777;
+}
+
+.infobar .dropdown:hover {
+    color: #000;
+}
+
+#sign-out {
+    display: none;
+}
+
+/* ---- Toolbar ---- */
+
+#admin-toolbar {
+    background-color: #fff;
+    padding: 10px 10px 5px 10px;
+}
+
+#admin-exit {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M360-240%20120-480l240-240%2056%2057-144%20143h568v80H272l144%20143-56%2057Z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+#admin-exit:hover {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M360-240%20120-480l240-240%2056%2057-144%20143h568v80H272l144%20143-56%2057Z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+#admin-toolbar button {
+    margin: 0 0.25em;
+    width: 60px;
+    height: 32px;
+}
+
+/* ---- Buttons ---- */
+
+button {
+    background-color: #eee;
+    border: solid 1px #aaa;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px #ddd;
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 10pt;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+button:active {
+    box-shadow: none;
+    color: #000;
+}
+
+button:hover {
+    border-color: #777;
+    color: #000;
+}
+
+button.solid-color {
+    background-color: #d14836;
+    border-color: #d14836;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+button.solid-color:hover {
+    background-color: #b03a2e;
+    border-color: #b03a2e;
+    color: white;
+}
+
+/* ---- Two-pane layout ---- */
+
+#admin-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    border-top: solid 1px #aaa;
+}
+
+#admin-nav {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: solid 1px #ddd;
+    background-color: #f8f8f8;
+    overflow-y: auto;
+    padding: 1em 0;
+}
+
+#admin-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#admin-nav ul li a {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    color: #444;
+    font-size: 12pt;
+    text-decoration: none;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 20px 20px;
+    padding-left: 24px;
+}
+
+#admin-nav ul li {
+    padding: 0.35em 1em 0.35em 25px;
+}
+
+#admin-nav ul li:hover {
+    background-color: #eee;
+}
+
+#admin-nav ul li.active {
+    background-color: #cedefa;
+}
+
+#admin-nav ul li a.test-access {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' enable-background='new 0 0 24 24' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cg%3E%3Crect fill='none' height='24' width='24'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M13,11.33L18,18H6l5-6.67V6h2 M15.96,4H8.04C7.62,4,7.39,4.48,7.65,4.81L9,6.5v4.17L3.2,18.4C2.71,19.06,3.18,20,4,20h16 c0.82,0,1.29-0.94,0.8-1.6L15,10.67V6.5l1.35-1.69C16.61,4.48,16.38,4,15.96,4L15.96,4z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#admin-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5em 2em;
+}
+
+/* ---- Dropdown menus ---- */
+
+button.dropdown {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%23575757%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
+    background-position-x: right 2px;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    padding: 0.5em 30px 0.5em 20px;
+}
+
+button.dropdown:hover {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2220px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2220px%22%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M480-384%20288-576h384L480-384Z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+ul.menu {
+    position: absolute;
+    display: none;
+    margin: 0;
+    padding-left: 0;
+    background-color: #fff;
+    list-style-type: none;
+    border: solid 1px #ccc;
+    border-radius: 2px;
+    box-shadow: 2px 2px 2px #ddd;
+    min-width: 13em;
+    z-index: 1000;
+}
+
+.menu li {
+    color: #555;
+    padding: 0.5em 1em;
+}
+
+.menu li:hover,
+.menu li.hovered {
+    cursor: pointer;
+    background-color: #ccc;
+}
+
+.menu li.divider,
+.menu li.divider:hover {
+    cursor: default;
+    height: 1px;
+    padding: 0;
+    background-color: #ccc;
+}
+
+/* ---- Test Access tool ---- */
+
+.field-row {
+    display: flex;
+    gap: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.field-row input[type=url] {
+    flex: 1;
+    padding: 0.5em 0.75em;
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 11pt;
+    border: solid 1px #aaa;
+    border-radius: 3px;
+    color: #444;
+}
+
+.field-row input[type=url]:focus {
+    outline: none;
+    border-color: #0276FD;
+}
+
+.results {
+    display: flex;
+    gap: 1.5em;
+}
+
+.result-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.result-panel h3 {
+    margin: 0 0 0.5em 0;
+    font-size: 11pt;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.result-pre {
+    margin: 0;
+    padding: 1em;
+    background-color: #f8f8f8;
+    border: solid 1px #ddd;
+    border-radius: 3px;
+    font-size: 10pt;
+    line-height: 1.5;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 60vh;
+    color: #333;
+}

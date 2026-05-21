@@ -15,7 +15,22 @@
  ******************************************************************************
  */
 
+const $$menu = {
+    clickCallback: null,
+};
+
 $().ready(function() {
+    $("html")
+        .click(function() {
+            $$menu.hideAll();
+        });
+
+    $(document).on('keydown', 'html', function(e) {
+        if (e.key === 'Escape') {
+            $$menu.hideAll();
+        }
+    });
+
     $(document).on('click', 'button.dropdown', function(e) {
         var topOffset = 0;
         var $button = $(this);
@@ -137,10 +152,6 @@ $().ready(function() {
         }
     });
 });
-
-var $$menu = {
-    clickCallback: null,
-};
 
 $$menu.click = function(callback) {
     this.clickCallback = callback;
