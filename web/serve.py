@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import gevent.monkey
+if not gevent.monkey.is_module_patched('socket'):
+    gevent.monkey.patch_all()
+
 import http
 import os
 from common.secret import deobfuscate_json
@@ -43,7 +47,6 @@ import flask_socketio
 import logging
 import os.path
 import port
-import re
 import tasks.actions as actions
 import tempfile
 import tomllib
@@ -59,17 +62,19 @@ app.jinja_env.globals["app_version"] = version.VERSION_FULL
 from web.admin import bp as admin_bp
 app.register_blueprint(admin_bp)
 
+from web.users import bp as users_bp
+app.register_blueprint(users_bp)
+
 socketio = flask_socketio.SocketIO(app, async_mode='gevent',
     cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', '*'),
     message_queue=app.config['REDIS_URL'])
 
 login_manager = flask_login.LoginManager()
-login_manager.login_view = "/login"
+login_manager.login_view = "users.login_get"
 login_manager.init_app(app)
 
 FEED_SYNC_TIMEOUT_SECS = 600 # 10 min
 UPLOAD_ALLOWED_TYPES = [ ".xml" ]
-REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
 
 def _action_error_response(e: ActionError):
     app.logger.error(e.message)
@@ -88,107 +93,6 @@ def _action_error_response(e: ActionError):
 @login_manager.user_loader
 def load_user(user_id):
     return ext_objs.User(user=stores.users.find_by_id(user_id))
-
-@app.get("/login")
-def login_get():
-    return flask.render_template(
-        "login.html",
-        block_new_accounts=app.config.get("BLOCK_NEW_ACCOUNTS", False),
-    )
-
-@app.post("/login")
-def login_post():
-    arg = requests.LoginRequest(flask.request.form)
-
-    try:
-        arg.validate()
-    except requests.ValidationException as e:
-        app.logger.error(e.message)
-        flask.flash(e.message)
-        return flask.render_template(
-            "login.html",
-            arg=arg,
-        )
-
-    try:
-        user = actions.users_authenticate(
-            stores,
-            current_user.get_id(),
-            arg.username,
-            arg.password
-        )
-    except ActionError as e:
-        app.logger.error(e.message)
-        flask.flash("Username or password incorrect")
-        return flask.render_template(
-            "login.html",
-            arg=arg,
-            block_new_accounts=app.config.get("BLOCK_NEW_ACCOUNTS", False),
-        )
-
-    flask.session.permanent = True
-    flask_login.utils.login_user(ext_objs.User(user))
-
-    if next := flask.request.args.get("next"):
-        if not REGEX_REDIRECT_URL.fullmatch(next):
-            logging.warn(f"{next} is not a valid redirection URL")
-            next = None
-
-    return flask.redirect(next or flask.url_for("index"))
-
-@app.get("/logout")
-@flask_login.login_required
-def logout():
-    flask_login.logout_user()
-    return flask.redirect(flask.url_for("login_get"))
-
-@app.get("/create_account")
-def create_account_get():
-    if app.config.get("BLOCK_NEW_ACCOUNTS", False):
-        app.logger.error(f"Account creation is not available")
-        flask.flash("Account creation is not available")
-        return flask.redirect(flask.url_for("login_get"))
-    return flask.render_template(
-        "create_account.html",
-    )
-
-@app.post("/create_account")
-def create_account_post():
-    if app.config.get("BLOCK_NEW_ACCOUNTS", False):
-        app.logger.error(f"Account creation is not available")
-        flask.flash("Account creation is not available")
-        return flask.redirect(flask.url_for("create_account_get"))
-
-    arg = requests.CreateAccountRequest(flask.request.form)
-
-    try:
-        arg.validate()
-    except requests.ValidationException as e:
-        app.logger.error(e.message)
-        flask.flash(e.message)
-        return flask.render_template(
-            "create_account.html",
-            arg=arg,
-        )
-
-    try:
-        user = actions.users_create_user(
-            stores,
-            None,
-            arg.username,
-            arg.email_address,
-            arg.password,
-        )
-    except ActionError as e:
-        app.logger.error(e.message)
-        flask.flash("Duplicate username or email address")
-        return flask.render_template(
-            "create_account.html",
-            arg=arg,
-        )
-
-    flask.flash(f"Account '{user.username}' created successfully", "success")
-    return flask.redirect(flask.url_for("login_get"))
 
 @app.get("/")
 @flask_login.login_required
@@ -584,9 +488,10 @@ def init_app():
         app.config["DATABASE_PORT"],
     )
     stores = Database(conn.db)
+    app.extensions['stores'] = stores
 
 init_app()
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port='8080',
+    socketio.run(app, host='0.0.0.0', port=8080,
                  debug=os.environ.get('FLASK_DEBUG', '0') == '1')
