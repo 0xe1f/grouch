@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from parser.parse_result import ParseResult
+from parser.defs import Alternative
+from parser.defs import ParseResult
 from parser.parse import parse_feed
 from parser.parse import parse_url

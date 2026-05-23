@@ -88,8 +88,6 @@ def _action_error_response(e: ActionError):
         case _:
             return ext_objs.Error(e.message, http.HTTPStatus.BAD_REQUEST).as_dict()
 
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return ext_objs.User(user=stores.users.find_by_id(user_id))
@@ -178,7 +176,7 @@ def subscribe():
         app.logger.warning(f"Remote check rejected URL: {arg.url}")
         return ext_objs.Error("Invalid URL").as_dict()
 
-    subs_subscribe_url.delay(current_user.id, arg.url, notify=True)
+    subs_subscribe_url.delay(current_user.id, arg.url, folder_id=arg.folder_id, notify=True)
 
     return responses.SubscribeResponse().as_dict()
 

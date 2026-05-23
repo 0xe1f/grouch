@@ -97,31 +97,48 @@ def sync_subs(
             bulk_q.enqueue(sub)
 
 
+_MAX_FEED_CHOICES = 8
+
+
 def subscribe_user_unknown_url(
     dao: Database,
     user_id: str,
     url: str,
-):
+    folder_id: str|None = None,
+) -> dict|None:
+    """Subscribe the user to the given URL.
+
+    Returns a dict with event data if the client needs to select from multiple
+    feeds, or None if the subscription was handled (or failed).
+    """
     with dao.new_q() as bulk_q:
-        # TODO: account for possibility of multiple feeds per URL
         if not _subscribe_local_feeds(dao, bulk_q, user_id, Source(feed_url=url)):
             # Subscribed to available feed
-            return
+            return None
 
         # Parse contents of URL
         if not (result := parser.parse_url(url)):
             logging.error(f"No valid feeds available for '{url}'")
-            return
+            return None
 
         if result.feed:
             # URL successfully parsed as feed
             _subscribe_user_parsed(dao, bulk_q, user_id, result)
         elif alts := result.alternatives:
-            # Not a feed, but alternatives are available. Use first available
-            # TODO: allow selection from multiple feeds
-            _subscribe_user(dao, bulk_q, user_id, Source(feed_url=alts[0]))
+            if len(alts) == 1:
+                # Only one option — subscribe without bothering the user
+                _subscribe_user(dao, bulk_q, user_id, Source(feed_url=alts[0].url))
+            else:
+                # Multiple feeds found — ask the client to pick one
+                logging.debug(f"Multiple feeds for '{url}', requesting selection")
+                return {
+                    "pageUrl": url,
+                    "feeds": [{"url": a.url, "title": a.title} for a in alts[:_MAX_FEED_CHOICES]],
+                    "folderId": folder_id,
+                }
 
     logging.debug(f"{bulk_q.written_count}/{bulk_q.enqueued_count} objects written")
+    return None
 
 
 def import_user_subs(
@@ -296,12 +313,15 @@ def subs_sync(self, user_id: str, notify: bool = False):
 
 @celery_app.task(bind=True, max_retries=30, default_retry_delay=10)
 @per_user
-def subs_subscribe_url(self, user_id: str, url: str, notify: bool = False):
-    subscribe_user_unknown_url(get_dao(), user_id, url)
+def subs_subscribe_url(self, user_id: str, url: str, folder_id: str|None = None, notify: bool = False):
+    selection = subscribe_user_unknown_url(get_dao(), user_id, url, folder_id)
 
     if notify:
         from tasks.worker_notify import notify as send_notification
-        send_notification(user_id, "refresh")
+        if selection is not None:
+            send_notification(user_id, "select_feed", selection)
+        else:
+            send_notification(user_id, "refresh")
 
 
 @celery_app.task(bind=True, max_retries=30, default_retry_delay=10)

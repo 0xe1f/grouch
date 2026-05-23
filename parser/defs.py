@@ -12,29 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
 from entity import Entry
 from entity import Feed
 
+@dataclass
+class Alternative:
+    url: str
+    title: str
+
+@dataclass
 class ParseResult:
-
-    def __init__(self, url: str, feed: Feed|None=None, entries: list[Entry]|None=None, alts: list[str]|None=None):
-        self._url = url
-        self._feed = feed
-        self._entries = entries
-        self._alternatives = alts
-
-    @property
-    def url(self) -> str:
-        return self._url
-
-    @property
-    def feed(self) -> Feed|None:
-        return self._feed
-
-    @property
-    def entries(self) -> list[Entry]|None:
-        return self._entries
-
-    @property
-    def alternatives(self) -> list[str]|None:
-        return self._alternatives
+    url: str
+    feed: Feed|None=None
+    entries: list[Entry]|None=None
+    alternatives: list[Alternative]|None=None

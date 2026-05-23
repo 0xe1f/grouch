@@ -1375,15 +1375,60 @@
                 });
             });
         },
+        "showDialog": function(id) {
+            $(id).showModal(true);
+        },
+        "hideDialog": function(id) {
+            $(id).showModal(false);
+        },
         "showImportSubscriptionsModal": function() {
             $("#import-subscriptions").find("form")[0].reset();
-            $("#import-subscriptions").showModal(true);
+            ui.showDialog("#import-subscriptions");
         },
         "exportSubscriptions": function() {
             window.location.href = "/exportOpml";
         },
         "showAbout": function() {
-            $("#about").showModal(true);
+            ui.showDialog("#about");
+        },
+        "showFeedSelector": function(data) {
+            var selectedUrl = null;
+            const $list = $("#feed-selector-list").empty();
+
+            $.each(data.feeds, function(_, feed) {
+                const $item = $("<li>")
+                    .addClass("feed-option")
+                    .click(function() {
+                        $list
+                            .find(".feed-option")
+                            .removeClass("selected");
+                        $(this)
+                            .addClass("selected");
+                        selectedUrl = feed.url;
+                        $("#feed-selector-confirm")
+                            .prop("disabled", false);
+                    });
+                $("<span>")
+                    .addClass("feed-option-title")
+                    .text(feed.title || feed.url)
+                    .appendTo($item);
+                $("<span>")
+                    .addClass("feed-option-url")
+                    .text(feed.url)
+                    .appendTo($item);
+                $list.append($item);
+            });
+
+            $("#feed-selector-confirm").prop("disabled", true).off("click").on("click", function() {
+                if (!selectedUrl) return;
+                var folder = (data.folderId && subscriptionMap && subscriptionMap[data.folderId])
+                    ? subscriptionMap[data.folderId]
+                    : getRootSubscription();
+                if (folder) folder.subscribe(selectedUrl);
+                ui.hideDialog("#feed-selector");
+            });
+
+            ui.showDialog("#feed-selector");
         },
         "isGModifierActive": function() {
             return new Date().getTime() - lastGPressTime < 1000;
@@ -2199,6 +2244,10 @@
         .on("refresh", function(response) {
             console.debug(`Refresh received: ${response}`);
             refresh(response != null && response.includes("articles"));
+        })
+        .on("select_feed", function(data) {
+            console.debug(`Feed selection requested: ${data.pageUrl}`);
+            ui.showFeedSelector(data);
         })
         .on("warning", function(data) {
             console.debug(`Warning received: ${data}`);

@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from html.parser import unescape
 from entity import Entry
 from entity import Feed
-from parser import ParseResult
+from parser.defs import Alternative
+from parser.defs import ParseResult
 from parser import sanitizer
 from parser import consts
+from parser.custom import custom_parsers
+from urllib.parse import urlparse
 import datetime
 import feedparser
 import logging
-from parser.custom import custom_parsers
 import time
 
 _FEED_TYPES = [
@@ -58,9 +61,14 @@ def parse_url(url: str) -> ParseResult:
         return None
 
     # Extract RSS feed, and attempt to parse it
-    if (alt_urls := [link["href"] for link in doc.feed.links if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES]):
-        logging.debug(f"No feeds for '{url}', but found {len(alt_urls)} alternatives")
-        return ParseResult(url, alts=alt_urls)
+    alts = [
+        Alternative(url=link["href"], title=unescape(link.get("title", link["href"])))
+        for link in doc.feed.links
+            if link.get("rel") == "alternate" and link.get("type") in _FEED_TYPES
+    ]
+    if alts:
+        logging.debug(f"No feeds for '{url}', but found {len(alts)} alternatives")
+        return ParseResult(url, alternatives=alts)
 
     logging.error(f"No feeds for '{url}'")
     return None

@@ -1010,6 +1010,55 @@ ul.menu {
     margin-top: 1.5em;
 }
 
+.feed-selector-text {
+    font-size: 11pt;
+    color: #888;
+    word-break: break-all;
+}
+
+.feed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 18em;
+    overflow-y: auto;
+    border: solid 1px #ddd;
+    border-radius: 3px;
+}
+
+.feed-list .feed-option {
+    display: block;
+    padding: 0.6em 0.8em;
+    cursor: pointer;
+    border-bottom: solid 1px #eee;
+    user-select: none;
+}
+
+.feed-list .feed-option:last-child {
+    border-bottom: none;
+}
+
+.feed-list .feed-option:hover {
+    background-color: #f5f5f5;
+}
+
+.feed-list .feed-option.selected {
+    background-color: #e8f0fe;
+}
+
+.feed-option-title {
+    display: block;
+    font-size: 11pt;
+}
+
+.feed-option-url {
+    display: block;
+    font-size: 9pt;
+    color: #888;
+    margin-top: 0.2em;
+    word-break: break-all;
+}
+
 /*** Desktop ****/
 
 .unavailable {

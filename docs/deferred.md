@@ -46,19 +46,6 @@ Two related issues:
 
 ---
 
-## 5. Subscribe to URL with multiple feeds — `tasks/subscriptions.py`
-
-Two TODOs acknowledge that when a page has multiple `<link rel="alternate">` feeds, only the first is used.
-
-**Agreed design direction:**
-1. Detect how many feeds are available for the given URL.
-2. If more than one, return them to the client with preview metadata and prompt the user to pick.
-3. Subscribe to the chosen feed.
-
-Requires backend API changes, a new client interaction flow, and updates to the subscribe task.
-
----
-
 ## 7. `refresh_feeds` time-bounding — `tasks/feeds.py`
 
 `iter_updated_before` can return an unbounded number of feeds. `fetch_batch_max = 40` batches writes but does not cap the total number refreshed per run. The real risk is runs taking longer than the schedule interval, causing task pile-up.
