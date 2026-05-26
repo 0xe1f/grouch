@@ -20,10 +20,6 @@ from entity import Folder
 from entity import Invite
 from entity import Subscription
 from entity import User
-from tasks.articles import articles_move as _articles_move_task
-from tasks.folders import folders_delete as _folders_delete_task
-from tasks.subscriptions import subs_sync as _subs_sync_task
-from tasks.subscriptions import subs_unsubscribe as _subs_unsubscribe_task
 import bcrypt
 import datetime
 from datetime import date
@@ -209,6 +205,7 @@ def folders_delete(
     if (owner_id := Folder.extract_owner_id(folder_id)) != user_id:
         raise ActionError(f"Unauthorized object ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
+    from tasks.folders import folders_delete as _folders_delete_task
     _folders_delete_task.delay(user_id, folder_id)
 
 
@@ -243,6 +240,7 @@ def subs_move(
 
     # Move the articles asynchronously
     if bulk_q.written_count > 0:
+        from tasks.articles import articles_move as _articles_move_task
         _articles_move_task.delay(user_id, sub_id, dest_id)
 
 
@@ -257,6 +255,7 @@ def subs_unsubscribe(
     if (owner_id := Subscription.extract_owner_id(sub_id)) != user_id:
         raise ActionError(f"Unauthorized sub_id ({owner_id}!={user_id})", ActionError.UNAUTHORIZED)
 
+    from tasks.subscriptions import subs_unsubscribe as _subs_unsubscribe_task
     _subs_unsubscribe_task.delay(user_id, [sub_id])
 
 
@@ -282,6 +281,7 @@ def subs_sync(
         with dao.new_q() as bulk_q:
             bulk_q.enqueue(user)
 
+    from tasks.subscriptions import subs_sync as _subs_sync_task
     _subs_sync_task.delay(user_id, notify=True)
 
     return ref_time + datetime.timedelta(seconds=timeout_secs)
