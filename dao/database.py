@@ -17,6 +17,7 @@ from .bulk_update_queue import BulkUpdateQueue
 from .entries import EntryDao
 from .feeds import FeedDao
 from .folders import FolderDao
+from .invites import InviteDao
 from .subscriptions import SubscriptionDao
 from .users import UserDao
 import couchdb.client as couchdb
@@ -29,6 +30,7 @@ class Database:
         self._entries = EntryDao(db)
         self._feeds = FeedDao(db)
         self._folders = FolderDao(db)
+        self._invites = InviteDao(db)
         self._subs = SubscriptionDao(db)
         self._users = UserDao(db)
 
@@ -47,6 +49,10 @@ class Database:
     @property
     def folders(self) -> FolderDao:
         return self._folders
+
+    @property
+    def invites(self) -> InviteDao:
+        return self._invites
 
     @property
     def subs(self) -> SubscriptionDao:

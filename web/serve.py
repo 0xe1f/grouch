@@ -59,6 +59,13 @@ app.config.from_prefixed_env("GROUCH")
 
 app.jinja_env.globals["app_version"] = version.VERSION_FULL
 
+@app.template_filter("datetimeformat")
+def datetimeformat(value):
+    if not value:
+        return ""
+    from datetime import datetime, timezone
+    return datetime.fromtimestamp(value, tz=timezone.utc).strftime("%b %d, %Y")
+
 from web.admin import bp as admin_bp
 app.register_blueprint(admin_bp)
 

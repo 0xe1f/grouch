@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Invitations{% endblock %}
+
+{% block toolbar %}
+<button id="admin-exit" onclick="location.href='/'"></button>
+{% endblock %}
+
+{% block content %}
+<h2>Invitations</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="flash-messages">
+        {% for category, message in messages %}
+            <li class="{{ category if category else 'error' }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<form method="post" action="{{ url_for('admin.invitations_send') }}">
+    <div class="field-row">
+        <input type="email" name="email" placeholder="email address to invite"
+            value="{{ send_email or '' }}" autocomplete="off" spellcheck="false" />
+        <button type="submit" class="solid-color">Send Invite</button>
+    </div>
+</form>
+
+<div class="list-controls">
+    <div class="status-tabs">
+        <a href="{{ url_for('admin.invitations', status='pending') }}"
+            class="{{ 'active' if status_filter == 'pending' }}">Pending</a>
+        <a href="{{ url_for('admin.invitations', status='expired') }}"
+            class="{{ 'active' if status_filter == 'expired' }}">Expired</a>
+        <a href="{{ url_for('admin.invitations', status='cancelled') }}"
+            class="{{ 'active' if status_filter == 'cancelled' }}">Cancelled</a>
+        <a href="{{ url_for('admin.invitations', status='accepted') }}"
+            class="{{ 'active' if status_filter == 'accepted' }}">Accepted</a>
+        <a href="{{ url_for('admin.invitations', status='all') }}"
+            class="{{ 'active' if status_filter == 'all' }}">All</a>
+    </div>
+    <form method="get" action="{{ url_for('admin.invitations') }}" class="find-form">
+        <div class="field-row">
+            <input type="email" name="email" placeholder="find by email"
+                value="{{ email_find or '' }}" autocomplete="off" spellcheck="false" />
+            <button type="submit">Find</button>
+        </div>
+    </form>
+</div>
+
+{% if invites %}
+<table class="invite-table">
+    <thead>
+        <tr>
+            <th>Invitee</th>
+            <th>Invited by</th>
+            <th>Sent</th>
+            <th>Status</th>
+            <th>Expires / Accepted</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="invite-tbody">
+        {% include "admin/invitations_rows.html" %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-state">No invitations found.</p>
+{% endif %}
+
+{% if next_start %}
+<div class="next-page"
+     data-status="{{ status_filter }}"
+     data-email="{{ email_find or '' }}"
+     data-start="{{ next_start }}">
+    Load more
+</div>
+{% endif %}
+
+{% endblock %}

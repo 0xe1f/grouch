@@ -17,6 +17,7 @@ from dao import Database
 from entity import Article
 from entity import Entity
 from entity import Folder
+from entity import Invite
 from entity import Subscription
 from entity import User
 from tasks.articles import articles_move as _articles_move_task
@@ -25,8 +26,15 @@ from tasks.subscriptions import subs_sync as _subs_sync_task
 from tasks.subscriptions import subs_unsubscribe as _subs_unsubscribe_task
 import bcrypt
 import datetime
+from datetime import date
+from datetime import time as dt_time
+from datetime import timedelta
+from datetime import timezone
 import enum
+import logging
 from parser.consts import MAX_TITLE_LEN
+
+logger = logging.getLogger(__name__)
 
 
 MAX_TAG_LEN = 32
@@ -295,6 +303,149 @@ def users_authenticate(
         raise ActionError("Password mismatch", ActionError.UNAUTHORIZED)
 
     return user
+
+
+# ---------------------------------------------------------------------------
+# Invites
+# ---------------------------------------------------------------------------
+
+INVITE_INVALID_MESSAGE = "This invitation is invalid or has expired."
+
+def invites_send(
+    dao: Database,
+    inviter_user_id: str,
+    invitee_email: str,
+    expiry_days: int = 14,
+) -> Invite:
+    existing = dao.invites.find_by_invitee_email(invitee_email)
+    for inv in existing:
+        if inv.status == Invite.STATUS_PENDING:
+            raise ActionError(f"An active invitation already exists for {invitee_email}")
+
+    now = datetime.datetime.now(tz=timezone.utc)
+    sent_at = now.timestamp()
+    sent_date = now.date()
+    expiry_dt = datetime.datetime.combine(
+        sent_date + timedelta(days=expiry_days + 1),
+        dt_time.min,
+        tzinfo=timezone.utc,
+    )
+    expiry_date = expiry_dt.timestamp()
+
+    invite = Invite()
+    invite.inviter_user_id = inviter_user_id
+    invite.invitee_email = invitee_email
+    invite.status = Invite.STATUS_PENDING
+    invite.sent_at = sent_at
+    invite.expiry_date = expiry_date
+
+    if not dao.invites.create(invite):
+        raise ActionError("Failed to create invitation", ActionError.SERVER_ERROR)
+
+    try:
+        from common.email import send_invite
+        send_invite(
+            token=invite.token,
+            to_address=invitee_email,
+            expiry_timestamp=expiry_date,
+        )
+    except Exception as exc:
+        logger.error("Failed to send invite email to %s: %s", invitee_email, exc)
+        raise ActionError("Invitation created but email could not be sent. Please try again.", ActionError.SERVER_ERROR)
+
+    return invite
+
+
+def invites_cancel(
+    dao: Database,
+    invite_id: str,
+) -> Invite:
+    invite = dao.invites.find_by_token(invite_id.removeprefix("invite::"))
+    if not invite:
+        raise ActionError("Invitation not found", ActionError.NOT_FOUND)
+    if invite.status != Invite.STATUS_PENDING:
+        raise ActionError("Only pending invitations can be cancelled")
+
+    invite.status = Invite.STATUS_CANCELLED
+    dao.invites.update(invite)
+    return invite
+
+
+def invites_resend(
+    dao: Database,
+    invite_id: str,
+    inviter_user_id: str,
+    expiry_days: int = 14,
+) -> Invite:
+    invite = dao.invites.find_by_token(invite_id.removeprefix("invite::"))
+    if not invite:
+        raise ActionError("Invitation not found", ActionError.NOT_FOUND)
+    if invite.status == Invite.STATUS_ACCEPTED:
+        raise ActionError("Cannot resend an accepted invitation")
+
+    invitee_email = invite.invitee_email
+
+    invite.status = Invite.STATUS_CANCELLED
+    dao.invites.update(invite)
+
+    return invites_send(dao, inviter_user_id, invitee_email, expiry_days)
+
+
+def invites_validate(
+    dao: Database,
+    token: str,
+    submitted_email: str,
+) -> Invite:
+    invite = dao.invites.find_by_token(token)
+    now = datetime.datetime.now(tz=timezone.utc).timestamp()
+
+    if not invite:
+        raise ActionError(INVITE_INVALID_MESSAGE)
+
+    if invite.status != Invite.STATUS_PENDING:
+        raise ActionError(INVITE_INVALID_MESSAGE)
+
+    if invite.expiry_date <= now:
+        if invite.status == Invite.STATUS_PENDING:
+            logger.warning(
+                "Invite %s has expired (expiry_date=%s) but status is still pending; "
+                "sweep may not have run yet",
+                invite.id,
+                invite.expiry_date,
+            )
+        raise ActionError(INVITE_INVALID_MESSAGE)
+
+    if invite.invitee_email.lower() != submitted_email.lower():
+        raise ActionError(INVITE_INVALID_MESSAGE)
+
+    return invite
+
+
+def invites_mark_accepted(
+    dao: Database,
+    invite: Invite,
+    user_id: str,
+):
+    invite.status = Invite.STATUS_ACCEPTED
+    invite.accepted_at = datetime.datetime.now(tz=timezone.utc).timestamp()
+    invite.accepted_user_id = user_id
+    dao.invites.update(invite)
+
+
+def invites_expire_pending(
+    dao: Database,
+):
+    midnight_utc = datetime.datetime.combine(
+        datetime.datetime.now(tz=timezone.utc).date(),
+        dt_time.min,
+        tzinfo=timezone.utc,
+    ).timestamp()
+
+    expired = dao.invites.find_expired_pending(midnight_utc)
+    logger.info("Expiry sweep: marking %d invites as expired", len(expired))
+    for invite in expired:
+        invite.status = Invite.STATUS_EXPIRED
+        dao.invites.update(invite)
 
 
 def users_create_user(

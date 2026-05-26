@@ -19,7 +19,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 1
+_SCHEMA_VERSION_CURRENT = 2
 
 class Connection:
 
@@ -231,6 +231,47 @@ class Connection:
                         }
                     """,
                     "reduce": "_count"
+                },
+            )
+
+        if from_ver < 2:
+            self.add_views(
+                design_doc,
+                invites_by_status_sent={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'invite') {
+                                emit([doc.status, doc.sent_at]);
+                            }
+                        }
+                    """
+                },
+                invites_by_sent={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'invite') {
+                                emit(doc.sent_at);
+                            }
+                        }
+                    """
+                },
+                invites_by_invitee_email={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'invite') {
+                                emit(doc.invitee_email);
+                            }
+                        }
+                    """
+                },
+                invites_pending_by_expiry={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'invite' && doc.status == 'pending') {
+                                emit(doc.expiry_date);
+                            }
+                        }
+                    """
                 },
             )
 

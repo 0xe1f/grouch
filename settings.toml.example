@@ -27,3 +27,15 @@ BLOCK_NEW_ACCOUNTS = true
 # subscribe task is enqueued. OPML imports are checked inside the background task.
 # If omitted, the check is skipped and a warning is logged per attempt.
 # URLHAUS_API_KEY = "your-auth-key-here"
+
+# Invitation validity period in days (default: 14).
+# Invites expire at midnight UTC at the end of the 14th day after sending.
+# INVITE_EXPIRY_DAYS = 14
+
+# Mail server settings - required for Invitatios
+# SMTP_HOST = "smtp.mailhost.com"
+# SMTP_PORT = 587
+# SMTP_USER = "mail_username"
+# SMTP_PASSWORD = "mail_password"
+# SMTP_TLS = true
+# SMTP_FROM = "noreply@your.domain.com"

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from tasks.actions import ActionError
+from tasks.actions import invites_mark_accepted
+from tasks.actions import invites_validate
 from web.ext_type import requests
 import flask
 import flask_login
@@ -27,6 +29,9 @@ REGEX_REDIRECT_URL = re.compile(r"^(/\w+)+|/$")
 
 @bp.get("/login")
 def login_get():
+    if flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for("index"))
+
     return flask.render_template(
         "login.html",
         block_new_accounts=flask.current_app.config.get("BLOCK_NEW_ACCOUNTS", False),
@@ -81,18 +86,50 @@ def logout():
 
 @bp.get("/create_account")
 def create_account_get():
+    if flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for("index"))
+
+    stores = flask.current_app.extensions["stores"]
+    token = flask.request.args.get("token", "").strip() or None
+
+    if token:
+        invite = stores.invites.find_by_token(token)
+        import datetime
+        from datetime import timezone
+        now = datetime.datetime.now(tz=timezone.utc).timestamp()
+        if (
+            not invite
+            or invite.status != "pending"
+            or invite.expiry_date <= now
+        ):
+            flask.current_app.logger.error(f"Invitation is invalid or has expired: {invite.status} {invite.expiry_date} {now}")
+            flask.flash("This invitation is invalid or has expired.")
+            return flask.redirect(flask.url_for("users.login_get"))
+
+        return flask.render_template(
+            "create_account.html",
+            invite_token=token,
+            message_banner=(
+                "You've been invited to create a Grouch Reader account. "
+                "Fill in the details below to get started."
+            ),
+        )
+
     if flask.current_app.config.get("BLOCK_NEW_ACCOUNTS", False):
-        flask.current_app.logger.error(f"Account creation is not available")
+        flask.current_app.logger.error("Account creation is not available")
         flask.flash("Account creation is not available")
         return flask.redirect(flask.url_for("users.login_get"))
-    return flask.render_template(
-        "create_account.html",
-    )
+
+    return flask.render_template("create_account.html")
+
 
 @bp.post("/create_account")
 def create_account_post():
-    if flask.current_app.config.get("BLOCK_NEW_ACCOUNTS", False):
-        flask.current_app.logger.error(f"Account creation is not available")
+    stores = flask.current_app.extensions["stores"]
+    token = flask.request.form.get("token", "").strip() or None
+
+    if not token and flask.current_app.config.get("BLOCK_NEW_ACCOUNTS", False):
+        flask.current_app.logger.error("Account creation is not available")
         flask.flash("Account creation is not available")
         return flask.redirect(flask.url_for("users.create_account_get"))
 
@@ -106,9 +143,25 @@ def create_account_post():
         return flask.render_template(
             "create_account.html",
             arg=arg,
+            invite_token=token,
         )
 
-    stores = flask.current_app.extensions['stores']
+    invite = None
+    if token:
+        try:
+            invite = invites_validate(stores, token, arg.email_address)
+        except ActionError as e:
+            flask.flash(e.message)
+            return flask.render_template(
+                "create_account.html",
+                arg=arg,
+                invite_token=token,
+                message_banner=(
+                    "You've been invited to create a Grouch Reader account. "
+                    "Fill in the details below to get started."
+                ),
+            )
+
     try:
         user = actions.users_create_user(
             stores,
@@ -123,7 +176,11 @@ def create_account_post():
         return flask.render_template(
             "create_account.html",
             arg=arg,
+            invite_token=token,
         )
+
+    if invite:
+        invites_mark_accepted(stores, invite, user.id)
 
     flask.flash(f"Account '{user.username}' created successfully", "success")
     return flask.redirect(flask.url_for("users.login_get"))

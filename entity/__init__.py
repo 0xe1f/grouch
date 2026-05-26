@@ -17,5 +17,6 @@ from entity.entry import Entry
 from entity.feed import Feed
 from entity.entity import Entity
 from entity.folder import Folder
+from entity.invite import Invite
 from entity.subscription import Subscription
 from entity.user import User

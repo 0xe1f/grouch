@@ -1,0 +1,31 @@
+{% for invite in invites %}
+<tr>
+    <td class="email-cell">{{ invite.invitee_email }}</td>
+    <td class="email-cell">{{ invite.inviter_user_id }}</td>
+    <td class="date-cell">{{ invite.sent_at | datetimeformat }}</td>
+    <td>
+        <span class="badge {{ invite.status }}">{{ invite.status }}</span>
+    </td>
+    <td class="date-cell">
+        {% if invite.status == 'accepted' %}
+            {{ invite.accepted_at | datetimeformat }}
+        {% elif invite.status in ('pending', 'expired') %}
+            {{ invite.expiry_date | datetimeformat }}
+        {% endif %}
+    </td>
+    <td class="actions-cell">
+        {% if invite.status in ('pending', 'expired') %}
+            <form method="post" action="{{ url_for('admin.invitations_resend') }}">
+                <input type="hidden" name="invite_id" value="{{ invite.id }}" />
+                <button type="submit">Resend</button>
+            </form>
+        {% endif %}
+        {% if invite.status == 'pending' %}
+            <form method="post" action="{{ url_for('admin.invitations_cancel') }}">
+                <input type="hidden" name="invite_id" value="{{ invite.id }}" />
+                <button type="submit">Cancel</button>
+            </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}

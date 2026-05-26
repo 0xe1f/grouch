@@ -33,6 +33,14 @@ if [ ! -f "$SCRIPT_DIR/settings.toml" ]; then
     exit 1
 fi
 
+# Warn if SMTP settings are absent (required for the Invitations feature)
+if ! grep -q '^SMTP_HOST' "$SCRIPT_DIR/settings.toml" 2>/dev/null; then
+    echo "NOTE: SMTP_HOST is not set in gce/settings.toml."
+    echo "      The Invitations feature will not be able to send emails."
+    echo "      See settings.toml.example for the required SMTP_* settings."
+    echo ""
+fi
+
 cat <<EOF
 
 ========================================================

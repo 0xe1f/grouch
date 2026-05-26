@@ -1,3 +1,66 @@
+/* ---- Invitations page: scroll-triggered pagination ---- */
+$(function() {
+    var $nextPage = $(".next-page");
+    if (!$nextPage.length) {
+        return;
+    }
+
+    var loading = false;
+
+    function loadNextPage() {
+        if (loading || !$nextPage.length) {
+            return;
+        }
+        loading = true;
+        $nextPage.text("Loading…");
+
+        var status = $nextPage.data("status");
+        var email  = $nextPage.data("email");
+        var start  = $nextPage.data("start");
+
+        var params = { partial: "1" };
+        if (status) {
+            params.status = status;
+        }
+        if (email) {
+            params.email  = email;
+        }
+        if (start) {
+            params.start  = start;
+        }
+
+        $.getJSON("/admin/invitations", params, function(data) {
+            $("#invite-tbody").append(data.rows_html);
+            if (data.next_start) {
+                $nextPage.data("start", data.next_start).text("Load more");
+            } else {
+                $nextPage.remove();
+                $nextPage = $();
+            }
+        }).fail(function() {
+            $nextPage.text("Load more");
+        }).always(function() {
+            loading = false;
+        });
+    }
+
+    var $content = $("#admin-content");
+    $content.on("scroll", function() {
+        if (!$nextPage.length) {
+            return;
+        }
+        const contentBottom = $content.scrollTop() + $content.innerHeight();
+        // offsetTop relative to the scrollable container
+        var triggerTop = $nextPage[0].offsetTop;
+        if (contentBottom >= triggerTop - 36) {
+            loadNextPage();
+        }
+    });
+
+    $nextPage.on("click", loadNextPage);
+});
+
+/* ---- Shared admin menu setup ---- */
 $(function() {
     var $menu = $("#menu-user-options");
 

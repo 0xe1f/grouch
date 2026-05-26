@@ -146,3 +146,24 @@ form a {
 .fields li.success {
     color: green;
 }
+
+/* ---- Message banner (invite flow and other contextual messages) ---- */
+
+.message-banner {
+    width: 350px;
+    box-sizing: border-box;
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: solid 1px #bfdbfe;
+    border-radius: 4px;
+    padding: 0.75em 1em;
+    margin-bottom: 0.75em;
+    font-size: 11pt;
+    line-height: 1.5;
+}
+
+@media (max-width: 340px) {
+    .message-banner {
+        width: 100%;
+    }
+}

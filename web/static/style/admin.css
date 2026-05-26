@@ -121,6 +121,8 @@ button {
     cursor: pointer;
     background-position: center center;
     background-repeat: no-repeat;
+    padding: 0.5em 1.5em;
+    margin: 0;
 }
 
 button:active {
@@ -309,4 +311,195 @@ ul.menu {
     word-break: break-all;
     max-height: 60vh;
     color: #333;
+}
+
+/* ---- Shared input styles (email + text) ---- */
+
+.field-row input[type=email],
+.field-row input[type=text] {
+    flex: 1;
+    padding: 0.5em 0.75em;
+    font-family: Ubuntu, helvetica neue, helvetica, arial, sans-serif;
+    font-size: 11pt;
+    border: solid 1px #aaa;
+    border-radius: 3px;
+    color: #444;
+}
+
+.field-row input[type=email]:focus,
+.field-row input[type=text]:focus {
+    outline: none;
+    border-color: #0276FD;
+}
+
+/* ---- Flash messages ---- */
+
+.flash-messages {
+    list-style: none;
+    margin: 0 0 1.25em 0;
+    padding: 0;
+}
+
+.flash-messages li {
+    padding: 0.6em 1em;
+    border-radius: 3px;
+    margin-bottom: 0.5em;
+    font-size: 11pt;
+    border: solid 1px #f5c6cb;
+    background-color: #fde8ea;
+    color: #721c24;
+}
+
+.flash-messages li.success {
+    border-color: #c3e6cb;
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* ---- List controls (status tabs + find form) ---- */
+
+.list-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+    margin: 1.25em 0 0.75em 0;
+    border-bottom: solid 1px #ddd;
+    padding-bottom: 0.75em;
+}
+
+.status-tabs {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+
+.status-tabs a {
+    display: inline-block;
+    padding: 0.4em 1em;
+    font-size: 11pt;
+    color: #555;
+    text-decoration: none;
+    border: solid 1px #ddd;
+    border-right: none;
+    background-color: #f8f8f8;
+}
+
+.status-tabs a:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.status-tabs a:last-child {
+    border-right: solid 1px #ddd;
+    border-radius: 0 3px 3px 0;
+}
+
+.status-tabs a:hover {
+    background-color: #eee;
+    color: #000;
+}
+
+.status-tabs a.active {
+    background-color: #cedefa;
+    color: #0044aa;
+    font-weight: 500;
+}
+
+.find-form .field-row {
+    margin-bottom: 0;
+}
+
+/* ---- Invite table ---- */
+
+.invite-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11pt;
+}
+
+.invite-table th {
+    text-align: left;
+    font-size: 10pt;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.5em 0.75em;
+    border-bottom: solid 2px #ddd;
+}
+
+.invite-table td {
+    padding: 0.6em 0.75em;
+    border-bottom: solid 1px #eee;
+    vertical-align: middle;
+}
+
+.invite-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.email-cell {
+    font-family: monospace;
+    font-size: 11pt;
+}
+
+.date-cell {
+    white-space: nowrap;
+    color: #666;
+    font-size: 10.5pt;
+}
+
+.actions-cell {
+    white-space: nowrap;
+    display: flex;
+    gap: 0.4em;
+}
+
+.actions-cell form {
+    display: contents;
+}
+
+/* ---- Status badges ---- */
+
+.badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    font-size: 9.5pt;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge.pending   { background-color: #dbeafe; color: #1d4ed8; }
+.badge.accepted  { background-color: #d1fae5; color: #065f46; }
+.badge.expired   { background-color: #f3f4f6; color: #6b7280; }
+.badge.cancelled { background-color: #fef3c7; color: #92400e; }
+
+/* ---- Empty state ---- */
+
+.empty-state {
+    color: #999;
+    font-style: italic;
+    margin-top: 2em;
+}
+
+/* ---- Scroll-load trigger (mirrors reader's .next-page) ---- */
+
+.next-page {
+    text-align: center;
+    padding: 1em;
+    margin-top: 0.5em;
+    color: #0276FD;
+    cursor: pointer;
+    font-size: 11pt;
+}
+
+.next-page:hover {
+    text-decoration: underline;
+}
+
+/* ---- Invitations nav icon ---- */
+
+#admin-nav ul li a.invitations {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/%3E%3C/svg%3E");
 }
