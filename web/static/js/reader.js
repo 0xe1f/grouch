@@ -1022,6 +1022,7 @@
             this.initButtons();
             this.initMenus();
             this.initShortcuts();
+            this.initSwipeGestures();
             this.initModals();
             this.initFileInputs();
             this.initBookmarklet();
@@ -1327,6 +1328,82 @@
                     $(".shortcuts").show();
                 });
         },
+        "initSwipeGestures": function() {
+            if (!('ontouchstart' in window)) {
+                return;
+            }
+
+            let startX, startY, axis;
+            const LOCK_THRESHOLD = 10;  // px before committing to an axis
+            const SWIPE_THRESHOLD = 50; // minimum horizontal travel to trigger nav
+            const container = $('.gofr-entries-container')[0];
+
+            function resetGesture() {
+                axis = null;
+                startX = startY = undefined;
+            }
+
+            function showSwipeIndicator(direction) {
+                $("#swipe-indicator")
+                    .stop(true, true)
+                    .text(direction > 0 ? "🡳" : "🡱")
+                    .fadeIn(150)
+                    .delay(350)
+                    .fadeOut(150);
+            }
+
+            container.addEventListener(
+                'touchstart',
+                function(e) {
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    axis = null;
+                },
+                { passive: true }
+            );
+            container.addEventListener(
+                'touchmove',
+                function(e) {
+                    if (!axis) {
+                        const dx = Math.abs(e.touches[0].clientX - startX);
+                        const dy = Math.abs(e.touches[0].clientY - startY);
+                        if (Math.max(dx, dy) >= LOCK_THRESHOLD) {
+                            axis = dx > dy ? 'horizontal' : 'vertical';
+                        }
+                    }
+                    if (axis === 'horizontal') {
+                        e.preventDefault();
+                    }
+                },
+                { passive: false }
+            );
+            container.addEventListener(
+                'touchend',
+                function(e) {
+                    if (axis === 'horizontal') {
+                        const dx = e.changedTouches[0].clientX - startX;
+                        if (Math.abs(dx) >= SWIPE_THRESHOLD) {
+                            const direction = dx < 0 ? 1 : -1;
+                            // swipe left  → next article
+                            // swipe right → previous article
+                            const selected = $(".gofr-entry.selected")[0] || null;
+                            ui.openArticle(direction);
+                            if (selected != ($(".gofr-entry.selected")[0] || null)) {
+                                showSwipeIndicator(direction);
+                            }
+                        }
+                    }
+                    resetGesture();
+                },
+                { passive: true }
+            );
+            container.addEventListener(
+                'touchcancel',
+                resetGesture,
+                { passive: true }
+            );
+        },
         "initModals": function() {
             $(".modal").wrapInner("<div class=\"modal-inner\"></div>").hide();
 
@@ -1549,10 +1626,11 @@
             this.selectArticle(which, false);
 
             if (!$(".gofr-entry-content", $(".gofr-entry.selected")).length || which === 0) {
-                $(".gofr-entry.selected")
-                    .click()
-                    [0]
-                    .scrollIntoView();
+                const $selected = $(".gofr-entry.selected");
+                if ($selected.length) {
+                    $selected.click();
+                    $selected[0].scrollIntoView();
+                }
             }
         },
         "collapseAllEntries": function() {

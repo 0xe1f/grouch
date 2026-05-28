@@ -860,6 +860,24 @@ button.subscribe {
     background-color: #ffaaaa;
 }
 
+#swipe-indicator {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50vmin;
+    height: 50vmin;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 10vmin;
+    color: #fff;
+    font-size: 25vmin;
+    line-height: 50vmin;
+    text-align: center;
+    pointer-events: none;
+    z-index: 9999;
+}
+
 .spinner {
     margin: 5px auto;
 }
