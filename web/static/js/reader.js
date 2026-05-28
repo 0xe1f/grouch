@@ -1346,7 +1346,7 @@
             function showSwipeIndicator(direction) {
                 $("#swipe-indicator")
                     .stop(true, true)
-                    .text(direction > 0 ? "🡳" : "🡱")
+                    .text(direction > 0 ? "▼" : "▲")
                     .fadeIn(150)
                     .delay(350)
                     .fadeOut(150);
