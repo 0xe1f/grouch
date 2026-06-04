@@ -202,6 +202,10 @@ button.solid-color:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z'/%3E%3C/svg%3E");
 }
 
+#admin-nav ul li a.users {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z'/%3E%3C/svg%3E");
+}
+
 #admin-nav ul li a.test-access {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' enable-background='new 0 0 24 24' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cg%3E%3Crect fill='none' height='24' width='24'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M13,11.33L18,18H6l5-6.67V6h2 M15.96,4H8.04C7.62,4,7.39,4.48,7.65,4.81L9,6.5v4.17L3.2,18.4C2.71,19.06,3.18,20,4,20h16 c0.82,0,1.29-0.94,0.8-1.6L15,10.67V6.5l1.35-1.69C16.61,4.48,16.38,4,15.96,4L15.96,4z'/%3E%3C/g%3E%3C/svg%3E");
 }
@@ -467,23 +471,102 @@ a.admin-cell-disabled {
     border-top: solid 1px #eee;
 }
 
-/* ---- Feeds table (feed-specific column rules) ---- */
+/* ---- Copy button & toast ---- */
 
-#feeds-table tbody td.col-site {
-    font-size: 10pt;
-    color: #666;
-    max-width: 18em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.copy-btn {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    margin-left: 0.35em;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='13px' viewBox='0 0 24 24' width='13px' fill='%23aaaaaa'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-#feeds-table tbody td.col-updated {
+td:hover .copy-btn,
+.copy-btn:focus {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='13px' viewBox='0 0 24 24' width='13px' fill='%230276FD'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'/%3E%3C/svg%3E");
+    opacity: 1;
+}
+
+#copy-toast {
+    position: fixed;
+    bottom: 2em;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.72);
+    color: #fff;
+    font-size: 10pt;
+    padding: 0.45em 1em;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+#copy-toast.visible {
+    opacity: 1;
+}
+
+/* ---- Stub placeholder ---- */
+
+.admin-action-stub {
+    font-size: 10pt;
+    color: #bbb;
+    font-style: italic;
+}
+
+/* ---- Shared column utility classes ---- */
+
+.col-date {
     font-size: 10pt;
     color: #888;
     white-space: nowrap;
 }
 
+.col-url {
+    display: flex;
+    align-items: center;
+    font-size: 10pt;
+    max-width: 18em;
+}
+
+.col-url a {
+    flex: 1;
+    min-width: 0;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---- Feeds table (feed-specific column widths) ---- */
+
 #feeds-table thead th.col-updated {
     width: 12em;
+}
+
+/* ---- Users table (user-specific column widths) ---- */
+
+#users-table thead th.col-created {
+    width: 12em;
+}
+
+#users-table thead th.col-subs,
+#users-table thead th.col-roles {
+    width: 5em;
 }

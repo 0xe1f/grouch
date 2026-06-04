@@ -33,6 +33,11 @@ def get_menu_items():
             "class_name": "feeds",
         },
         {
+            "endpoint": "admin.users",
+            "title": "Users",
+            "class_name": "users",
+        },
+        {
             "endpoint": "admin.test_access",
             "title": "Test Access",
             "class_name": "test-access",
@@ -92,6 +97,49 @@ def feeds_list():
                 "published": f.published,
             }
             for f in feeds
+        ],
+    }
+    if next_start:
+        result["continue"] = obfuscate_json(next_start)
+
+    return flask.jsonify(result)
+
+@bp.get("/users")
+def users():
+    return flask.render_template(
+        "admin/users.html",
+        menu_items=get_menu_items(),
+        active_endpoint=flask.request.endpoint,
+    )
+
+@bp.get("/users/list")
+def users_list():
+    stores = flask.current_app.extensions["stores"]
+    sort = flask.request.args.get("sort", "email")
+    raw_start = flask.request.args.get("start")
+
+    start = deobfuscate_json(raw_start) if raw_start else None
+
+    if sort == "username":
+        page, next_start = stores.users.get_page_by_username(start)
+    else:
+        page, next_start = stores.users.get_page_by_email(start)
+
+    sub_counts = stores.subs.get_sub_counts([u.id for u in page])
+
+    result = {
+        "users": [
+            {
+                "id": u.id,
+                "username": u.username,
+                "email_address": u.email_address,
+                "sub_count": sub_counts.get(u.id, 0),
+                "roles": u.roles,
+                "created": u.created,
+                "updated": u.updated,
+                "last_sync": u.last_sync,
+            }
+            for u in page
         ],
     }
     if next_start:

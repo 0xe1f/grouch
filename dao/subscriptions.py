@@ -21,6 +21,7 @@ class SubscriptionDao(Dao):
     BY_USER = "maint/subs_by_user"
     BY_USER_BY_SYNC = "maint/subs_by_user"
     BY_USER_UNREAD_COUNT = "maint/subs_by_user_unread_count"
+    COUNT_BY_USER = "maint/subs_count_by_user"
 
     def find_by_id(
         self,
@@ -83,6 +84,15 @@ class SubscriptionDao(Dao):
             _, sub_id = item.key
             counts[sub_id] = item.value
 
+        return counts
+
+    def get_sub_counts(
+        self,
+        user_ids: list[str],
+    ) -> dict[str, int]:
+        counts = {}
+        for row in self.db.view(self.__class__.COUNT_BY_USER, keys=user_ids, group=True):
+            counts[row.key] = row.value
         return counts
 
     def iter_by_folder(

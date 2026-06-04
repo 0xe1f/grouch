@@ -13,8 +13,8 @@
             <th colspan="5">
                 <div class="admin-action-bar">
                     <div class="admin-sort-group">
-                        <button class="admin-sort-btn active" data-sort="updated">By Updated</button>
                         <button class="admin-sort-btn" data-sort="title">By Title</button>
+                        <button class="admin-sort-btn active" data-sort="updated">By Updated</button>
                     </div>
                     <div class="admin-bulk-actions">
                         <button id="btn-enable-selected" disabled>Enable Selected</button>
@@ -49,6 +49,28 @@ $(function() {
         return new Date(ts * 1000).toLocaleString();
     }
 
+    var $copyToast = $("<div />", { "id": "copy-toast" }).appendTo("body");
+    var copyToastTimer = null;
+
+    function showCopyToast(message) {
+        if (copyToastTimer) clearTimeout(copyToastTimer);
+        $copyToast.text(message).addClass("visible");
+        copyToastTimer = setTimeout(function() {
+            $copyToast.removeClass("visible");
+        }, 2000);
+    }
+
+    function makeCopyBtn(url, label, onCopy) {
+        return $("<button />", { "class": "copy-btn", "title": label })
+            .on("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                navigator.clipboard.writeText(url).then(function() {
+                    showCopyToast(onCopy);
+                });
+            });
+    }
+
     function updateBulkButtons() {
         var any = $("#feeds-body input.admin-check:checked").length > 0;
         $("#btn-enable-selected, #btn-disable-selected").prop("disabled", !any);
@@ -69,15 +91,19 @@ $(function() {
         if (feed.disabled) {
             $titleLink.addClass("admin-cell-disabled");
         }
-        var $title = $("<td />", { "class": "col-title" }).append($titleLink);
+        var $title = $("<td />", { "class": "col-title" })
+            .append($titleLink)
+            .append(makeCopyBtn(feed.feed_url, "Copy feed link", "Feed link copied"));
 
-        var $site = $("<td />", { "class": "col-site" });
+        var $site = $("<td />", { "class": "col-site col-url" });
         if (feed.site_url) {
-            $site.append($("<a />", { "href": feed.site_url, "target": "_blank" })
-                .text(stripProtocol(feed.site_url)));
+            $site
+                .append($("<a />", { "href": feed.site_url, "target": "_blank" })
+                    .text(stripProtocol(feed.site_url)))
+                .append(makeCopyBtn(feed.site_url, "Copy site link", "Site link copied"));
         }
 
-        var $updated = $("<td />", { "class": "col-updated" }).text(formatDate(feed.updated));
+        var $updated = $("<td />", { "class": "col-updated col-date" }).text(formatDate(feed.updated));
 
         var $viewLink = $("<a />", { "href": "#", "class": "admin-action" }).text("View");
         var $toggleLink = $("<a />", {

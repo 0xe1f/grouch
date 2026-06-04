@@ -267,6 +267,16 @@ class Connection:
                         }
                     """
                 },
+                subs_count_by_user={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub') {
+                                emit(doc.user_id);
+                            }
+                        }
+                    """,
+                    "reduce": "_count"
+                },
             )
             self.save_design_doc(design_doc)
 

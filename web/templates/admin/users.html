@@ -1,0 +1,123 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block toolbar %}
+<button id="admin-exit" onclick="location.href='/'"></button>
+{% endblock %}
+
+{% block content %}
+<table id="users-table" class="admin-table">
+    <thead>
+        <tr class="admin-action-row">
+            <th colspan="6">
+                <div class="admin-action-bar">
+                    <div class="admin-sort-group">
+                        <button class="admin-sort-btn" data-sort="username">By Username</button>
+                        <button class="admin-sort-btn active" data-sort="email">By Email</button>
+                    </div>
+                </div>
+            </th>
+        </tr>
+        <tr class="admin-col-headers">
+            <th class="col-username">Username</th>
+            <th class="col-email">Email</th>
+            <th class="col-subs">Subs</th>
+            <th class="col-created">Created</th>
+            <th class="col-roles">Roles</th>
+            <th class="col-actions">Actions</th>
+        </tr>
+    </thead>
+    <tbody id="users-body"></tbody>
+</table>
+<div id="users-continue" class="next-page" style="display:none">Continue</div>
+
+<script>
+$(function() {
+    var continueFrom = null;
+    var currentSort = "email";
+
+    function formatDate(ts) {
+        if (!ts) return "";
+        return new Date(ts * 1000).toLocaleString();
+    }
+
+    function renderRow(user) {
+        var $row = $("<tr />", { "class": "admin-row", "data-user-id": user.id });
+
+        var createdTooltip = [];
+        if (user.updated) createdTooltip.push("Updated: " + formatDate(user.updated));
+        if (user.last_sync) createdTooltip.push("Last sync: " + formatDate(user.last_sync));
+
+        var $username = $("<td />", { "class": "col-username" }).text(user.username || "");
+        var $email    = $("<td />", { "class": "col-email" }).text(user.email_address || "");
+        var $subs     = $("<td />", { "class": "col-subs" }).text(user.sub_count);
+        var $created  = $("<td />", { "class": "col-created col-date", "title": createdTooltip.join("\n") })
+            .text(formatDate(user.created));
+        var $roles    = $("<td />", { "class": "col-roles" })
+            .text(user.roles && user.roles.length ? user.roles.join(", ") : "[]");
+        var $actions  = $("<td />", { "class": "col-actions" })
+            .append($("<span />", { "class": "admin-action-stub" }).text("Stub"));
+
+        $row.append($username, $email, $subs, $created, $roles, $actions);
+        return $row;
+    }
+
+    function loadPage() {
+        var params = { sort: currentSort };
+        if (continueFrom) {
+            params.start = continueFrom;
+        }
+        $.ajax({
+            url: "/admin/users/list",
+            data: params,
+            success: function(resp) {
+                continueFrom = resp.continue || null;
+                $.each(resp.users, function(_, user) {
+                    $("#users-body").append(renderRow(user));
+                });
+                if (continueFrom) {
+                    $("#users-continue").show();
+                } else {
+                    $("#users-continue").hide();
+                }
+            },
+        });
+    }
+
+    function resetAndLoad() {
+        continueFrom = null;
+        $("#users-body").empty();
+        $("#users-continue").hide();
+        loadPage();
+    }
+
+    // Sort buttons
+    $(".admin-sort-btn").click(function() {
+        var sort = $(this).data("sort");
+        if (sort === currentSort) return;
+        currentSort = sort;
+        $(".admin-sort-btn").removeClass("active");
+        $(this).addClass("active");
+        resetAndLoad();
+    });
+
+    // Continue button
+    $("#users-continue").click(function() {
+        loadPage();
+    });
+
+    // Auto-scroll pagination
+    $("#admin-content").scroll(function() {
+        if (!$("#users-continue").is(":visible")) return;
+        var pagerHeight = $("#users-continue").outerHeight();
+        var offset = $("#users-table").height() - ($(this).scrollTop() + $(this).height()) - pagerHeight;
+        if (offset < 36) {
+            $("#users-continue").click();
+        }
+    });
+
+    resetAndLoad();
+});
+</script>
+{% endblock %}

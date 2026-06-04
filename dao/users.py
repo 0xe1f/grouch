@@ -23,6 +23,44 @@ class UserDao(Dao):
     BY_EMAIL = "maint/users_by_email"
     BY_USERNAME = "maint/users_by_username"
 
+    def get_page_by_email(
+        self,
+        start: dict|None=None,
+        limit: int=40,
+    ) -> tuple[list[User], dict|None]:
+        return self._get_page(self.__class__.BY_EMAIL, start, limit)
+
+    def get_page_by_username(
+        self,
+        start: dict|None=None,
+        limit: int=40,
+    ) -> tuple[list[User], dict|None]:
+        return self._get_page(self.__class__.BY_USERNAME, start, limit)
+
+    def _get_page(
+        self,
+        view: str,
+        start: dict|None,
+        limit: int,
+    ) -> tuple[list[User], dict|None]:
+        options = {
+            "include_docs": True,
+            "reduce": False,
+            "limit": limit + 1,
+        }
+        if start:
+            options["startkey"] = start["key"]
+            options["startkey_docid"] = start["id"]
+
+        rows = list(self.db.view(view, **options))
+        next_start = None
+        if len(rows) > limit:
+            extra = rows[limit]
+            next_start = {"key": extra.key, "id": extra.id}
+            rows = rows[:limit]
+
+        return [User(row.doc) for row in rows], next_start
+
     def find_by_id(
         self,
         user_id: str,
