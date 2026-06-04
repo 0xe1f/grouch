@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from common.secret import deobfuscate_json
+from common.secret import obfuscate_json
 from flask_login import current_user
 from parser.parse import parse_url
 from web.auth import roles_required
@@ -25,6 +27,11 @@ bp = flask.Blueprint("admin", __name__, url_prefix="/admin")
 
 def get_menu_items():
     return [
+        {
+            "endpoint": "admin.feeds",
+            "title": "Feeds",
+            "class_name": "feeds",
+        },
         {
             "endpoint": "admin.test_access",
             "title": "Test Access",
@@ -50,6 +57,57 @@ def test_access():
         menu_items=get_menu_items(),
         active_endpoint=flask.request.endpoint
     )
+
+@bp.get("/feeds")
+def feeds():
+    return flask.render_template(
+        "admin/feeds.html",
+        menu_items=get_menu_items(),
+        active_endpoint=flask.request.endpoint,
+    )
+
+@bp.get("/feeds/list")
+def feeds_list():
+    stores = flask.current_app.extensions["stores"]
+    sort = flask.request.args.get("sort", "updated")
+    raw_start = flask.request.args.get("start")
+
+    start = deobfuscate_json(raw_start) if raw_start else None
+
+    if sort == "title":
+        feeds, next_start = stores.feeds.get_page_by_title(start)
+    else:
+        feeds, next_start = stores.feeds.get_page_by_updated(start)
+
+    result = {
+        "feeds": [
+            {
+                "id": f.id,
+                "title": f.title,
+                "feed_url": f.feed_url,
+                "site_url": f.site_url,
+                "updated": f.updated,
+                "disabled": f.disabled,
+                "description": f.description,
+                "published": f.published,
+            }
+            for f in feeds
+        ],
+    }
+    if next_start:
+        result["continue"] = obfuscate_json(next_start)
+
+    return flask.jsonify(result)
+
+@bp.post("/feeds/set-enabled")
+def feeds_set_enabled():
+    stores = flask.current_app.extensions["stores"]
+    data = flask.request.get_json(force=True)
+    feed_ids = data.get("ids", [])
+    enabled = bool(data.get("enabled", True))
+    if feed_ids:
+        stores.feeds.set_disabled(feed_ids, not enabled)
+    return flask.jsonify({"ok": True})
 
 @bp.post("/test-access")
 def test_access_post():

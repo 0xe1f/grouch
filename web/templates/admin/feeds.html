@@ -1,0 +1,272 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Feeds{% endblock %}
+
+{% block toolbar %}
+<button id="admin-exit" onclick="location.href='/'"></button>
+{% endblock %}
+
+{% block content %}
+<table id="feeds-table" class="admin-table">
+    <thead>
+        <tr class="admin-action-row">
+            <th colspan="5">
+                <div class="admin-action-bar">
+                    <div class="admin-sort-group">
+                        <button class="admin-sort-btn active" data-sort="updated">By Updated</button>
+                        <button class="admin-sort-btn" data-sort="title">By Title</button>
+                    </div>
+                    <div class="admin-bulk-actions">
+                        <button id="btn-enable-selected" disabled>Enable Selected</button>
+                        <button id="btn-disable-selected" disabled>Disable Selected</button>
+                    </div>
+                </div>
+            </th>
+        </tr>
+        <tr class="admin-col-headers">
+            <th class="col-check"><input type="checkbox" id="select-all" title="Select all"></th>
+            <th class="col-title">Title</th>
+            <th class="col-site">Site</th>
+            <th class="col-updated">Updated</th>
+            <th class="col-actions">Actions</th>
+        </tr>
+    </thead>
+    <tbody id="feeds-body"></tbody>
+</table>
+<div id="feeds-continue" class="next-page" style="display:none">Continue</div>
+
+<script>
+$(function() {
+    var continueFrom = null;
+    var currentSort = "updated";
+
+    function stripProtocol(url) {
+        return url ? url.replace(/^https?:\/\//, "") : "";
+    }
+
+    function formatDate(ts) {
+        if (!ts) return "";
+        return new Date(ts * 1000).toLocaleString();
+    }
+
+    function updateBulkButtons() {
+        var any = $("#feeds-body input.admin-check:checked").length > 0;
+        $("#btn-enable-selected, #btn-disable-selected").prop("disabled", !any);
+    }
+
+    function renderRow(feed) {
+        var $row = $("<tr />", {
+            "data-feed-id": feed.id,
+            "class": feed.disabled ? "admin-row admin-row-disabled" : "admin-row",
+        });
+
+        var $check = $("<td />", { "class": "col-check" }).append(
+            $("<input />", { "type": "checkbox", "class": "admin-check", "data-feed-id": feed.id })
+        );
+
+        var $titleLink = $("<a />", { "href": feed.feed_url, "target": "_blank" })
+            .text(feed.title || "(untitled)");
+        if (feed.disabled) {
+            $titleLink.addClass("admin-cell-disabled");
+        }
+        var $title = $("<td />", { "class": "col-title" }).append($titleLink);
+
+        var $site = $("<td />", { "class": "col-site" });
+        if (feed.site_url) {
+            $site.append($("<a />", { "href": feed.site_url, "target": "_blank" })
+                .text(stripProtocol(feed.site_url)));
+        }
+
+        var $updated = $("<td />", { "class": "col-updated" }).text(formatDate(feed.updated));
+
+        var $viewLink = $("<a />", { "href": "#", "class": "admin-action" }).text("View");
+        var $toggleLink = $("<a />", {
+            "href": "#",
+            "class": "admin-action admin-toggle",
+            "data-feed-id": feed.id,
+            "data-disabled": feed.disabled ? "1" : "0",
+        }).text(feed.disabled ? "Enable" : "Disable");
+
+        var $actions = $("<td />", { "class": "col-actions" })
+            .append($viewLink)
+            .append($("<span />", { "class": "admin-action-sep" }).text(" · "))
+            .append($toggleLink);
+
+        $row.append($check, $title, $site, $updated, $actions);
+
+        $viewLink.click(function(e) {
+            e.preventDefault();
+            var $detail = $row.next(".admin-detail-row");
+            if ($detail.length) {
+                $detail.remove();
+                return;
+            }
+            var $content = $("<div />", { "class": "admin-detail-content" });
+            $content.append($("<p />").text(feed.description || "(no description)"));
+            if (feed.published) {
+                $content.append(
+                    $("<p />", { "class": "admin-detail-meta" })
+                        .text("Published: " + formatDate(feed.published))
+                );
+            }
+            $row.after(
+                $("<tr />", { "class": "admin-detail-row" })
+                    .append($("<td />", { "colspan": 5 }).append($content))
+            );
+        });
+
+        return $row;
+    }
+
+    function loadPage() {
+        var params = { sort: currentSort };
+        if (continueFrom) {
+            params.start = continueFrom;
+        }
+        $.ajax({
+            url: "/admin/feeds/list",
+            data: params,
+            success: function(resp) {
+                continueFrom = resp.continue || null;
+                $.each(resp.feeds, function(_, feed) {
+                    $("#feeds-body").append(renderRow(feed));
+                });
+                if (continueFrom) {
+                    $("#feeds-continue").show();
+                } else {
+                    $("#feeds-continue").hide();
+                }
+            },
+        });
+    }
+
+    function resetAndLoad() {
+        continueFrom = null;
+        $("#feeds-body").empty();
+        $("#feeds-continue").hide();
+        $("#select-all").prop("checked", false).prop("indeterminate", false);
+        updateBulkButtons();
+        loadPage();
+    }
+
+    // Sort buttons
+    $(".admin-sort-btn").click(function() {
+        var sort = $(this).data("sort");
+        if (sort === currentSort) return;
+        currentSort = sort;
+        $(".admin-sort-btn").removeClass("active");
+        $(this).addClass("active");
+        resetAndLoad();
+    });
+
+    // Select all
+    $("#select-all").change(function() {
+        $("#feeds-body input.admin-check").prop("checked", this.checked);
+        updateBulkButtons();
+    });
+
+    // Individual checkboxes
+    $("#feeds-body").on("change", "input.admin-check", function() {
+        var total = $("#feeds-body input.admin-check").length;
+        var checked = $("#feeds-body input.admin-check:checked").length;
+        $("#select-all")
+            .prop("indeterminate", checked > 0 && checked < total)
+            .prop("checked", checked === total && total > 0);
+        updateBulkButtons();
+    });
+
+    // Per-row enable/disable toggle
+    $("#feeds-body").on("click", ".admin-toggle", function(e) {
+        e.preventDefault();
+        var $link = $(this);
+        var feedId = $link.data("feed-id");
+        var enabling = $link.data("disabled") == "1";
+        $.ajax({
+            url: "/admin/feeds/set-enabled",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ ids: [feedId], enabled: enabling }),
+            success: function() {
+                var $row = $("#feeds-body tr[data-feed-id='" + feedId + "']");
+                if (enabling) {
+                    $row.removeClass("admin-row-disabled");
+                    $row.find("a.admin-cell-disabled").removeClass("admin-cell-disabled");
+                    $link.text("Disable").data("disabled", "0");
+                } else {
+                    $row.addClass("admin-row-disabled");
+                    $row.find(".col-title a").addClass("admin-cell-disabled");
+                    $link.text("Enable").data("disabled", "1");
+                }
+            },
+        });
+    });
+
+    // Bulk enable
+    $("#btn-enable-selected").click(function() {
+        var ids = $("#feeds-body input.admin-check:checked").map(function() {
+            return $(this).data("feed-id");
+        }).get();
+        if (!ids.length) return;
+        $.ajax({
+            url: "/admin/feeds/set-enabled",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ ids: ids, enabled: true }),
+            success: function() {
+                ids.forEach(function(id) {
+                    var $row = $("#feeds-body tr.admin-row[data-feed-id='" + id + "']");
+                    $row.removeClass("admin-row-disabled");
+                    $row.find("a.admin-cell-disabled").removeClass("admin-cell-disabled");
+                    $row.find(".admin-toggle").text("Disable").data("disabled", "0");
+                });
+                $("#feeds-body input.admin-check").prop("checked", false);
+                $("#select-all").prop("checked", false).prop("indeterminate", false);
+                updateBulkButtons();
+            },
+        });
+    });
+
+    // Bulk disable
+    $("#btn-disable-selected").click(function() {
+        var ids = $("#feeds-body input.admin-check:checked").map(function() {
+            return $(this).data("feed-id");
+        }).get();
+        if (!ids.length) return;
+        $.ajax({
+            url: "/admin/feeds/set-enabled",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ ids: ids, enabled: false }),
+            success: function() {
+                ids.forEach(function(id) {
+                    var $row = $("#feeds-body tr.admin-row[data-feed-id='" + id + "']");
+                    $row.addClass("admin-row-disabled");
+                    $row.find(".col-title a").addClass("admin-cell-disabled");
+                    $row.find(".admin-toggle").text("Enable").data("disabled", "1");
+                });
+                $("#feeds-body input.admin-check").prop("checked", false);
+                $("#select-all").prop("checked", false).prop("indeterminate", false);
+                updateBulkButtons();
+            },
+        });
+    });
+
+    // Continue button click
+    $("#feeds-continue").click(function() {
+        loadPage();
+    });
+
+    // Auto-scroll pagination
+    $("#admin-content").scroll(function() {
+        if (!$("#feeds-continue").is(":visible")) return;
+        var pagerHeight = $("#feeds-continue").outerHeight();
+        var offset = $("#feeds-table").height() - ($(this).scrollTop() + $(this).height()) - pagerHeight;
+        if (offset < 36) {
+            $("#feeds-continue").click();
+        }
+    });
+
+    resetAndLoad();
+});
+</script>
+{% endblock %}

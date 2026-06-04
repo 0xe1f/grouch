@@ -20,6 +20,8 @@ FeedMeta = tuple[str, str]
 class FeedDao(Dao):
 
     BY_URL = "maint/feeds_by_url"
+    ALL_BY_UPDATED = "maint/feeds_all_by_updated"
+    ALL_BY_TITLE = "maint/feeds_all_by_title"
 
     def find_by_id(
         self,
@@ -56,3 +58,51 @@ class FeedDao(Dao):
         iterable = self.db.iterview("maint/updated_feeds", batch_limit, **options)
         for item in iterable:
             yield Feed(item.doc)
+
+    def get_page_by_updated(
+        self,
+        start: dict|None=None,
+        limit: int=40,
+    ) -> tuple[list[Feed], dict|None]:
+        return self._get_page(self.__class__.ALL_BY_UPDATED, start, limit)
+
+    def get_page_by_title(
+        self,
+        start: dict|None=None,
+        limit: int=40,
+    ) -> tuple[list[Feed], dict|None]:
+        return self._get_page(self.__class__.ALL_BY_TITLE, start, limit)
+
+    def _get_page(
+        self,
+        view: str,
+        start: dict|None,
+        limit: int,
+    ) -> tuple[list[Feed], dict|None]:
+        options = {
+            "include_docs": True,
+            "limit": limit + 1,
+        }
+        if start:
+            options["startkey"] = start["key"]
+            options["startkey_docid"] = start["id"]
+
+        rows = list(self.db.view(view, **options))
+        next_start = None
+        if len(rows) > limit:
+            extra = rows[limit]
+            next_start = {"key": extra.key, "id": extra.id}
+            rows = rows[:limit]
+
+        return [Feed(row.doc) for row in rows], next_start
+
+    def set_disabled(
+        self,
+        feed_ids: list[str],
+        disabled: bool,
+    ):
+        feeds = self.find_by_id(*feed_ids)
+        with self.new_q() as q:
+            for feed in feeds:
+                feed.disabled = disabled
+                q.enqueue(feed)

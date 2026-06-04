@@ -198,6 +198,10 @@ button.solid-color:hover {
     background-color: #cedefa;
 }
 
+#admin-nav ul li a.feeds {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z'/%3E%3C/svg%3E");
+}
+
 #admin-nav ul li a.test-access {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' enable-background='new 0 0 24 24' height='24px' viewBox='0 0 24 24' width='24px' fill='%23575757'%3E%3Cg%3E%3Crect fill='none' height='24' width='24'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M13,11.33L18,18H6l5-6.67V6h2 M15.96,4H8.04C7.62,4,7.39,4.48,7.65,4.81L9,6.5v4.17L3.2,18.4C2.71,19.06,3.18,20,4,20h16 c0.82,0,1.29-0.94,0.8-1.6L15,10.67V6.5l1.35-1.69C16.61,4.48,16.38,4,15.96,4L15.96,4z'/%3E%3C/g%3E%3C/svg%3E");
 }
@@ -205,7 +209,7 @@ button.solid-color:hover {
 #admin-content {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5em 2em;
+    padding: 0 2em 1.5em 2em;
 }
 
 /* ---- Dropdown menus ---- */
@@ -309,4 +313,177 @@ ul.menu {
     word-break: break-all;
     max-height: 60vh;
     color: #333;
+}
+
+/* ---- Admin table (generic) ---- */
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11pt;
+}
+
+.admin-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-table thead th {
+    background-color: #fff;
+    text-align: left;
+    font-size: 10pt;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.5em 0.6em;
+    border-bottom: solid 1px #ccc;
+    white-space: nowrap;
+}
+
+.admin-table thead th.col-check {
+    width: 2em;
+    text-align: center;
+}
+
+.admin-table thead th.col-actions {
+    width: 8em;
+}
+
+.admin-table tbody tr.admin-row {
+    border-bottom: solid 1px #eee;
+}
+
+.admin-table tbody tr.admin-row:hover {
+    background-color: #f5f8ff;
+}
+
+.admin-table tbody td {
+    padding: 0.5em 0.6em;
+    vertical-align: top;
+}
+
+.admin-table tbody td.col-check {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.admin-table tbody td.col-actions {
+    white-space: nowrap;
+}
+
+tr.admin-row-disabled td a {
+    color: #bbb;
+}
+
+a.admin-cell-disabled {
+    color: #aaa !important;
+    text-decoration: line-through;
+}
+
+.admin-action {
+    font-size: 10pt;
+    color: #555;
+}
+
+.admin-action:hover {
+    color: #0276FD;
+}
+
+.admin-action-sep {
+    color: #ccc;
+}
+
+.admin-detail-row td {
+    background-color: #f8f8f8;
+    border-bottom: solid 1px #eee;
+}
+
+.admin-detail-content {
+    padding: 0.5em 0.75em 0.5em 2.5em;
+    font-size: 10pt;
+    color: #555;
+    line-height: 1.5;
+}
+
+.admin-detail-content p {
+    margin: 0.25em 0;
+}
+
+.admin-detail-meta {
+    color: #888;
+}
+
+/* ---- Admin action bar (generic) ---- */
+
+.admin-action-row th {
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0.5em 0;
+    border-bottom: none;
+}
+
+.admin-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.5em;
+    border-bottom: solid 1px #eee;
+}
+
+.admin-sort-group {
+    display: flex;
+    gap: 0.4em;
+}
+
+.admin-sort-btn {
+    font-size: 10pt;
+    padding: 0.3em 0.75em;
+}
+
+.admin-sort-btn.active {
+    background-color: #cedefa;
+    border-color: #99b8f0;
+    color: #333;
+}
+
+.admin-bulk-actions {
+    display: flex;
+    gap: 0.4em;
+}
+
+.admin-bulk-actions button {
+    font-size: 10pt;
+    padding: 0.3em 0.75em;
+}
+
+.admin-bulk-actions button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.admin-col-headers th {
+    border-top: solid 1px #eee;
+}
+
+/* ---- Feeds table (feed-specific column rules) ---- */
+
+#feeds-table tbody td.col-site {
+    font-size: 10pt;
+    color: #666;
+    max-width: 18em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#feeds-table tbody td.col-updated {
+    font-size: 10pt;
+    color: #888;
+    white-space: nowrap;
+}
+
+#feeds-table thead th.col-updated {
+    width: 12em;
 }

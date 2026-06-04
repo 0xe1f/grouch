@@ -249,6 +249,24 @@ class Connection:
                         }
                     """
                 },
+                feeds_all_by_updated={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.updated);
+                            }
+                        }
+                    """
+                },
+                feeds_all_by_title={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed') {
+                                emit(doc.title);
+                            }
+                        }
+                    """
+                },
             )
             self.save_design_doc(design_doc)
 
