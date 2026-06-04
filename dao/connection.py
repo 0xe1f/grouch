@@ -19,7 +19,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 2
+_SCHEMA_VERSION_CURRENT = 3
 
 class Connection:
 
@@ -234,10 +234,7 @@ class Connection:
                 },
             )
 
-        self.save_design_doc(design_doc)
-
         if from_ver < 2:
-            design_doc = self.get_design_doc("maint")
             self.add_views(
                 design_doc,
                 updated_feeds={
@@ -249,6 +246,11 @@ class Connection:
                         }
                     """
                 },
+            )
+
+        if from_ver < 3:
+            self.add_views(
+                design_doc,
                 feeds_all_by_updated={
                     "map": """
                         function (doc) {
@@ -278,7 +280,8 @@ class Connection:
                     "reduce": "_count"
                 },
             )
-            self.save_design_doc(design_doc)
+
+        self.save_design_doc(design_doc)
 
     def get_design_doc(self, design_doc_name: str):
         id = f"_design/{design_doc_name}"
