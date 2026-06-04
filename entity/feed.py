@@ -81,6 +81,14 @@ class Feed(Entity):
         self._computed_digest = None
 
     @property
+    def disabled(self) -> bool:
+        return self._doc.get("disabled", False)
+
+    @disabled.setter
+    def disabled(self, val: bool):
+        self.set_prop("disabled", val)
+
+    @property
     def digest(self) -> str:
         return self.get_prop("digest")
 

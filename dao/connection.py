@@ -19,7 +19,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 1
+_SCHEMA_VERSION_CURRENT = 2
 
 class Connection:
 
@@ -235,6 +235,22 @@ class Connection:
             )
 
         self.save_design_doc(design_doc)
+
+        if from_ver < 2:
+            design_doc = self.get_design_doc("maint")
+            self.add_views(
+                design_doc,
+                updated_feeds={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'feed' && !doc.disabled) {
+                                emit(doc.updated);
+                            }
+                        }
+                    """
+                },
+            )
+            self.save_design_doc(design_doc)
 
     def get_design_doc(self, design_doc_name: str):
         id = f"_design/{design_doc_name}"
