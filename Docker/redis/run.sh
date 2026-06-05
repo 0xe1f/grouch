@@ -9,3 +9,8 @@ NAME="redis.$NETWORK"
         --rm \
         redis:7-alpine \
         $@)
+
+echo "Waiting for Redis to be ready..."
+until docker exec "$NAME" redis-cli ping >/dev/null 2>&1; do
+    sleep 1
+done
