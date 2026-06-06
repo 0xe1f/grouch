@@ -19,8 +19,6 @@ from parser.defs import Alternative
 from parser.defs import ParseResult
 from parser import sanitizer
 from parser import consts
-from parser.custom import custom_parsers
-from urllib.parse import urlparse
 import datetime
 import feedparser
 import logging
@@ -32,11 +30,6 @@ _FEED_TYPES = [
 ]
 
 def parse_url(url: str) -> ParseResult:
-    for (matcher, parser) in custom_parsers.items():
-        if matcher(url):
-            logging.debug(f"Custom parser matched '{url}'")
-            return parser(url)
-
     if not (doc := feedparser.parse(url)):
         logging.error(f"FeedParser returned nothing for '{url}'")
         return None
@@ -77,11 +70,6 @@ def parse_feed(url: str) -> ParseResult:
     if not (doc := feedparser.parse(url)):
         logging.error(f"No document available for '{url}'")
         return ParseResult(url)
-
-    for (matcher, parser) in custom_parsers.items():
-        if matcher(url):
-            logging.debug(f"Custom parser matched '{url}'")
-            return parser(url)
 
     return _parse_feed(doc, url)
 
