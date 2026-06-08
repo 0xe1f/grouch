@@ -120,6 +120,6 @@ class Article(Entity):
         doc_type, parts = cls.decompose_key(obj_id)
         if doc_type != cls.DOC_TYPE:
             return None
-        if len(parts) != 3:
+        if len(parts) != 2:
             return None
         return cls.build_key(User.DOC_TYPE, parts[0])

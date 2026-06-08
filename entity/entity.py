@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import re
+from urllib.parse import quote, unquote
 
 class Entity:
 
@@ -79,11 +80,11 @@ class Entity:
 
     @classmethod
     def build_key(cls, prefix: str, *entity_ids: str) -> str:
-        # TODO: should also strip out :+ in individual ids
-        # Remove entity prefix from each key
-        stripped = [re.sub(r"^[a-z]+::", "", id) for id in entity_ids]
-        # Join them together and tack on a prefix
-        return f"{prefix}::{"::".join(stripped)}"
+        parts = []
+        for entity_id in entity_ids:
+            stripped = re.sub(r"^[a-z]+::", "", entity_id)
+            parts.append(quote(unquote(stripped), safe='/'))
+        return f"{prefix}::{'::'.join(parts)}"
 
     @classmethod
     def extract_doc_type(cls, entity_id: str) -> str|None:
@@ -95,4 +96,4 @@ class Entity:
         parts = key.split("::")
         if not parts:
             return None, None
-        return parts[0], parts[1:]
+        return parts[0], [unquote(p) for p in parts[1:]]
