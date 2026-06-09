@@ -32,6 +32,13 @@
     // A 15x15 transparent image
     var transparentIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH3QkaEBchBQxHYwAAAbxJREFUKM+lkr1rFEEYxn8zs7eXu1u4i3prwJOAqBeicCBYCYIgCgraSBRt/ANSia2FdsbCIkVsLDVaqdiJYJqQWGkTUEyQBYNfJ5ecObMfszMWl2wIuYiQt5qB+T3P+77zwA5KACw9uYyTqv+GtEqpXHmKBDJQeP663j9r/b2TtVDop3jhPjYJMa0A0/qMDmYxzU/bi2Rwrkj64yOyfxDl11F+nVz9LHp+ivj9JDbubA+b9iLh6zuAQHo+cu8wbuMSzsFTqNoxwle3MSvfN8Fy4+TQd/oW7vHryIFhdDDN6sub6IU3iL4y+ROjIFVvZ1neh/KHUP4QAO6Ri0QzE0RvHyJKVdTAUdzGCPG7ya3OphXw59ko4dQ9dDCLKFXJn7yBKO4imnmATUJyh8+AUD3aXvt122kSTY+TzL1AuB5uYwS72sL8/ADKRVZqPWDHpXBujML5u8hyjXjuOViDrB4CIP210AV2H9g6M2mKDZcAsEkHdIxZ/oKs7EfkPUxzvgtXBjfHc+XR1bWbAqVAx9kSbdjGRr9B5ZClPZj2N8DiXXvcddYq7UbOpqDTTNksL27sI00w7a9ZtndcfwE4Q5nI69qxywAAAABJRU5ErkJggg==";
 
+    const slugify = function(str) {
+        return (str || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "item";
+    };
+
     var linkify = function(str, args) {
         const re = /\(((?:[a-z]+:\/\/|%(?:[0-9]+\$)?s)[^\)]*)\)\[([^\]]*)\]/g;
         var m;
@@ -204,7 +211,7 @@
             this.loadEntries();
         },
         "readableId": function() {
-            return this.isRoot() ? "" : btoa(this.id);
+            return this.isRoot() ? "" : (this.slug || btoa(this.id));
         },
         "select": function(reloadItems /* = true */) {
             if (typeof reloadItems === "undefined")
@@ -1960,6 +1967,31 @@
 
                 return 0;
             });
+        });
+
+        // Assign URL-safe slugs for hash navigation
+        // Pre-seed reserved slugs so user folders/subs can't collide with them
+        const slugCounts = { "liked-items": 1, "starred-items": 1 };
+        const assignSlug = function(item) {
+            const base = slugify(item.title);
+            if (!slugCounts[base]) {
+                slugCounts[base] = 1;
+                item.slug = base;
+            } else {
+                item.slug = `${base}-${++slugCounts[base]}`;
+            }
+        };
+        $.each(map[""], function(_, item) {
+            if (!item.id) {
+                return; // skip root
+            }
+            assignSlug(item);
+            if (map[item.id]) {
+                $.each(
+                    map[item.id],
+                    function(_, child) { assignSlug(child); }
+                );
+            }
         });
 
         delete fmap;
