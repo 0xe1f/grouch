@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from os.path import abspath, dirname, exists, join
+from common.config import load_config
 import flask_socketio
-import tomllib
 
 _socketio = None
 
@@ -22,10 +21,6 @@ _socketio = None
 def notify(user_id: str, event: str, payload=None):
     global _socketio
     if _socketio is None:
-        config_path = "config.toml"
-        if not exists(config_path):
-            config_path = join(dirname(abspath(__file__)), "..", "config.toml")
-        with open(config_path, "rb") as f:
-            config = tomllib.load(f)
+        config = load_config()
         _socketio = flask_socketio.SocketIO(message_queue=config['REDIS_URL'])
     _socketio.emit(event, payload, to=user_id)

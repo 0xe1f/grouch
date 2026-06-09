@@ -14,22 +14,13 @@
 
 from celery import Celery
 from celery.signals import worker_init
-from os.path import abspath, dirname, exists, join
+from common.config import load_config
 import dao
 import functools
 import redis as redis_lib
-import tomllib
 
 
-def _load_config() -> dict:
-    config_path = "config.toml"
-    if not exists(config_path):
-        config_path = join(dirname(abspath(__file__)), "..", "config.toml")
-    with open(config_path, "rb") as f:
-        return tomllib.load(f)
-
-
-_config = _load_config()
+_config = load_config()
 
 celery_app = Celery(
     'grouch',

@@ -80,6 +80,19 @@ export GROUCH_REDIS_URL="redis://localhost:$REDIS_PORT/0"
 
 export FLASK_DEBUG=1
 
+cleanup() {
+    echo ""
+    echo "Shutting down..."
+    kill "$WORKER_PID" 2>/dev/null
+    wait "$WORKER_PID" 2>/dev/null
+}
+trap cleanup EXIT INT TERM
+
+echo ""
+echo "Starting Celery worker..."
+celery -A tasks.celery_app worker --loglevel=info --concurrency=2 &
+WORKER_PID=$!
+
 echo ""
 echo "Starting serve.py with hot-reloading..."
 exec python web/serve.py

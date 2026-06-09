@@ -15,16 +15,12 @@
 # limitations under the License.
 
 from argparse import ArgumentParser
+from common.config import load_config
 from datetime import datetime
-from os.path import abspath
-from os.path import dirname
-from os.path import exists
-from os.path import join
 from dao import Database
 from tasks.feeds import refresh_feeds
 import logging
 import dao
-import tomllib
 
 def main():
     arg_parser = ArgumentParser()
@@ -39,13 +35,7 @@ def main():
     args = arg_parser.parse_args()
     logging.basicConfig(level=logging.DEBUG)
 
-    config_path = "config.toml"
-    if not exists(config_path):
-        script_dir = dirname(abspath(__file__))
-        config_path = join(script_dir, "config.toml")
-
-    with open(config_path, "rb") as file:
-        config = tomllib.load(file)
+    config = load_config()
 
     conn = dao.Connection()
     conn.connect(
