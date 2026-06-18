@@ -81,6 +81,25 @@ class Feed(Entity):
         self._computed_digest = None
 
     @property
+    def etag(self) -> str:
+        return self.get_prop("etag")
+
+    @etag.setter
+    def etag(self, val: str):
+        # HTTP cache validator, not feed content — deliberately excluded from
+        # computed_digest() so it never counts as a content change.
+        self.set_prop("etag", val)
+
+    @property
+    def last_modified(self) -> str:
+        return self.get_prop("last_modified")
+
+    @last_modified.setter
+    def last_modified(self, val: str):
+        # HTTP cache validator, not feed content — see etag note above.
+        self.set_prop("last_modified", val)
+
+    @property
     def disabled(self) -> bool:
         return self._doc.get("disabled", False)
 

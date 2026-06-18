@@ -27,7 +27,8 @@ def import_feeds(
     bulk_q: BulkUpdateQueue,
     *feed_urls: str,
 ) -> set[str]:
-    successful, _ = _fetch_feeds(*feed_urls)
+    # Fresh imports have no cached validators yet — fetch unconditionally.
+    successful, _, _ = _fetch_feeds(*[(url, None, None) for url in feed_urls])
     import_feed_results(bulk_q, *successful)
 
     return [result.url for result in successful]
@@ -86,19 +87,38 @@ def _freshen_stale_feed(
 
     feeds_changed = 0
     entries_changed = 0
-    successful, _ = _fetch_feeds(*local_feed_map.keys())
+    specs = [
+        (feed.feed_url, feed.etag, feed.last_modified)
+        for feed in local_feed_map.values()
+    ]
+    successful, failed, not_modified = _fetch_feeds(*specs)
+
+    # Log the outcome for every feed, regardless of result.
+    for result in not_modified:
+        logging.info(f"Feed unchanged (304 Not Modified): {result.url}")
+    for result in failed:
+        logging.info(f"Feed fetch failed (no content): {result.url}")
 
     for result in successful:
         remote_feed = result.feed
         local_feed = local_feed_map[remote_feed.feed_url]
-        if remote_feed.digest != local_feed.digest:
-            feeds_changed += 1
+
+        feed_meta_changed = remote_feed.digest != local_feed.digest
+        # Persist refreshed validators even when content is unchanged, otherwise
+        # the conditional GET never becomes effective for a stable feed.
+        validators_changed = (
+            remote_feed.etag != local_feed.etag
+            or remote_feed.last_modified != local_feed.last_modified
+        )
+        if feed_meta_changed or validators_changed:
+            feeds_changed += feed_meta_changed
             remote_feed.rev = local_feed.rev
             remote_feed.id = local_feed.id
             remote_feed.digest = remote_feed.computed_digest()
 
             bulk_q.enqueue(remote_feed)
 
+        feed_entries_changed = 0
         remote_entry_map = { entry.entry_uid:entry for entry in result.entries }
         for local_entry in dao.entries.iter_by_uid(local_feed.id, *remote_entry_map.keys()):
             remote_entry = remote_entry_map[local_entry.entry_uid]
@@ -109,7 +129,7 @@ def _freshen_stale_feed(
                 remote_entry.digest = remote_entry.computed_digest()
 
                 bulk_q.enqueue(remote_entry)
-                entries_changed += 1
+                feed_entries_changed += 1
                 del remote_entry_map[local_entry.entry_uid]
             else:
                 del remote_entry_map[local_entry.entry_uid]
@@ -118,30 +138,54 @@ def _freshen_stale_feed(
             remote_entry.feed_id = local_feed.id
             remote_entry.digest = remote_entry.computed_digest()
             bulk_q.enqueue(remote_entry)
-            entries_changed += 1
+            feed_entries_changed += 1
+
+        entries_changed += feed_entries_changed
+        if feed_meta_changed or feed_entries_changed:
+            logging.info(
+                f"Feed updated: {result.url} "
+                f"(metadata={'changed' if feed_meta_changed else 'same'}, "
+                f"+{feed_entries_changed} entries)"
+            )
+        else:
+            logging.info(f"Feed unchanged (200 OK, same content): {result.url}")
 
     logging.info(f"{feeds_changed} feeds and {entries_changed} entries updated")
 
 def _fetch_feeds(
-    *feed_urls: str,
-) -> tuple[list[ParseResult], list[ParseResult]]:
+    *specs: tuple[str, str | None, str | None],
+) -> tuple[list[ParseResult], list[ParseResult], list[ParseResult]]:
+    """Fetch feeds in parallel.
+
+    Each spec is (url, etag, last_modified); the latter two enable a conditional
+    GET. Returns (successful, failed, not_modified) lists of ParseResult.
+    """
     start = time.time()
 
     successful = []
     failed = []
+    not_modified = []
     with ThreadPoolExecutor(max_workers=10) as executor:
-        future_to_url = { executor.submit(parse_feed, url):url for url in feed_urls }
+        future_to_url = {
+            executor.submit(parse_feed, url, etag, last_modified): url
+            for (url, etag, last_modified) in specs
+        }
         for future in as_completed(future_to_url):
             url = future_to_url[future]
             try:
                 result = future.result()
-                if result.feed:
+                if result.not_modified:
+                    not_modified.append(result)
+                elif result.feed:
                     successful.append(result)
                 else:
                     failed.append(result)
             except Exception:
                 logging.exception(f"Failed to load {url}")
 
-    logging.info(f"Fetched {len(feed_urls)} in {"%.2f" % (time.time() - start)}s; {len(successful)} OK, {len(failed)} failed")
+    logging.info(
+        f"Fetched {len(specs)} in {"%.2f" % (time.time() - start)}s; "
+        f"{len(successful)} OK, {len(not_modified)} unchanged (304), {len(failed)} failed"
+    )
 
-    return successful, failed
+    return successful, failed, not_modified

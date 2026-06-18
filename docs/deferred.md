@@ -4,8 +4,6 @@ Items from the TODO/FIXME audit that require further investigation or a separate
 
 ---
 
----
-
 ## 4. `articleExtras` dead code — `web/static/js/reader.js`
 
 Two related issues:
@@ -71,20 +69,6 @@ Separately, `refresh_feeds` (in `refresh.py`) runs as its own process and can co
 - For concurrent subscribes: would a per-feed Redis lock during the fetch+write window prevent duplicate creation?
 - For subscribe vs. refresh conflicts: would a retry-on-conflict strategy (re-fetch current `_rev` and retry) be sufficient, or does the conflict window need to be narrowed further?
 - Is conflict frequency high enough at current scale to warrant immediate action?
-
----
-
-## Future work: ETag / Last-Modified support in feed pipeline
-
-Currently `requests.get` fetches the full feed body on every refresh, ignoring HTTP caching headers. Adding conditional GET support would reduce bandwidth and skip re-parsing unchanged feeds.
-
-**Agreed direction:**
-1. Add `etag` and `last_modified` fields to the `Feed` entity.
-2. Store the values after each successful fetch.
-3. On subsequent requests, pass `If-None-Match` / `If-Modified-Since` headers.
-4. Handle `304 Not Modified` responses to skip re-parsing entirely.
-
-Implement as part of the feed pipeline plan alongside favicon fetching (item 9).
 
 ---
 

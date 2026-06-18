@@ -87,6 +87,27 @@ class TestFeedContent(unittest.TestCase):
             self.assertEqual(previous_digest, digest)
             previous_digest = digest
 
+    def test_feed_validator_properties(self):
+        obj = Feed()
+        for k in ("etag", "last_modified"):
+            v = uuid.uuid4().hex
+            self.assertTrue(hasattr(obj, k))
+            setattr(obj, k, v)
+            self.assertEqual(getattr(obj, k), v)
+
+    def test_feed_validators_do_not_affect_digest(self):
+        # Two feeds with identical content but different cache validators must
+        # produce the same digest (validators are excluded from hash_keys).
+        plain = Feed()
+        with_validators = Feed()
+        for k, v in self.__class__.DIGEST_DICT.items():
+            setattr(plain, k, v)
+            setattr(with_validators, k, v)
+        with_validators.etag = uuid.uuid4().hex
+        with_validators.last_modified = uuid.uuid4().hex
+
+        self.assertEqual(plain.computed_digest(), with_validators.computed_digest())
+
 class TestEntryContent(unittest.TestCase):
 
     DIGEST_DICT = {

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
 from html.parser import unescape
 from entity import Entry
 from entity import Feed
@@ -30,21 +31,48 @@ _FEED_TYPES = [
     "application/rss+xml",
 ]
 
-def _fetch_url(url: str) -> tuple[bytes, dict] | None:
-    """Fetch raw feed bytes with a hard timeout.
+@dataclass
+class _Fetched:
+    content: bytes | None = None
+    headers: dict | None = None
+    etag: str | None = None
+    last_modified: str | None = None
+    not_modified: bool = False
+
+def _fetch_url(
+    url: str,
+    etag: str | None = None,
+    last_modified: str | None = None,
+) -> _Fetched | None:
+    """Fetch raw feed bytes with a hard timeout and conditional GET support.
 
     feedparser has no timeout of its own, so we do the HTTP request and pass the
-    body to feedparser.parse(). Returns the content and response headers (the
-    latter lets feedparser detect charset/encoding), or None on any request
-    failure (timeout, connection error, etc.). We intentionally do not call
+    body to feedparser.parse(). When etag/last_modified are supplied we send
+    If-None-Match / If-Modified-Since; a 304 response yields a not-modified
+    result (the caller skips re-parsing). Returns None on any request failure
+    (timeout, connection error, etc.). We intentionally do not call
     raise_for_status() — feedparser's bozo/version checks already handle bad
     or error-page content.
     """
+    req_headers = {}
+    if etag:
+        req_headers["If-None-Match"] = etag
+    if last_modified:
+        req_headers["If-Modified-Since"] = last_modified
+
     try:
-        response = requests.get(url, timeout=consts.FEED_FETCH_TIMEOUT_SECS)
+        response = requests.get(
+            url,
+            timeout=consts.FEED_FETCH_TIMEOUT_SECS,
+            headers=req_headers or None,
+        )
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to fetch '{url}': {e}")
         return None
+
+    if response.status_code == 304:
+        # Server confirms our cached copy is current; echo the validators back.
+        return _Fetched(etag=etag, last_modified=last_modified, not_modified=True)
 
     # feedparser looks up response headers by lowercase key; requests preserves
     # the server's casing (e.g. "Content-Type"), so it would otherwise miss the
@@ -56,15 +84,19 @@ def _fetch_url(url: str) -> tuple[bytes, dict] | None:
         if k.lower() not in ("content-encoding", "content-length")
     }
 
-    return response.content, headers
+    return _Fetched(
+        content=response.content,
+        headers=headers,
+        etag=response.headers.get("ETag"),
+        last_modified=response.headers.get("Last-Modified"),
+    )
 
 def parse_url(url: str) -> ParseResult:
     if not (fetched := _fetch_url(url)):
         logging.error(f"FeedParser returned nothing for '{url}'")
         return None
 
-    content, headers = fetched
-    doc = feedparser.parse(content, response_headers=headers)
+    doc = feedparser.parse(fetched.content, response_headers=fetched.headers)
 
     if "version" not in doc:
         if "bozo_exception" in doc:
@@ -75,7 +107,7 @@ def parse_url(url: str) -> ParseResult:
 
     if doc.version:
         # URL represents an actual feed
-        return _parse_feed(doc, url)
+        return _parse_feed(doc, url, etag=fetched.etag, last_modified=fetched.last_modified)
 
     # Possibly an HTML doc? Try to extract an RSS feed
     if "feed" not in doc:
@@ -98,17 +130,29 @@ def parse_url(url: str) -> ParseResult:
     logging.error(f"No feeds for '{url}'")
     return None
 
-def parse_feed(url: str) -> ParseResult:
-    if not (fetched := _fetch_url(url)):
+def parse_feed(
+    url: str,
+    etag: str | None = None,
+    last_modified: str | None = None,
+) -> ParseResult:
+    fetched = _fetch_url(url, etag=etag, last_modified=last_modified)
+    if fetched is None:
         logging.error(f"No document available for '{url}'")
         return ParseResult(url)
 
-    content, headers = fetched
-    doc = feedparser.parse(content, response_headers=headers)
+    if fetched.not_modified:
+        return ParseResult(url, not_modified=True)
 
-    return _parse_feed(doc, url)
+    doc = feedparser.parse(fetched.content, response_headers=fetched.headers)
 
-def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
+    return _parse_feed(doc, url, etag=fetched.etag, last_modified=fetched.last_modified)
+
+def _parse_feed(
+    doc: feedparser.FeedParserDict,
+    url: str,
+    etag: str | None = None,
+    last_modified: str | None = None,
+) -> ParseResult:
     if "status" in doc and doc.status == 404:
         logging.error(f"Doc not found (404) ({url})")
         return ParseResult(url)
@@ -127,11 +171,16 @@ def _parse_feed(doc: feedparser.FeedParserDict, url: str) -> ParseResult:
 
     return ParseResult(
         url,
-        feed=_create_feed(url, doc.feed),
+        feed=_create_feed(url, doc.feed, etag=etag, last_modified=last_modified),
         entries=[_create_entry(entry) for entry in doc.entries],
     )
 
-def _create_feed(url: str, feed: feedparser.FeedParserDict) -> Feed:
+def _create_feed(
+    url: str,
+    feed: feedparser.FeedParserDict,
+    etag: str | None = None,
+    last_modified: str | None = None,
+) -> Feed:
     content = Feed()
     content.feed_url = url
     content.title = (feed.title or "")[:consts.MAX_TITLE_LEN]
@@ -148,6 +197,8 @@ def _create_feed(url: str, feed: feedparser.FeedParserDict) -> Feed:
         content.published = _utc_struct_as_timestamp(feed.updated_parsed)
     elif "published" in feed:
         content.published = _utc_struct_as_timestamp(feed.published_parsed)
+    content.etag = etag
+    content.last_modified = last_modified
     content.digest = content.computed_digest()
 
     return content

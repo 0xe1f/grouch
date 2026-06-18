@@ -27,3 +27,4 @@ class ParseResult:
     feed: Feed|None=None
     entries: list[Entry]|None=None
     alternatives: list[Alternative]|None=None
+    not_modified: bool=False
