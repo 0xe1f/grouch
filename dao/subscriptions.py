@@ -59,15 +59,18 @@ class SubscriptionDao(Dao):
 
         return matches
 
-    def find_metadata_by_user_by_synced(
+    def iter_metadata_by_user_by_synced(
         self,
         user_id: str,
-    ) -> list[tuple[str, str, str]]:
-        matches = []
-        for doc in self.db.view(self.__class__.BY_USER_BY_SYNC, start_key=[ user_id ], end_key=[ user_id, {} ]):
-            matches.append((doc.id, doc.value["feed_id"], doc.value.get("folder_id"), doc.value.get("last_sync")))
-
-        return matches
+        batch_size: int = 40,
+    ):
+        for doc in self.db.iterview(
+            self.__class__.BY_USER_BY_SYNC,
+            batch_size,
+            start_key=[user_id],
+            end_key=[user_id, {}],
+        ):
+            yield (doc.id, doc.value["feed_id"], doc.value.get("folder_id"), doc.value.get("last_sync"))
 
     def get_unread_counts_by_user(
         self,

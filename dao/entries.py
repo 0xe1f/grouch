@@ -43,6 +43,22 @@ class EntryDao(Dao):
         for item in self.db.view("maint/entries_by_feed_updated", **options):
             yield Entry(item.doc)
 
+    def iter_latest(
+        self,
+        feed_id: str,
+        n: int,
+        batch_size: int = 40,
+    ):
+        options = {
+            "start_key": [feed_id, {}],
+            "end_key": [feed_id],
+            "descending": True,
+            "limit": n,
+            "include_docs": True,
+        }
+        for item in self.db.iterview("maint/entries_by_feed_updated", batch_size, **options):
+            yield Entry(item.doc)
+
     def iter_by_uid(
         self,
         feed_id: str,

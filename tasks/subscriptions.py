@@ -46,22 +46,28 @@ def sync_subs(
     # Ensure nothing's left to write
     bulk_q.flush()
 
-    # FIXME: migrate to iterview
-    for sub_id, feed_id, folder_id, synced in dao.subs.find_metadata_by_user_by_synced(user_id):
+    for sub_id, feed_id, folder_id, synced in dao.subs.iter_metadata_by_user_by_synced(user_id):
         if feed_ids and feed_id not in feed_ids:
             continue
 
-        max_synced = 0
+        max_synced = None
         read_batch_size = 40
+
+        entry_iter = (
+            dao.entries.iter_latest(feed_id, _FIRST_SYNC_MAX_ENTRIES)
+            if synced is None
+            else dao.entries.iter_updated_since(feed_id, synced)
+        )
 
         # Fetch entries that have updated
         marked_unread = 0
         updated_article_count = 0
-        for entry_batch in batched(dao.entries.iter_updated_since(feed_id, synced), read_batch_size):
+        for entry_batch in batched(entry_iter, read_batch_size):
             entry_map = {}
             for entry in entry_batch:
                 entry_map[entry.id] = entry
-                max_synced = max(max_synced, entry.updated or "")
+                if entry.updated:
+                    max_synced = entry.updated if max_synced is None else max(max_synced, entry.updated)
 
             # Batch existing articles
             for article in dao.articles.iter_by_user_by_entry(user_id, *entry_map.keys()):
@@ -91,13 +97,14 @@ def sync_subs(
                 bulk_q.enqueue(article)
 
         # Update sub, if there were changes
-        if updated_article_count:
+        if updated_article_count and max_synced is not None:
             sub = first_or_none(dao.subs.find_by_id(sub_id))
             sub.last_synced = max_synced
             bulk_q.enqueue(sub)
 
 
 _MAX_FEED_CHOICES = 8
+_FIRST_SYNC_MAX_ENTRIES = 100
 
 
 def subscribe_user_unknown_url(
