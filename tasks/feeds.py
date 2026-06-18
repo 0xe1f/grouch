@@ -129,7 +129,7 @@ def _fetch_feeds(
 
     successful = []
     failed = []
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_url = { executor.submit(parse_feed, url):url for url in feed_urls }
         for future in as_completed(future_to_url):
             url = future_to_url[future]

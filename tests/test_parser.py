@@ -13,17 +13,47 @@
 # limitations under the License.
 
 from parser import parse_url
+import functools
+import http.server
 import json
+import socketserver
+import threading
 import unittest
+
+_RESOURCES_DIR = "tests/resources"
+
+# parse_url now fetches over HTTP (with a timeout) instead of reading local
+# paths, so the fixtures are served from a throwaway local HTTP server for the
+# duration of the test module.
+_server = None
+_base_url = None
+
+class _QuietHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+def setUpModule():
+    global _server, _base_url
+    handler = functools.partial(_QuietHandler, directory=_RESOURCES_DIR)
+    _server = socketserver.ThreadingTCPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=_server.serve_forever, daemon=True).start()
+    _base_url = f"http://127.0.0.1:{_server.server_address[1]}"
+
+def tearDownModule():
+    _server.shutdown()
+    _server.server_close()
+
+def _feed_url(filename: str) -> str:
+    return f"{_base_url}/{filename}"
 
 class TestAtomParsing(unittest.TestCase):
 
-    XML_PATH = "tests/resources/feed_atom.xml"
+    XML_FILE = "feed_atom.xml"
     JSON_PATH = "tests/resources/feed_atom.json"
     ENTRY_COUNT = 25
 
     def test_atom_parsing_feed(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -34,6 +64,9 @@ class TestAtomParsing(unittest.TestCase):
         with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
+        # Fixtures are now served over HTTP, so the recorded feed_url no longer
+        # matches; it is asserted separately just below.
+        feed_proto["feed_url"] = feed_url
 
         # Verify items
         self.assertEqual(feed_url, feed.feed_url)
@@ -45,7 +78,7 @@ class TestAtomParsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_atom_parsing_entries(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -71,12 +104,12 @@ class TestAtomParsing(unittest.TestCase):
 
 class TestRss1Parsing(unittest.TestCase):
 
-    XML_PATH = "tests/resources/feed_rss1.xml"
+    XML_FILE = "feed_rss1.xml"
     JSON_PATH = "tests/resources/feed_rss1.json"
     ENTRY_COUNT = 15
 
     def test_rss1_parsing_feed(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -87,6 +120,9 @@ class TestRss1Parsing(unittest.TestCase):
         with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
+        # Fixtures are now served over HTTP, so the recorded feed_url no longer
+        # matches; it is asserted separately just below.
+        feed_proto["feed_url"] = feed_url
 
         # Verify items
         self.assertEqual(feed_url, feed.feed_url)
@@ -98,7 +134,7 @@ class TestRss1Parsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_rss1_parsing_entries(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -124,12 +160,12 @@ class TestRss1Parsing(unittest.TestCase):
 
 class TestRss2Parsing(unittest.TestCase):
 
-    XML_PATH = "tests/resources/feed_rss2.xml"
+    XML_FILE = "feed_rss2.xml"
     JSON_PATH = "tests/resources/feed_rss2.json"
     ENTRY_COUNT = 20
 
     def test_rss2_parsing_feed(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)
@@ -140,6 +176,9 @@ class TestRss2Parsing(unittest.TestCase):
         with open(self.__class__.JSON_PATH) as file:
             proto = json.load(file)
         feed_proto = proto["feed"]
+        # Fixtures are now served over HTTP, so the recorded feed_url no longer
+        # matches; it is asserted separately just below.
+        feed_proto["feed_url"] = feed_url
 
         # Verify items
         self.assertEqual(feed_url, feed.feed_url)
@@ -151,7 +190,7 @@ class TestRss2Parsing(unittest.TestCase):
         self.assertEqual(feed.digest, feed.computed_digest())
 
     def test_rss2_parsing_entries(self):
-        feed_url = self.__class__.XML_PATH
+        feed_url = _feed_url(self.__class__.XML_FILE)
         result = parse_url(feed_url)
 
         self.assertIsNotNone(result)

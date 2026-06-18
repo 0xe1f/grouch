@@ -15,3 +15,7 @@
 MAX_SUMMARY_LEN = 400
 MAX_TITLE_LEN = 128
 MAX_FEED_DESCRIPTION_LEN = 1024
+
+# Per-request timeout (seconds) for fetching remote feed content. feedparser
+# itself offers no timeout, so we fetch with requests and hand the bytes off.
+FEED_FETCH_TIMEOUT_SECS = 10

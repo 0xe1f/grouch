@@ -4,34 +4,6 @@ Items from the TODO/FIXME audit that require further investigation or a separate
 
 ---
 
-## 3. `sync_subs` memory + first-sync cutoff — `tasks/subscriptions.py`
-
-### iterview migration
-
-`find_metadata_by_user_by_synced` in `dao/subscriptions.py` uses `self.db.view(...)`, which materializes the full result set in memory. Every other DAO method uses `iterview`. For users with many subscriptions this creates unnecessary memory pressure.
-
-**Agreed direction:**
-- Rename to `iter_metadata_by_user_by_synced` (matches `iter_*` convention).
-- Convert to a generator using `iterview` with `batch_size=40`.
-- Must **not** use `include_docs=True` — the method reads from `doc.value`, not the full document.
-- Update the call site in `tasks/subscriptions.py`. A long-lived cursor during `sync_subs` processing is acceptable.
-
-### Latent `max_synced` type bug
-
-`max_synced` initializes as `0` (int) and is updated via `max(max_synced, entry.updated or "")`. When `entry.updated` is `None` the fallback becomes `""` (str), which causes a `TypeError` when compared against `0` or a numeric timestamp in Python 3.
-
-**Agreed direction:** Initialize `max_synced = None` and handle `None` explicitly, or filter out entries with no `updated` value. Fix alongside the iterview migration.
-
-### First-sync cutoff
-
-A new subscription (`synced=None`) currently fetches the entire entry history, potentially flooding the user with years of backlog. The agreed direction is a smarter initial cutoff — e.g. "entries from the last 30 days or the top N most recent, whichever is smaller" — but the details are more nuanced than they appear.
-
-**Open questions:**
-- Should "top N" be ordered by `entry.published` or `entry.updated`?
-- Should "top N" guarantee a minimum number of entries even for infrequent feeds, or is 0 results acceptable when nothing falls within the time window?
-- Where does the cutoff logic live — in `sync_subs`, in the DAO, or a dedicated helper?
-- Should the constants (30 days, N articles) be hardcoded or configurable?
-
 ---
 
 ## 4. `articleExtras` dead code — `web/static/js/reader.js`
@@ -55,42 +27,6 @@ A simple count cap is too crude. Options discussed:
 - **Time-boxed runs (recommended):** Stop processing new batches once a deadline is reached (e.g. 90% of the schedule interval). Feeds are already sorted oldest-first, so natural priority is preserved. Requires a `max_runtime_secs` config parameter.
 - **Per-feed Celery tasks:** `refresh_feeds` becomes a coordinator that enqueues one task per feed. Most scalable, but a significant refactor — better suited to its own plan.
 - **Chunked runs with Redis cursor:** Process the next N feeds per run from a stored position. Adds persistent state to manage.
-
----
-
-## 8. `::` separator collision in entity keys — `entity/entity.py`
-
-The `::` separator used in all CouchDB `_id` fields can appear inside key components, causing `decompose_key` to produce extra parts and breaking strict `len(parts)` guards in `extract_owner_id`.
-
-**Susceptible entities:**
-- `Feed` — key is `feed::{feed_url}`. IPv6 URLs (e.g. `https://[::1]/feed`) inject `::`.
-- `Entry` — key is `entry::{feed_url}::{entry_uid}`. `entry_uid` is the raw RSS/Atom `<guid>` field; some publishers use `tag:host,year::path` style GUIDs.
-- `Subscription` — key is `sub::{user_uid}::{feed_url}`. Same feed_url exposure.
-- `Article` — key is `article::{user_uid}::{feed_url}::{entry_uid}`. Both inner components exposed.
-
-**Safe entities:** `User` and `Folder` (all components are `token_urlsafe` base64url, no `:`).
-
-**Immediate low-risk fix (also deferred):** Relax the strict `len(parts)` guards in `extract_owner_id`:
-- `Subscription.extract_owner_id`: `!= 2` → `< 1`
-- `Article.extract_owner_id`: `!= 3` → `< 1`
-
-In both cases `parts[0]` is always the user UID regardless of extra segments from `::` collisions.
-
-**Full-fix options:**
-- **URL-encode components** (`urllib.parse.quote(val, safe='')` turns `::` → `%3A%3A`). Reversible, human-readable; `%` itself encodes to `%25` so it can't re-introduce `::`. Recommended.
-- **Hash components** (SHA-256 hex of `feed_url`, `entry_uid`). Completely collision-free but loses human-readable keys.
-- **Unicode sentinel** (e.g. `\ufff0`). Unlikely in practice but not guaranteed to be absent from arbitrary RSS content.
-
-**Migration scope:** Re-keying requires updating all Feed, Entry, Article, and Subscription `_id` fields, plus all foreign-key references stored in related documents (`feed_id`, `entry_id`, `user_id`). Must be done atomically or with a transition period. A migration script with CouchDB bulk updates would be required.
-
-### UUID-based keys (alternative approach)
-
-Rather than encoding URL-derived components, generate a UUID at creation time for each feed/entry/subscription. UUIDs (v4) are fixed-format hex+hyphens with no `::` — the separator collision problem disappears entirely.
-
-**Open questions:**
-- **Duplicate safety:** With URL-derived keys, the same URL always maps to the same document implicitly. With UUIDs, a lookup table (`feed_url → feed_id`) is needed to prevent duplicate feed documents for the same URL. Right place for the index: CouchDB view, Redis cache, or separate lookup doc?
-- **Entry deduplication:** Entries currently deduplicate on `(feed_id, entry_uid)` via the key. With UUIDs, a view/index on `(feed_id, entry_uid)` must be queried synchronously before assigning a UUID during feed refresh. Is that lookup fast enough?
-- **Migration scope:** Same as the URL-encoding migration — all document `_id` values and foreign-key references must be updated.
 
 ---
 
@@ -138,23 +74,6 @@ Separately, `refresh_feeds` (in `refresh.py`) runs as its own process and can co
 
 ---
 
-## D. Feed parsing has no timeout — `parser/parse.py`
-
-`parse_url` and `parse_feed` call `feedparser.parse(url)` directly. feedparser 6.0.11 has no `timeout` parameter (the maintainer rejected it). A slow or unresponsive remote server will hold a Celery worker indefinitely.
-
-**Agreed direction:**
-- Use `requests.get(url, timeout=FEED_FETCH_TIMEOUT_SECS)` to fetch the content, then pass it to `feedparser.parse()` instead of letting feedparser do the HTTP request.
-- Define `FEED_FETCH_TIMEOUT_SECS = 10` in `parser/consts.py`.
-- Extract a `_fetch_url(url: str) -> tuple[bytes, dict] | None` helper. Both `parse_url` and `parse_feed` call it, then pass `feedparser.parse(content, response_headers=headers)`.
-- Catch `requests.exceptions.RequestException` (covers `Timeout`, `ConnectionError`, etc.) — log and return `None`.
-- Pass `response_headers=dict(response.headers)` to `feedparser.parse()` for correct charset/encoding detection.
-- No `raise_for_status()` — preserve feedparser's "try to parse anything" behavior; existing bozo/version checks already handle bad content.
-- `requests` decompresses gzip/deflate transparently — feedparser's HTTP gzip handling is not missed.
-
-**Note:** ETag/Last-Modified support can be added in the same pass — see the ETag future-work item below.
-
----
-
 ## Future work: ETag / Last-Modified support in feed pipeline
 
 Currently `requests.get` fetches the full feed body on every refresh, ignoring HTTP caching headers. Adding conditional GET support would reduce bandwidth and skip re-parsing unchanged feeds.
@@ -166,3 +85,21 @@ Currently `requests.get` fetches the full feed body on every refresh, ignoring H
 4. Handle `304 Not Modified` responses to skip re-parsing entirely.
 
 Implement as part of the feed pipeline plan alongside favicon fetching (item 9).
+
+---
+
+## Future work: scale up feed-fetch concurrency
+
+`_fetch_feeds` in `tasks/feeds.py` currently fans out via `ThreadPoolExecutor(max_workers=10)`. Two related ideas were discussed and deferred:
+
+- **Raise concurrency (e.g. to ~50).** Effective in-flight count is also capped by `fetch_batch_max = 40` in `refresh_feeds`, so to truly run 50 at once both `max_workers` and `fetch_batch_max` must be raised together. The import path (`import_feeds`) has no batching, so there `max_workers` is the sole cap. This is the lever that actually helps; it overlaps more network wait, especially valuable now that a hung feed caps at the 10s fetch timeout.
+- **Switch to coroutines (asyncio).** Decided *not* worth it at current/near-term scale:
+  - `requests` is blocking, so it would require an async HTTP client (`aiohttp`/`httpx` — new dependency) and async rewrites of the parser entry points.
+  - `feedparser.parse()` + lxml sanitizing are CPU-bound and synchronous; they'd block the event loop, so an executor would still be needed for the parse step. asyncio doesn't escape threads here.
+  - At n≈50, plain threads are fine; asyncio's per-task memory advantage only matters at hundreds–thousands of concurrent connections.
+  - The bottleneck above ~50 shifts off the fetch onto GIL-serialized parsing and CouchDB writes (`BulkUpdateQueue`), neither of which asyncio improves. Prefork Celery (`--concurrency=2`) already provides multi-core parse parallelism.
+
+**Open questions for revisit:**
+- What concurrency do real refresh/import batch sizes justify? (Measure fetch phase vs. parse phase vs. CouchDB write latency before tuning.)
+- At higher concurrency, watch per-worker memory (parsed content held in flight) and CouchDB write-burst latency.
+- If fan-out ever reaches many hundreds, prefer `celery worker --pool=gevent` (cooperative `requests` with no code rewrite) over a full asyncio/`aiohttp` port.

@@ -22,6 +22,7 @@ from parser import consts
 import datetime
 import feedparser
 import logging
+import requests
 import time
 
 _FEED_TYPES = [
@@ -29,10 +30,41 @@ _FEED_TYPES = [
     "application/rss+xml",
 ]
 
+def _fetch_url(url: str) -> tuple[bytes, dict] | None:
+    """Fetch raw feed bytes with a hard timeout.
+
+    feedparser has no timeout of its own, so we do the HTTP request and pass the
+    body to feedparser.parse(). Returns the content and response headers (the
+    latter lets feedparser detect charset/encoding), or None on any request
+    failure (timeout, connection error, etc.). We intentionally do not call
+    raise_for_status() — feedparser's bozo/version checks already handle bad
+    or error-page content.
+    """
+    try:
+        response = requests.get(url, timeout=consts.FEED_FETCH_TIMEOUT_SECS)
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to fetch '{url}': {e}")
+        return None
+
+    # feedparser looks up response headers by lowercase key; requests preserves
+    # the server's casing (e.g. "Content-Type"), so it would otherwise miss the
+    # content type and flag the feed as NonXMLContentType. Drop content-encoding
+    # and content-length too: requests has already transparently decompressed
+    # the body, so those headers no longer describe the bytes we hand off.
+    headers = {
+        k.lower(): v for k, v in response.headers.items()
+        if k.lower() not in ("content-encoding", "content-length")
+    }
+
+    return response.content, headers
+
 def parse_url(url: str) -> ParseResult:
-    if not (doc := feedparser.parse(url)):
+    if not (fetched := _fetch_url(url)):
         logging.error(f"FeedParser returned nothing for '{url}'")
         return None
+
+    content, headers = fetched
+    doc = feedparser.parse(content, response_headers=headers)
 
     if "version" not in doc:
         if "bozo_exception" in doc:
@@ -67,9 +99,12 @@ def parse_url(url: str) -> ParseResult:
     return None
 
 def parse_feed(url: str) -> ParseResult:
-    if not (doc := feedparser.parse(url)):
+    if not (fetched := _fetch_url(url)):
         logging.error(f"No document available for '{url}'")
         return ParseResult(url)
+
+    content, headers = fetched
+    doc = feedparser.parse(content, response_headers=headers)
 
     return _parse_feed(doc, url)
 
