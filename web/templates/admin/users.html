@@ -10,7 +10,7 @@
 <table id="users-table" class="admin-table">
     <thead>
         <tr class="admin-action-row">
-            <th colspan="6">
+            <th colspan="7">
                 <div class="admin-action-bar">
                     <div class="admin-sort-group">
                         <button class="admin-sort-btn" data-sort="username">By Username</button>
@@ -20,6 +20,7 @@
             </th>
         </tr>
         <tr class="admin-col-headers">
+            <th class="col-check"></th>
             <th class="col-username">Username</th>
             <th class="col-email">Email</th>
             <th class="col-subs">Subs</th>
@@ -49,6 +50,7 @@ $(function() {
         if (user.updated) createdTooltip.push("Updated: " + formatDate(user.updated));
         if (user.last_sync) createdTooltip.push("Last sync: " + formatDate(user.last_sync));
 
+        var $check = $("<td />", { "class": "col-check" });
         var $username = $("<td />", { "class": "col-username" }).text(user.username || "");
         var $email    = $("<td />", { "class": "col-email" }).text(user.email_address || "");
         var $subs     = $("<td />", { "class": "col-subs" }).text(user.sub_count);
@@ -59,7 +61,7 @@ $(function() {
         var $actions  = $("<td />", { "class": "col-actions" })
             .append($("<span />", { "class": "admin-action-stub" }).text("Stub"));
 
-        $row.append($username, $email, $subs, $created, $roles, $actions);
+        $row.append($check, $username, $email, $subs, $created, $roles, $actions);
         return $row;
     }
 
