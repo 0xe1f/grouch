@@ -104,6 +104,40 @@ def index():
 def subscriptions():
     return _fetch_table_of_contents().as_dict()
 
+@app.get("/api/feeds/favicon")
+@flask_login.login_required
+def feed_favicon():
+    feed_id = flask.request.args.get("feed_id")
+    if not feed_id:
+        return flask.abort(http.HTTPStatus.BAD_REQUEST)
+    if not stores.subs.user_has_feed(current_user.id, feed_id):
+        return flask.abort(http.HTTPStatus.NOT_FOUND)
+
+    from entity.favicon import STATUS_OK
+    from tasks.favicons import claim_favicon_enqueue
+    from tasks.favicons import favicon_fetch
+    from tasks.favicons import is_favicon_due
+
+    fav = stores.favicons.find_by_feed_id(feed_id)
+    due = is_favicon_due(fav)
+    if due and claim_favicon_enqueue(feed_id):
+        favicon_fetch.delay(feed_id, notify_user_id=current_user.id)
+
+    if fav and fav.status == STATUS_OK and fav.has_display_attachment():
+        data = stores.favicons.get_display_bytes(fav)
+        if data:
+            response = flask.Response(data, mimetype="image/png")
+            etag = fav.content_hash or None
+            if etag:
+                response.set_etag(etag)
+            response.headers["Cache-Control"] = "private, max-age=604800"
+            return response.make_conditional(flask.request)
+
+    placeholder = os.path.join(app.root_path, "static", "favicon.png")
+    response = flask.send_file(placeholder, mimetype="image/png")
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
 @app.get("/articles")
 @flask_login.login_required
 def articles():

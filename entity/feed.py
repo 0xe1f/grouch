@@ -54,15 +54,6 @@ class Feed(Entity):
         self._computed_digest = None
 
     @property
-    def favicon_url(self) -> str:
-        return self.get_prop("favicon_url")
-
-    @favicon_url.setter
-    def favicon_url(self, val: str):
-        self.set_prop("favicon_url", val)
-        self._computed_digest = None
-
-    @property
     def site_url(self) -> str:
         return self.get_prop("site_url")
 
@@ -117,7 +108,7 @@ class Feed(Entity):
 
     def computed_digest(self):
         if not self._computed_digest:
-            hash_keys = [ "feed_url", "title", "description", "favicon_url", "site_url", "published" ]
+            hash_keys = [ "feed_url", "title", "description", "site_url", "published" ]
             hash_doc = { key:self._doc[key] for key in hash_keys if key in self._doc }
             m = hashlib.md5()
             m.update(json.dumps(hash_doc).encode())

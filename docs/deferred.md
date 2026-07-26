@@ -30,9 +30,7 @@ A simple count cap is too crude. Options discussed:
 
 ## 9. Favicon URL — `parser/parse.py`
 
-`content.favicon_url = None` is a commented-out placeholder. Feed objects have a `favicon_url` field that is never populated.
-
-**Agreed direction:** Fetch the favicon as part of the feed fetch pipeline. Full implementation scope to be defined in a feed pipeline plan.
+Implemented: [docs/plans/feed-favicons.md](plans/feed-favicons.md).
 
 ---
 

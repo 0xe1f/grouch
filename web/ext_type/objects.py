@@ -140,7 +140,7 @@ class Subscription(JsonObject):
             self.set_prop("title", sub.title)
             self.set_prop("parent", sub.folder_id)
         if feed:
-            self.set_prop("faviconUrl", feed.favicon_url)
+            self.set_prop("feedId", feed.id)
             self.set_prop("link", feed.site_url)
         if unread_count:
             self.set_prop("unread", unread_count)
@@ -168,8 +168,8 @@ class Subscription(JsonObject):
         self.set_prop("unread", val)
 
     @property
-    def favicon_url(self) -> str:
-        return self._doc.get("faviconUrl")
+    def feed_id(self) -> str:
+        return self._doc.get("feedId")
 
     @property
     def folder_id(self) -> str:

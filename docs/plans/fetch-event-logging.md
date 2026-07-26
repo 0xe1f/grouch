@@ -5,7 +5,7 @@ Record the outcome of every feed we look at during a refresh (304 not-modified, 
 
 ## Decisions (confirmed)
 - Storage: monthly-rotated dedicated CouchDB databases; retention = drop old DB.
-- Design for up to ~5,000 feeds (do not hardcode to current count of 21).
+- Design for up to ~5,000 feeds (do not hardcode to a small deployment size).
 - Autocomplete: prefix-match views.
 
 ## Storage model: monthly-rotated databases

@@ -191,7 +191,6 @@ def _create_feed(
         description = feed.description
     if description:
         content.description = description[:consts.MAX_FEED_DESCRIPTION_LEN]
-    # TODO content.favicon_url = None
     content.site_url = feed.link
     if "updated" in feed:
         content.published = _utc_struct_as_timestamp(feed.updated_parsed)

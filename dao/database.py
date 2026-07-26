@@ -15,6 +15,7 @@
 from .articles import ArticleDao
 from .bulk_update_queue import BulkUpdateQueue
 from .entries import EntryDao
+from .favicons import FaviconDao
 from .feeds import FeedDao
 from .folders import FolderDao
 from .subscriptions import SubscriptionDao
@@ -27,6 +28,7 @@ class Database:
         self._db = db
         self._articles = ArticleDao(db)
         self._entries = EntryDao(db)
+        self._favicons = FaviconDao(db)
         self._feeds = FeedDao(db)
         self._folders = FolderDao(db)
         self._subs = SubscriptionDao(db)
@@ -39,6 +41,10 @@ class Database:
     @property
     def entries(self) -> EntryDao:
         return self._entries
+
+    @property
+    def favicons(self) -> FaviconDao:
+        return self._favicons
 
     @property
     def feeds(self) -> FeedDao:

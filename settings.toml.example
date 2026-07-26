@@ -4,6 +4,10 @@ PERMANENT_SESSION_LIFETIME = 2678400
 # Feed refresh interval in minutes
 REFRESH_INTERVAL_MINUTES = 20
 
+# Favicon re-check cadence (days). Successes are revalidated monthly; failures weekly.
+# FAVICON_OK_REFRESH_DAYS = 30
+# FAVICON_RETRY_DAYS = 7
+
 # Block new user account registrations
 BLOCK_NEW_ACCOUNTS = true
 

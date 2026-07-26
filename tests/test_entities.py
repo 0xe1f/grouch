@@ -37,10 +37,9 @@ class TestFeedContent(unittest.TestCase):
         "feed_url": uuid.uuid4().hex,
         "title": uuid.uuid4().hex,
         "description": uuid.uuid4().hex,
-        "favicon_url": uuid.uuid4().hex,
         "site_url": uuid.uuid4().hex,
         "published": uuid.uuid4().hex,
-    }   
+    }  
 
     def test_feed_properties(self):
         obj = Feed()

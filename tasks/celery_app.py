@@ -30,6 +30,7 @@ celery_app = Celery(
         'tasks.subscriptions',
         'tasks.articles',
         'tasks.folders',
+        'tasks.favicons',
     ],
 )
 
@@ -48,6 +49,10 @@ def get_dao() -> dao.Database:
     if _dao is None:
         raise RuntimeError("Worker not initialized — get_dao() called before @worker_init")
     return _dao
+
+
+def get_redis() -> redis_lib.Redis:
+    return _redis
 
 
 def per_user(func):

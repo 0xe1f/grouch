@@ -22,6 +22,7 @@ class SubscriptionDao(Dao):
     BY_USER_BY_SYNC = "maint/subs_by_user"
     BY_USER_UNREAD_COUNT = "maint/subs_by_user_unread_count"
     COUNT_BY_USER = "maint/subs_count_by_user"
+    BY_FEED = "maint/subs_by_feed"
 
     def find_by_id(
         self,
@@ -97,6 +98,28 @@ class SubscriptionDao(Dao):
         for row in self.db.view(self.__class__.COUNT_BY_USER, keys=user_ids, group=True):
             counts[row.key] = row.value
         return counts
+
+    def user_has_feed(self, user_id: str, feed_id: str) -> bool:
+        rows = list(self.db.view(
+            self.__class__.BY_FEED,
+            key=[feed_id, user_id],
+            limit=1,
+            reduce=False,
+        ))
+        return bool(rows)
+
+    def iter_user_ids_by_feed(self, feed_id: str):
+        options = {
+            "start_key": [feed_id],
+            "end_key": [feed_id, {}],
+            "reduce": False,
+        }
+        seen = set()
+        for item in self.db.view(self.__class__.BY_FEED, **options):
+            user_id = item.key[1]
+            if user_id not in seen:
+                seen.add(user_id)
+                yield user_id
 
     def iter_by_folder(
         self,

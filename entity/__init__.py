@@ -15,6 +15,7 @@
 from entity.article import Article
 from entity.entry import Entry
 from entity.feed import Feed
+from entity.favicon import Favicon
 from entity.entity import Entity
 from entity.folder import Folder
 from entity.subscription import Subscription

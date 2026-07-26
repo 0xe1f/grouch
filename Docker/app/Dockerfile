@@ -3,7 +3,12 @@ FROM python:3.12-slim
 RUN apt update -y && \
     apt install -y \
         cron \
-        tini
+        tini \
+        libcairo2 \
+        libpangocairo-1.0-0 \
+        libgdk-pixbuf-2.0-0 \
+        libffi-dev \
+        shared-mime-info
 
 ARG HTTP_PORT
 ARG GIT_HASH=dev

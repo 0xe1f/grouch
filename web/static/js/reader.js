@@ -364,7 +364,10 @@
             return this.link;
         },
         "getFavIconUrl": function() {
-            return this.favIconUrl;
+            if (!this.feedId) {
+                return null;
+            }
+            return "/api/feeds/favicon?feed_id=" + encodeURIComponent(this.feedId);
         },
         "getChildren": function() {
             var subscription = this;
@@ -2047,23 +2050,19 @@
         var newSubscriptions = [];
         var markedFirstSub = false;
 
-        const faviconless = $.map($(".subscription.no-favicon:not(.folder)"), function(e) {
-            return $(e).data("subscription").id;
-        });
         var subMap = generateSubscriptionMap(userSubscriptions);
         var createSubDom = function(subscription) {
-            const url = URL.parse(subscription.link);
-            var favicon = transparentIcon;
-            if (url && $.inArray(subscription.id, faviconless) == -1) {
-                url.pathname = "/favicon.ico";
-                favicon = url.toString();
-            }
+            var favicon = subscription.getFavIconUrl ? subscription.getFavIconUrl() : null;
             var faviconClass = "";
-            if (!subscription.isFolder()) {
-                faviconClass = (favicon == transparentIcon) ? " no-favicon" : "";
+            if (!subscription.isFolder() && !favicon) {
+                faviconClass = " no-favicon";
+                favicon = transparentIcon;
+            } else if (!favicon) {
+                favicon = transparentIcon;
             }
             var $subscription = $("<li />", { "class" : `subscription ${subscription.domId} ${faviconClass}` })
                 .attr("data-sub-id", subscription.readableId())
+                .attr("data-feed-id", subscription.feedId || "")
                 .data("subscription", subscription)
                 .append($("<div />", { "class" : "subscription-item" })
                     .append($("<span />", { "class" : "chevron" })
@@ -2362,6 +2361,17 @@
         .on("warning", function(data) {
             console.debug(`Warning received: ${data}`);
             if (data) ui.showToast(data, true);
+        })
+        .on("favicon", function(data) {
+            if (!data || !data.feedId || !data.url) {
+                return;
+            }
+            $(".subscription").filter(function() {
+                return $(this).attr("data-feed-id") === data.feedId;
+            })
+                .removeClass("no-favicon")
+                .find("> .subscription-item > .subscription-icon")
+                .attr("src", data.url);
         });
 
     ui.init();

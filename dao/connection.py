@@ -19,7 +19,7 @@ import logging
 _METADATA_KEY = "$store_metadata"
 _METADATA_SCHEMA_VERSION = "schema_version"
 
-_SCHEMA_VERSION_CURRENT = 3
+_SCHEMA_VERSION_CURRENT = 4
 
 class Connection:
 
@@ -278,6 +278,21 @@ class Connection:
                         }
                     """,
                     "reduce": "_count"
+                },
+            )
+
+        if from_ver < 4:
+            # Compound key for favicon auth / per-feed subscriber lookup.
+            self.add_views(
+                design_doc,
+                subs_by_feed={
+                    "map": """
+                        function (doc) {
+                            if (doc.doc_type == 'sub') {
+                                emit([doc.feed_id, doc.user_id]);
+                            }
+                        }
+                    """
                 },
             )
 
