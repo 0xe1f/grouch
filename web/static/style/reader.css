@@ -282,6 +282,10 @@ a.gofr-entry-title:hover {
     margin: 0.7em 0;
 }
 
+.gofr-article-body * {
+    width: unset !important;
+}
+
 .gofr-article-body a {
     color: #0000ff;
     text-decoration: underline;
