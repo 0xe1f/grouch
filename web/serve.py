@@ -114,12 +114,16 @@ def feed_favicon():
         return flask.abort(http.HTTPStatus.NOT_FOUND)
 
     from entity.favicon import STATUS_OK
+    from entity.favicon import is_favicon_due
     from tasks.favicons import claim_favicon_enqueue
     from tasks.favicons import favicon_fetch
-    from tasks.favicons import is_favicon_due
 
     fav = stores.favicons.find_by_feed_id(feed_id)
-    due = is_favicon_due(fav)
+    due = is_favicon_due(
+        fav,
+        ok_refresh_days=int(app.config.get("FAVICON_OK_REFRESH_DAYS", 30)),
+        retry_days=int(app.config.get("FAVICON_RETRY_DAYS", 7)),
+    )
     if due and claim_favicon_enqueue(feed_id):
         favicon_fetch.delay(feed_id, notify_user_id=current_user.id)
 

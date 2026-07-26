@@ -19,27 +19,14 @@ from entity.favicon import STATUS_OK
 from parser.favicon import build_display_png
 from parser.favicon import discover_favicon
 from parser.favicon import hash_bytes
-from common.config import load_config
 from tasks.celery_app import celery_app
 from tasks.celery_app import get_dao
 from tasks.celery_app import get_redis
 import logging
 import time
 
-_config = load_config()
-FAVICON_OK_REFRESH_DAYS = int(_config.get("FAVICON_OK_REFRESH_DAYS", 30))
-FAVICON_RETRY_DAYS = int(_config.get("FAVICON_RETRY_DAYS", 7))
 FAVICON_QUEUE_TTL_SECS = 600
 FAVICON_LOCK_TTL_SECS = 600
-
-
-def is_favicon_due(favicon: Favicon | None, now: float | None = None) -> bool:
-    now = now if now is not None else time.time()
-    if favicon is None or not favicon.checked_at:
-        return True
-    if favicon.status == STATUS_OK and favicon.has_display_attachment():
-        return now - float(favicon.checked_at) >= FAVICON_OK_REFRESH_DAYS * 86400
-    return now - float(favicon.checked_at) >= FAVICON_RETRY_DAYS * 86400
 
 
 def claim_favicon_enqueue(feed_id: str) -> bool:

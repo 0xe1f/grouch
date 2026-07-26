@@ -22,7 +22,7 @@ from parser.favicon import MAX_BYTES
 from parser.favicon import build_display_png
 from parser.favicon import hash_bytes
 from PIL import Image
-from tasks.favicons import is_favicon_due
+from entity.favicon import is_favicon_due
 import base64
 import time
 import unittest

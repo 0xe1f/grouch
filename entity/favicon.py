@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .entity import Entity
+import time
 
 STATUS_OK = "ok"
 STATUS_MISSING = "missing"
@@ -20,6 +21,24 @@ STATUS_FAILED = "failed"
 
 ATTACHMENT_ORIGINAL = "original"
 ATTACHMENT_DISPLAY = "display"
+
+# Defaults; callers may override from settings (FAVICON_OK_REFRESH_DAYS / FAVICON_RETRY_DAYS).
+DEFAULT_OK_REFRESH_DAYS = 30
+DEFAULT_RETRY_DAYS = 7
+
+
+def is_favicon_due(
+    favicon: "Favicon | None",
+    now: float | None = None,
+    ok_refresh_days: int = DEFAULT_OK_REFRESH_DAYS,
+    retry_days: int = DEFAULT_RETRY_DAYS,
+) -> bool:
+    now = now if now is not None else time.time()
+    if favicon is None or not favicon.checked_at:
+        return True
+    if favicon.status == STATUS_OK and favicon.has_display_attachment():
+        return now - float(favicon.checked_at) >= ok_refresh_days * 86400
+    return now - float(favicon.checked_at) >= retry_days * 86400
 
 
 class Favicon(Entity):
