@@ -14,6 +14,7 @@
 
 from celery import Celery
 from celery.signals import worker_init
+from celery.signals import worker_process_init
 from common.config import load_config
 import dao
 import functools
@@ -47,7 +48,7 @@ _redis = redis_lib.Redis.from_url(_config['REDIS_URL'])
 
 def get_dao() -> dao.Database:
     if _dao is None:
-        raise RuntimeError("Worker not initialized — get_dao() called before @worker_init")
+        raise RuntimeError("Worker not initialized — get_dao() called before worker init")
     return _dao
 
 
@@ -67,9 +68,11 @@ def per_user(func):
     return wrapper
 
 
-@worker_init.connect
-def init_worker(**kwargs):
+def _init_dao(**kwargs):
+    # Prefork children need their own connection (worker_init alone is parent-only).
     global _dao
+    if _dao is not None:
+        return
     conn = dao.Connection()
     conn.connect(
         _config['DATABASE_NAME'],
@@ -79,3 +82,16 @@ def init_worker(**kwargs):
         _config.get('DATABASE_PORT'),
     )
     _dao = dao.Database(conn.db)
+
+
+@worker_init.connect
+def init_worker(**kwargs):
+    _init_dao(**kwargs)
+
+
+@worker_process_init.connect
+def init_worker_process(**kwargs):
+    global _dao
+    # After fork the parent's handle is unsafe; always reconnect in the child.
+    _dao = None
+    _init_dao(**kwargs)
