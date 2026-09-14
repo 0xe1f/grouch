@@ -1353,6 +1353,12 @@
                 startX = startY = undefined;
             }
 
+            // Pinch-zoom pan should own horizontal touch; don't steal it for article nav.
+            function isPinchZoomed() {
+                const vv = window.visualViewport;
+                return !!(vv && vv.scale > 1.01);
+            }
+
             function showSwipeIndicator(direction) {
                 $("#swipe-indicator")
                     .stop(true, true)
@@ -1382,7 +1388,8 @@
                             axis = dx > dy ? 'horizontal' : 'vertical';
                         }
                     }
-                    if (axis === 'horizontal') {
+                    // Don't steal horizontal pans while pinch-zoomed.
+                    if (axis === 'horizontal' && !isPinchZoomed()) {
                         e.preventDefault();
                     }
                 },
@@ -1391,7 +1398,7 @@
             container.addEventListener(
                 'touchend',
                 function(e) {
-                    if (axis === 'horizontal') {
+                    if (axis === 'horizontal' && !isPinchZoomed()) {
                         const dx = e.changedTouches[0].clientX - startX;
                         if (Math.abs(dx) >= SWIPE_THRESHOLD) {
                             const direction = dx < 0 ? 1 : -1;
