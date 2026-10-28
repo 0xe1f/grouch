@@ -81,4 +81,14 @@ _ssh "
     NETWORK=$NETWORK ./run.sh
 "
 
+# Ensure Let's Encrypt renewal cron is present (idempotent). First-time setup
+# installs this, but it was easy to lose if DOMAIN was added later or crontab
+# was rewritten — deploy should keep it healthy.
+DOMAIN=$(grep '^DOMAIN' "$SCRIPT_DIR/settings.toml" 2>/dev/null | cut -d= -f2- | tr -d ' "' | head -1)
+if [ -n "$DOMAIN" ]; then
+    echo "==> Ensuring Let's Encrypt renewal cron"
+    CRON_CMD="docker exec nginx.$NETWORK /usr/local/bin/certbot-renew.sh >> /var/log/grouch-certbot.log 2>&1"
+    _ssh "crontab -l 2>/dev/null | grep -qF '$CRON_CMD' || { crontab -l 2>/dev/null; echo '0 3 * * 1 $CRON_CMD'; } | crontab -"
+fi
+
 echo "==> Done."

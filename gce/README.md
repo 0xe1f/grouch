@@ -93,7 +93,7 @@ With `DOMAIN` set:
 
 - Certificates are stored in a Docker volume (`letsencrypt`) on the VM and survive image rebuilds — no re-issuance happens on every deploy.
 
-- `gce/first-time-setup.sh` installs a weekly renewal cron job on the VM (`0 3 * * 1`). Renewal runs inside the nginx container via `docker exec` with no downtime.
+- `gce/first-time-setup.sh` and `gce/deploy.sh` ensure a weekly renewal cron job on the VM (`0 3 * * 1`). Renewal runs inside the nginx container via `docker exec` with no downtime.
 
 ## SSH Access
 
